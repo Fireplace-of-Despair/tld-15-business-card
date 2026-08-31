@@ -13,9 +13,6 @@
   <PropertyGroup Label="Analysis">
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-minimum</AnalysisLevel>
-    <!-- IDE0005 (remove unnecessary usings) runs only when the compiler writes the documentation
-         file. This project is an application, not a library, so CS1591 stays off. CLAUDE.md section 9
-         asks for an XML summary on a library project such as StainlessCore. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
