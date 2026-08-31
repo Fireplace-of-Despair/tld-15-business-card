@@ -2,6 +2,7 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace tld15Server.Composition;
 
@@ -121,6 +122,9 @@ public static class Globals
         {"en", "English"},
         {"ja", "日本語"}
     };
+
+    /// <summary> The locale a page falls back to when the requested one holds no translation </summary>
+    public static string LanguageFallback => Locales.First().Key;
 
     public static class Page
     {

@@ -20,7 +20,7 @@ namespace tld15ServerTests.Application.IntegrationTests.Features.Sessions;
 [Collection(DatabaseCollection.Name)]
 public class SessionsWipeFeature_Tests
 {
-    private const string _feature = "stainless_tasks.pull";
+    private const string _feature = "profile.get";
 
     private static readonly DateTimeOffset _expiration = DateTimeOffset.UtcNow.AddMinutes(480);
 

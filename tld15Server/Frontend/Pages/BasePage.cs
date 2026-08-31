@@ -40,7 +40,7 @@ public abstract class BasePage : ComponentBase, IDisposable
         {
             var culture = CultureInfo.CurrentUICulture.Name;
 
-            return Globals.Locales.ContainsKey(culture) ? culture : Globals.Locales.First().Key;
+            return Globals.Locales.ContainsKey(culture) ? culture : Globals.LanguageFallback;
         }
     }
     internal IncidentCode? IncidentCode { get; set; } = null;

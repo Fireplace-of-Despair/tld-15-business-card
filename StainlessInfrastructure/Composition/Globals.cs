@@ -19,6 +19,7 @@ internal static class Globals
         internal const int ContentId = 64;
         internal const int DivisionId = 3;
         internal const int ProjectId = 64;
+        internal const int ProjectTypeId = 64;
         internal const int LanguageId = 4;
     }
 

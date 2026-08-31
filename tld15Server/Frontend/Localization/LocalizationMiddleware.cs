@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using tld15Server.Composition;
@@ -17,7 +16,7 @@ public sealed class LocalizationMiddleware(RequestDelegate next)
 
         if (string.IsNullOrWhiteSpace(userLanguage) || !Globals.Locales.ContainsKey(userLanguage))
         {
-            userLanguage = Globals.Locales.First().Key;
+            userLanguage = Globals.LanguageFallback;
         }
 
         var culture = CultureInfo.GetCultureInfo(userLanguage);
