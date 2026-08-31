@@ -10,28 +10,12 @@
 <InitializeBrowserTime @rendermode="InteractiveServer" />
 
 <header>
-    <a class="name" href="@Pages.Home.Url" rel="canonical">
-        <img class="logo" src="@Assets["images/logo.png"]" alt="@Localizer["Brand"]" />
+    <a class="brand-header-name" href="@Pages.Home.Url" rel="canonical">
         @Localizer["Brand"]
     </a>
-
-    <div class="filler"></div>
-    <AuthorizeView>
-        <Authorized>
-            <a class="icon-button logo"
-               href="@Pages.Identity.LogoutPage.Url">
-               <Logout /></a>
-        </Authorized>
-        <NotAuthorized>
-            <a class="icon-button logo"
-               href="@Pages.Identity.LoginPage.Url"><Login /></a>
-        </NotAuthorized>
-    </AuthorizeView>
-
-    <a class="icon-button logo"
-       href="@Pages.Settings.ChangeLanguagePage.Url">
-       <Translate />
-   </a>
+    <div class="brand-header-slogan">
+        <i>@Localizer["Brand.Slogan"]</i>
+    </div>
 </header>
 
 <div class="page">
@@ -51,6 +35,23 @@
 </div>
 
 <footer>
+    <AuthorizeView>
+        <Authorized>
+            <a class="icon-button logo"
+               href="@Pages.Identity.LogoutPage.Url">
+                <Logout />
+            </a>
+        </Authorized>
+        <NotAuthorized>
+            <a class="icon-button logo"
+               href="@Pages.Identity.LoginPage.Url"><Login /></a>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <a class="icon-button logo"
+       href="@Pages.Settings.ChangeLanguagePage.Url">
+        <Translate />
+    </a>
     <div class="copyright">
         @DateTimeOffset.UtcNow.Year © @Localizer["Brand.Company"]
     </div>

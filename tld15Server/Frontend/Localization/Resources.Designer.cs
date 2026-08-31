@@ -205,6 +205,15 @@ namespace tld15Server.Frontend.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Articles.
+        /// </summary>
+        internal static string Articles {
+            get {
+                return ResourceManager.GetString("Articles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fireplace of Despair.
         /// </summary>
         internal static string Brand {
@@ -759,6 +768,15 @@ namespace tld15Server.Frontend.Localization {
         internal static string Project_Weight {
             get {
                 return ResourceManager.GetString("Project.Weight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Projects.
+        /// </summary>
+        internal static string Projects {
+            get {
+                return ResourceManager.GetString("Projects", resourceCulture);
             }
         }
         

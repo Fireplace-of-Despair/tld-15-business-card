@@ -384,4 +384,10 @@
   <data name="Profile" xml:space="preserve">
     <value>プロフィール</value>
   </data>
+  <data name="Articles" xml:space="preserve">
+    <value>記事</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>プロジェクト</value>
+  </data>
 </root>

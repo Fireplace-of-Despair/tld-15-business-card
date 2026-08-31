@@ -1,6 +1,4 @@
-﻿@using System.Globalization
-@using tld15Server.Composition
-@using tld15Server.Frontend.Components.Common
+﻿@using tld15Server.Frontend.Components.Common
 @attribute [Route(Home.Url)]
 @rendermode InteractiveServer
 @inherits BasePage
@@ -74,7 +72,7 @@
 @if (Articles.Any())
 {
     <div class="component-container-column">
-        <h2 id="articles" class="component-title">Articles</h2>
+        <h2 id="articles" class="component-title">@Localizer["Articles"]</h2>
 
         <div class="articles-container">
             @foreach (var article in Articles)
@@ -88,7 +86,7 @@
 @if (Projects.Any())
 {
     <div class="component-container-column">
-        <h2 id="projects" class="component-title">Projects</h2>
+        <h2 id="projects" class="component-title">@Localizer["Projects"]</h2>
         <div class="articles-container">
             @foreach (var project in Projects)
             {

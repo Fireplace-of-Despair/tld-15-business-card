@@ -25,7 +25,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
-    font-size: 17px;
+    font-size: 20px;
 }
 
 h1 {
@@ -36,10 +36,19 @@ h1 {
 }
 
 h2 {
-    font-size: 30px;
+    font-family: "Park Lane NF";
+    font-size: 35px;
     margin-top: 2px;
     margin-bottom: 2px;
     font-weight: 450;
+}
+
+@font-face {
+    font-family: "Park Lane NF";
+    src: url(../fonts/park_lane_nf.woff2) format("woff2"), url(../fonts/park_lane_nf.woff) format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 /* ------------------------------------------------------------ */
