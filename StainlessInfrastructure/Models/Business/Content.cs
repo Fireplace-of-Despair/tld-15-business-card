@@ -27,7 +27,7 @@ public sealed class Content : IVersionLocal, IUpdatable
 [Table("content_translation", Schema = Globals.Schema.Business)]
 public sealed class ContentTranslation : IVersionLocal, IUpdatable
 {
-    [Key, Column("id")]
+    [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.None)]
     public required Guid Id { get; set; }
 
     [Column("content_id")]

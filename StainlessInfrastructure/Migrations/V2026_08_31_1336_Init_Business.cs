@@ -69,6 +69,7 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .OnColumn("language_id").Ascending()
             .WithOptions().Unique();
         this.AttachLocalVersionTrigger("project_type_translation", Globals.Schema.Reference);
+        this.FillBasicReferenceTable("project_type", Globals.Schema.Reference, "project_types.json");
 
 
         Create.Table("content")

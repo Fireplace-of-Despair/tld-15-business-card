@@ -150,6 +150,9 @@
   <data name="Account.Features" xml:space="preserve">
     <value>機能</value>
   </data>
+  <data name="Articles" xml:space="preserve">
+    <value>記事</value>
+  </data>
   <data name="Brand" xml:space="preserve">
     <value>Fireplace of Despair</value>
   </data>
@@ -189,6 +192,39 @@
   <data name="Common.UserAgent" xml:space="preserve">
     <value>ユーザーエージェント</value>
   </data>
+  <data name="Content" xml:space="preserve">
+    <value>コンテンツ</value>
+  </data>
+  <data name="Content.Icon" xml:space="preserve">
+    <value>アイコン</value>
+  </data>
+  <data name="Content.Icon.Language" xml:space="preserve">
+    <value>アイコンの言語</value>
+  </data>
+  <data name="Content.Id" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Content.Language" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="Content.Link" xml:space="preserve">
+    <value>リンク</value>
+  </data>
+  <data name="Content.Links" xml:space="preserve">
+    <value>リンク一覧</value>
+  </data>
+  <data name="Content.Translation.Language" xml:space="preserve">
+    <value>翻訳</value>
+  </data>
+  <data name="Content.Validation.Duplicate" xml:space="preserve">
+    <value>このアイコンとこの言語の組み合わせは他の行が既に使っています。</value>
+  </data>
+  <data name="Content.Validation.Language" xml:space="preserve">
+    <value>ラテン文字3文字まで。空欄は〇〇になります。</value>
+  </data>
+  <data name="Contents" xml:space="preserve">
+    <value>コンテンツ一覧</value>
+  </data>
   <data name="Identity" xml:space="preserve">
     <value>認証</value>
   </data>
@@ -221,6 +257,9 @@
   </data>
   <data name="Incident.TooManyAttempts" xml:space="preserve">
     <value>ログイン試行が多すぎます。しばらくしてからもう一度お試しください。</value>
+  </data>
+  <data name="Menu.Content" xml:space="preserve">
+    <value>コンテンツ</value>
   </data>
   <data name="Sessions" xml:space="preserve">
     <value>セッション</value>

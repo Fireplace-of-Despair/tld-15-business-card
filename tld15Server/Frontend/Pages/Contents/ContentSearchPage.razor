@@ -1,0 +1,61 @@
+﻿@attribute [Route(ContentSearchPage.Url)]
+@inherits BasePage
+@rendermode InteractiveServer
+@using tld15Server.Frontend.Components.Common
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Contents"]
+</PageTitle>
+
+<div class="component-container-column">
+    <h1>@Localizer["Contents"]</h1>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (_items.Count == 0)
+{
+    <div class="component-container-column">
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    </div>
+    return;
+}
+
+<div class="component-container-column">
+    <table>
+        <thead>
+            <tr>
+                <th>@Localizer["Content"]</th>
+                <th>@Localizer["Content.Id"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in _items)
+            {
+                <tr @key="item.Id">
+                    <td>
+                        <NavLink href="@($"{ContentEditPage.Url}/{item.Id}")">
+                            @item.Title
+                        </NavLink>
+                    </td>
+                    <td>
+                        @item.Id
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

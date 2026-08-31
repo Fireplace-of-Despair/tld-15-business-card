@@ -11,6 +11,19 @@
 <input type="checkbox" class="navbar-toggler" />
 
 <nav>
+    <NavAccordion Title="@Localizer["Menu.Content"]"
+                  ActiveUrls='new[]
+                                      {
+                                          Pages.Contents.ContentSearchPage.Url, Pages.Contents.ContentEditPage.Url
+                                      }'>
+
+        <Restricted Feature="@Features.Contents.ContentSearchFeature.Id">
+            <NavLink href="@Pages.Contents.ContentSearchPage.Url">
+                @Localizer["Contents"]
+            </NavLink>
+        </Restricted>
+    </NavAccordion>
+
     <NavAccordion Title="@Localizer["Menu.System"]"
                   ActiveUrls='new[]
                                       {

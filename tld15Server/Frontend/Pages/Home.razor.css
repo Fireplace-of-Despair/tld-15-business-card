@@ -8,15 +8,23 @@
     margin-bottom: 10px;
 }
 
+/* The icon is inline SVG painted with currentColor, so the colour of the link is the colour of the icon. */
 ::deep .social-button {
-    object-fit: cover;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 50px;
     height: 50px;
-    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7484%) hue-rotate(203deg) brightness(103%) contrast(101%);
+    color: var(--color-text);
 }
 
+    ::deep .social-button svg {
+        width: 100%;
+        height: 100%;
+    }
+
     ::deep .social-button:hover {
-        filter: brightness(0) saturate(100%) invert(40%) sepia(56%) saturate(5293%) hue-rotate(342deg) brightness(94%) contrast(93%);
+        color: var(--color-highlight-hard);
     }
 
 .articles-container {

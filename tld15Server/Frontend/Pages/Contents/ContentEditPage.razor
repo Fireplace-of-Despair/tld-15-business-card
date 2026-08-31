@@ -1,0 +1,125 @@
+﻿@attribute [Route($"{ContentEditPage.Url}/{ContentEditPage.UrlParamId}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Common.Update"] @Localizer["Content"]
+</PageTitle>
+
+<div class="component-container-column">
+    <h1>@(_content == null ? Localizer["Content"].Value : _content.Title)</h1>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (_content == null)
+{
+    return;
+}
+
+<div class="component-container-column">
+    <div class="container-header">
+        <button class="icon-button" type="button" @onclick="AddLink">
+            <Plus />
+        </button>
+        <h2>@Localizer["Content.Links"]</h2>
+    </div>
+
+    @if (_links.Count == 0)
+    {
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>@Localizer["Content.Icon"]</th>
+                    <th>@Localizer["Content.Icon.Language"]</th>
+                    <th>@Localizer["Content.Translation.Language"]</th>
+                    <th>@Localizer["Content.Link"]</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var link in _links)
+                {
+                    var issue = Validate(link);
+
+                    <tr @key="link">
+                        <td>
+                            <div class="link-icon-cell">
+                                <span class="link-icon">@IconHelper.GetIcon(link.Icon)</span>
+                                <select @bind="link.Icon">
+                                    @foreach (var option in IconOptions(link))
+                                    {
+                                        <option value="@option">@option</option>
+                                    }
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <input class="link-language @(issue == RowIssue.None ? string.Empty : "invalid")"
+                                   type="text"
+                                   maxlength="3"
+                                   placeholder="@IconHelper.GetLanguage(string.Empty)"
+                                   @bind="link.Language"
+                                   @bind:event="oninput" />
+
+                            @if (issue == RowIssue.Language)
+                            {
+                                <span class="link-error">@Localizer["Content.Validation.Language"]</span>
+                            }
+                            else if (issue == RowIssue.Duplicate)
+                            {
+                                <span class="link-error">@Localizer["Content.Validation.Duplicate"]</span>
+                            }
+                        </td>
+                        <td>
+                            <select @bind="link.TranslationLanguageId">
+                                @foreach (var language in _content.Languages)
+                                {
+                                    <option value="@language.Key">@language.Value</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <input class="link-url" type="url" @bind="link.Url" />
+                        </td>
+                        <td>
+                            <button class="icon-button" type="button" @onclick="() => DeleteLink(link)">
+                                <Minus />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<VersionInfo UpdatableModel="@_content" VersionLocalModel="@_content" />
+
+<div class="component-container-row">
+    <AuthorizeView Policy="@Features.Contents.ContentPostFeature.Id">
+        <Authorized>
+            <button disabled="@(!CanSave)" @onclick="() => Save()">@Localizer["Common.Save"]</button>
+        </Authorized>
+    </AuthorizeView>
+</div>

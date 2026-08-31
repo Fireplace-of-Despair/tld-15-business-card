@@ -60,6 +60,8 @@ public static class Globals
         public static string Social => "social";
         public static string Contacts => "contacts";
         public static string Press => "press";
+
+        public static string[] LinkEditable => [Social, Contacts];
     }
 
     public static class CustomClaim

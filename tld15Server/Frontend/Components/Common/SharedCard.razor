@@ -8,7 +8,7 @@
             @if (string.IsNullOrEmpty(SharedCardContent.PosterUrl))
             {
                 <img class="article-image" loading="lazy"
-                     src="/images/placeholder/SharedCardContent.png"
+                     src="/images/placeholder/project.png"
                      alt="@SharedCardContent.PosterAlt"
                      aria-labelledby="@SharedCardContent.PosterAlt">
             }
@@ -54,9 +54,9 @@
                             @IconHelper.GetLanguage(@link.Key)
                         }
                     </div>
-                    <img class="external-button-icon" loading="lazy"
-                         src="@IconHelper.GetIcon(@link.Key)"
-                         alt="@link.Key">
+                    <span class="external-button-icon" aria-label="@link.Key">
+                        @IconHelper.GetIcon(link.Key)
+                    </span>
                 </a>
             }
     }

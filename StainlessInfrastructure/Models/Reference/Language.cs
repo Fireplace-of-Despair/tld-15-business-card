@@ -8,7 +8,7 @@ using StainlessInfrastructure.Composition;
 
 namespace StainlessInfrastructure.Models.Reference;
 
-[Table("language", Schema = Globals.Schema.Identity)]
+[Table("language", Schema = Globals.Schema.Reference)]
 public sealed class Language : IVersionLocal
 {
     [Key, Column("id")]

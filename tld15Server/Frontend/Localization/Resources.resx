@@ -150,6 +150,9 @@
   <data name="Account.Features" xml:space="preserve">
     <value>Features</value>
   </data>
+  <data name="Articles" xml:space="preserve">
+    <value>Articles</value>
+  </data>
   <data name="Brand" xml:space="preserve">
     <value>Fireplace of Despair</value>
   </data>
@@ -189,6 +192,39 @@
   <data name="Common.UserAgent" xml:space="preserve">
     <value>User Agent</value>
   </data>
+  <data name="Content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Content.Icon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="Content.Icon.Language" xml:space="preserve">
+    <value>Icon language</value>
+  </data>
+  <data name="Content.Id" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="Content.Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Content.Link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="Content.Links" xml:space="preserve">
+    <value>Links</value>
+  </data>
+  <data name="Content.Translation.Language" xml:space="preserve">
+    <value>Translation</value>
+  </data>
+  <data name="Content.Validation.Duplicate" xml:space="preserve">
+    <value>Another row already carries this icon in this language.</value>
+  </data>
+  <data name="Content.Validation.Language" xml:space="preserve">
+    <value>Up to three latin letters, or empty for 〇〇.</value>
+  </data>
+  <data name="Contents" xml:space="preserve">
+    <value>Contents</value>
+  </data>
   <data name="Identity" xml:space="preserve">
     <value>Identity</value>
   </data>
@@ -221,6 +257,9 @@
   </data>
   <data name="Incident.TooManyAttempts" xml:space="preserve">
     <value>Too many sign-in attempts. Try again later.</value>
+  </data>
+  <data name="Menu.Content" xml:space="preserve">
+    <value>Content</value>
   </data>
   <data name="Sessions" xml:space="preserve">
     <value>Sessions</value>

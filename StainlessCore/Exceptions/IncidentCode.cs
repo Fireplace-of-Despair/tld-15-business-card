@@ -38,8 +38,11 @@ public enum IncidentCode
     /// <summary> The password does not match the stored hash. </summary>
     WrongPassword = 2_000,
 
-    /// <summary> Reserved for a validation failure. No production code throws this code. </summary>
+    /// <summary> General validation error</summary>
     Validation = 10_000,
+
+    /// <summary> The request carries a value that a feature refuses to store. </summary>
+    ValidationCoreMissmatch = 10_001,
 }
 
 /// <summary> Maps an <see cref="IncidentCode"/> onto an HTTP status code. </summary>

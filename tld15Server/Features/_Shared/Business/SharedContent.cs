@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
+﻿// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (c) 2025 Fireplace of Despair
+
+using System.Collections.Generic;
 
 namespace tld15Server.Features.Shared.Business;
 
@@ -10,18 +12,8 @@ public sealed class SharedContent
     public string? Html { get; set; } = null;
     public string? Json { get; set; } = null;
 
-    private static readonly JsonSerializerOptions jsonSerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
-
     public Dictionary<string, string> JsonToDictionary()
     {
-        if (string.IsNullOrEmpty(Json))
-        {
-            return [];
-        }
-
-        return JsonSerializer.Deserialize<Dictionary<string, string>>(Json, jsonSerializerOptions) ?? [];
+        return ContentJson.ToDictionary(Json);
     }
 }

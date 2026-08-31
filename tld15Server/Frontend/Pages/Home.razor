@@ -103,11 +103,8 @@
         <div class="social-container">
             @foreach (var link in @Social.JsonToDictionary())
             {
-                <a href="@link.Value">
-                    <img class="social-button"
-                         src="@IconHelper.GetIcon(link.Key)"
-                         alt="@link.Key"
-                         aria-labelledby="@link.Key">
+                <a class="social-button" href="@link.Value" title="@link.Key" aria-label="@link.Key">
+                    @IconHelper.GetIcon(link.Key)
                 </a>
             }
         </div>
@@ -121,11 +118,8 @@
         <div class="social-container">
             @foreach (var link in @Contacts.JsonToDictionary())
             {
-                <a href="@link.Value">
-                    <img class="social-button"
-                         src="@IconHelper.GetIcon(link.Key)"
-                         alt="@link.Key"
-                         aria-labelledby="@link.Key">
+                <a class="social-button" href="@link.Value" title="@link.Key" aria-label="@link.Key">
+                    @IconHelper.GetIcon(link.Key)
                 </a>
             }
         </div>

@@ -22,7 +22,7 @@ public sealed class Division : IVersionLocal
 [Table("division_translation", Schema = Globals.Schema.Reference)]
 public sealed class DivisionTranslation : IVersionLocal
 {
-    [Key, Column("id")]
+    [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.None)]
     public required Guid Id { get; set; }
 
     [Column("division_id")]

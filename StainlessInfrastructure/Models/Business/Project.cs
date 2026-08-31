@@ -61,7 +61,7 @@ public sealed class Project : IVersionLocal, IUpdatable
 [Table("project_translation", Schema = Globals.Schema.Business)]
 public sealed class ProjectTranslation : IVersionLocal, IUpdatable
 {
-    [Key, Column("id")]
+    [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.None)]
     public required Guid Id { get; set; }
 
     [Column("project_id")]

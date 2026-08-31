@@ -10,6 +10,7 @@ using Mediator;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 using tld15Server.Composition;
 using tld15Server.Features.Identity;
 using tld15Server.Features.Shared.System;
@@ -34,6 +35,8 @@ public class CookieStateProvider(
     {
         if (httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated != true)
         {
+            // No context of its own: an interactive circuit reads the state it was started with,
+            // and nothing here signs anybody out.
             return _anonymousState;
         }
 
@@ -42,33 +45,30 @@ public class CookieStateProvider(
 
         if (!Guid.TryParse(cookieSession?.Value ?? string.Empty, out var sessionId))
         {
-            await SignOutAsync();
-            return _anonymousState;
+            return await SignOutAsync(null, "the principal carries no session claim");
         }
 
         var session = cacheManager.GetSessionById(sessionId);
         if (session == null)
         {
-            await SignOutAsync();
-            return _anonymousState;
+            return await SignOutAsync(sessionId, "the cache holds no session under that id: it expired, it was wiped, or the application restarted");
         }
 
         if (httpContextAccessor.HttpContext?.User is not ClaimsPrincipal identity)
         {
-            await SignOutAsync();
-            return _anonymousState;
+            return await SignOutAsync(sessionId, "the context carries no principal");
         }
 
-        if (!AreFeaturesEqual(httpContextAccessor.HttpContext?.User?.Identity as ClaimsIdentity, session))
+        var features = FeatureMismatch(httpContextAccessor.HttpContext?.User?.Identity as ClaimsIdentity, session);
+        if (features != null)
         {
-            await SignOutAsync();
-            return _anonymousState;
+            return await SignOutAsync(sessionId, features);
         }
 
-        if (!AreMetadataEqual(httpContextAccessor.HttpContext, session))
+        var metadata = SessionMetadata.Mismatch(httpContextAccessor.HttpContext, session);
+        if (metadata != null)
         {
-            await SignOutAsync();
-            return _anonymousState;
+            return await SignOutAsync(sessionId, metadata);
         }
 
         return new AuthenticationState(identity);
@@ -110,32 +110,41 @@ public class CookieStateProvider(
         NotifyAuthenticationStateChanged(Task.FromResult(_anonymousState));
     }
 
-    private static bool AreFeaturesEqual(ClaimsIdentity? claimsIdentity, SharedSession session)
+    /// <summary>
+    /// Ends the session and says why. This path deletes the session outright, so a silent one leaves
+    /// nothing behind to explain the sign-out with.
+    /// </summary>
+    private async Task<AuthenticationState> SignOutAsync(Guid? sessionId, string reason)
     {
-        if (claimsIdentity == null) { return false; }
+        Log.Warning("Session dropped while building the authentication state on {Method} {Path}, session {SessionId}: {Reason}",
+            httpContextAccessor.HttpContext?.Request.Method,
+            httpContextAccessor.HttpContext?.Request.Path.Value,
+            sessionId,
+            reason);
+
+        await SignOutAsync();
+
+        return _anonymousState;
+    }
+
+    private static string? FeatureMismatch(ClaimsIdentity? claimsIdentity, SharedSession session)
+    {
+        if (claimsIdentity == null) { return "the context carries no claims identity"; }
 
         var principalFeatures = claimsIdentity.Claims
             .Where(c => c.Type == Globals.CustomClaim.Feature)
             .Select(c => c.Value)
-            .ToList() ?? [];
+            .ToList();
 
-        return principalFeatures.Count == session.Features.Count
+        if (principalFeatures.Count == session.Features.Count
             && principalFeatures.All(session.Features.Contains)
-            && session.Features.All(principalFeatures.Contains);
-    }
+            && session.Features.All(principalFeatures.Contains))
+        {
+            return null;
+        }
 
-    private static bool AreMetadataEqual(HttpContext? context, SharedSession session)
-    {
-        if (context == null) { return false; }
-
-        var userAgent = context.Request.Headers.UserAgent.ToString();
-        var userIP = context.Connection.RemoteIpAddress?.ToString();
-        var acceptLanguage = context.Request.Headers.AcceptLanguage.ToString();
-        var acceptEncoding = context.Request.Headers.AcceptEncoding.ToString();
-
-        return string.Equals(session.UserAgent, userAgent, StringComparison.Ordinal)
-            && string.Equals(session.UserIP, userIP, StringComparison.Ordinal)
-            && string.Equals(session.AcceptLanguage, acceptLanguage, StringComparison.Ordinal)
-            && string.Equals(session.AcceptEncoding, acceptEncoding, StringComparison.Ordinal);
+        return $"the features of the cookie differ from the features of the session: "
+            + $"cookie [{string.Join(", ", principalFeatures.Order())}], "
+            + $"session [{string.Join(", ", session.Features.Order())}]";
     }
 }

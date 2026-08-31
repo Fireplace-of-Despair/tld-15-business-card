@@ -112,7 +112,7 @@ public sealed class HomeGetFeature : IFeature
                         continue;
                     }
 
-                    if (row.ProjectTypeId == Globals.ProjectType.Article)
+                    if (row.ProjectTypeId == Globals.ProjectType.Project)
                     {
                         result.Projects.Add(MapProject(row, language));
                         continue;

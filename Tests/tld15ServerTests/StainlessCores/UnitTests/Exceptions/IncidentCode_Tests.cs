@@ -28,6 +28,7 @@ public class IncidentCode_Tests
     [InlineData(IncidentCode.Fatal)]
     [InlineData(IncidentCode.General)]
     [InlineData(IncidentCode.Validation)]
+    [InlineData(IncidentCode.ValidationCoreMissmatch)]
     public void ToHTTPCode_Returns500_ForUnmappedIncidentCodes(
         IncidentCode incidentCode)
     {
