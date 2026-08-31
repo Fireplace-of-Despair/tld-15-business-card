@@ -39,11 +39,16 @@ public sealed class ContentTranslation : IVersionLocal, IUpdatable
     [Column("name")]
     public string Name { get; set; } = string.Empty;
 
+    /// <summary> html </summary>
     [Column("html")]
     public string? Html { get; set; }
 
+    /// <summary>
+    /// Dictionary in format %key-name%_%language% to %url%
+    /// </summary>
     [Column("json")]
     public string? Json { get; set; }
+
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
 
