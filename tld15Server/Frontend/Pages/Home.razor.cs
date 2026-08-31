@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using StainlessCore;
-using tld15Server.Features.Homes;
+using tld15Server.Features.Home;
 using tld15Server.Features.Shared.Business;
 
 namespace tld15Server.Frontend.Pages;
@@ -17,7 +17,7 @@ public partial class Home
     public SharedContent? Lore { get; set; } = null;
     public SharedContent? Social { get; set; } = null;
     public SharedContent? Contacts { get; set; } = null;
-    public List<SharedArticlePreview> Articles { get; set; } = [];
+    public List<SharedProjectPreview> Articles { get; set; } = [];
     public List<SharedProjectPreview> Projects { get; set; } = [];
 
     protected override async Task OnInitializedAsync()

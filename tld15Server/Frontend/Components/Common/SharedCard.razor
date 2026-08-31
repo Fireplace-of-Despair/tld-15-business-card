@@ -41,9 +41,9 @@
     </div>
 
     <div class="project-buttons-container">
-        @if (SharedCardContent is ISharedProjectPreview)
+        @if (SharedCardContent.ProjectTypeId == Globals.ProjectType.Project)
         {
-            var links = ((ISharedProjectPreview)SharedCardContent).LinksToDictionary();
+            var links = SharedCardContent.LinksToDictionary();
 
             @foreach (var link in links)
             {

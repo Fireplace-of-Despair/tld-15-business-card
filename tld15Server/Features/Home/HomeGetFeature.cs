@@ -9,7 +9,7 @@ using StainlessInfrastructure;
 using tld15Server.Composition;
 using tld15Server.Features.Shared.Business;
 
-namespace tld15Server.Features.Homes;
+namespace tld15Server.Features.Home;
 
 public class HomeGetFeature : IFeature
 {
@@ -23,7 +23,7 @@ public class HomeGetFeature : IFeature
         public SharedContent Contacts { get; set; } = new();
 
         public List<SharedProjectPreview> Projects { get; set; } = [];
-        public List<SharedArticlePreview> Articles { get; set; } = [];
+        public List<SharedProjectPreview> Articles { get; set; } = [];
     }
 
     public sealed record Query : IQuery<Result>
@@ -109,7 +109,7 @@ public class HomeGetFeature : IFeature
 
                 result.Articles = projects
                     .Where(x => x.ProjectTypeId == Globals.ProjectType.Project)
-                    .Select(x => new SharedArticlePreview
+                    .Select(x => new SharedProjectPreview
                     {
                         Id = x.Id,
                         DivisionId = x.DivisionId,
