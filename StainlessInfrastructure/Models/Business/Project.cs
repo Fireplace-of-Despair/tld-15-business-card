@@ -10,7 +10,7 @@ using StainlessInfrastructure.Models.Reference;
 namespace StainlessInfrastructure.Models.Business;
 
 [Table("project", Schema = Globals.Schema.Business)]
-public sealed class Project : IVersionLocal
+public sealed class Project : IVersionLocal, IUpdatable
 {
     [Key, Column("id")]
     public required string Id { get; set; }
@@ -21,8 +21,14 @@ public sealed class Project : IVersionLocal
     [Column("poster_url")]
     public string PosterUrl { get; set; } = string.Empty;
 
-    [Column("links")]
-    public string Links { get; set; } = string.Empty;
+    [Column("links_json")]
+    public string LinksJson { get; set; } = string.Empty;
+
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
 
     [Column("version_local")]
     public long VersionLocal { get; set; }
@@ -31,11 +37,6 @@ public sealed class Project : IVersionLocal
     public Division Division { get; set; } = null!;
 
     public ICollection<ProjectTranslation> Translations { get; set; } = [];
-
-    public static Dictionary<string, string> LinksToDictionary(string links)
-    {
-        return JsonSerializer.Deserialize<Dictionary<string, string>>(links) ?? [];
-    }
 
     [NotMapped]
     public static string LinksDefault
@@ -52,7 +53,7 @@ public sealed class Project : IVersionLocal
 }
 
 [Table("project_translation", Schema = Globals.Schema.Business)]
-public sealed class ProjectTranslation : IVersionLocal
+public sealed class ProjectTranslation : IVersionLocal, IUpdatable
 {
     [Key, Column("id")]
     public required Guid Id { get; set; }
@@ -74,6 +75,11 @@ public sealed class ProjectTranslation : IVersionLocal
 
     [Column("content_html")]
     public string ContentHtml { get; set; } = string.Empty;
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
 
     [Column("version_local")]
     public long VersionLocal { get; set; }

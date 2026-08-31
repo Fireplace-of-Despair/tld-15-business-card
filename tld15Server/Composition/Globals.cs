@@ -12,7 +12,7 @@ public static class Globals
     public static class Content
     {
         public static string Lore => "lore";
-        public static string Social => "Social";
+        public static string Social => "social";
         public static string Contacts => "contacts";
         public static string Press => "press";
     }
@@ -132,5 +132,6 @@ public static class Globals
         public const string SourceUrl = "Application:SourceUrl";
         public const string ConnectionString = "PostgreSQL";
         public const string AutomationTimeoutMinutes = "Automation:TimeoutMinutes";
+        public static string DateFormat => "yyyy/MM/dd";
     }
 }

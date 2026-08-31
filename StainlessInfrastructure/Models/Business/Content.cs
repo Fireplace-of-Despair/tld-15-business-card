@@ -8,10 +8,15 @@ using StainlessInfrastructure.Composition;
 namespace StainlessInfrastructure.Models.Business;
 
 [Table("content", Schema = Globals.Schema.Business)]
-public sealed class Content : IVersionLocal
+public sealed class Content : IVersionLocal, IUpdatable
 {
     [Key, Column("id")]
     public required string Id { get; set; }
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
 
     [Column("version_local")]
     public long VersionLocal { get; set; }
@@ -20,7 +25,7 @@ public sealed class Content : IVersionLocal
 }
 
 [Table("content_translation", Schema = Globals.Schema.Business)]
-public sealed class ContentTranslation : IVersionLocal
+public sealed class ContentTranslation : IVersionLocal, IUpdatable
 {
     [Key, Column("id")]
     public required Guid Id { get; set; }
@@ -31,8 +36,19 @@ public sealed class ContentTranslation : IVersionLocal
     [Column("language_id")]
     public required string LanguageId { get; set; }
 
-    [Column("data")]
-    public string Data { get; set; } = string.Empty;
+    [Column("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [Column("html")]
+    public string? Html { get; set; }
+
+    [Column("json")]
+    public string? Json { get; set; }
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
 
     [Column("version_local")]
     public long VersionLocal { get; set; }

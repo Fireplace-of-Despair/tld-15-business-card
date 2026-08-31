@@ -58,7 +58,8 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
                 .ForeignKey("fk_feature_translation_to_language", Globals.Schema.Reference, "language", "id")
                 .OnDelete(Rule.Cascade)
             .WithColumn("name").AsString().NotNullable()
-            .WithColumn("data").AsString().Nullable()
+            .WithColumn("html").AsString().Nullable()
+            .WithColumn("json").AsString().Nullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);
@@ -89,8 +90,6 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .WithColumn("title").AsString().NotNullable()
             .WithColumn("subtitle").AsString().NotNullable()
             .WithColumn("content_html").AsString().NotNullable()
-            .WithColumn("name").AsString().NotNullable()
-            .WithColumn("data").AsString().NotNullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);
@@ -101,7 +100,6 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .WithColumn("id").AsString(Globals.ColumnLength.ProjectId).PrimaryKey()
             .WithColumn("division_id").AsString(3)
             .WithColumn("poster_url").AsString(100)
-            .WithColumn("links_json").AsString()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);
@@ -120,8 +118,6 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .WithColumn("title").AsString().NotNullable()
             .WithColumn("subtitle").AsString().NotNullable()
             .WithColumn("content_html").AsString().NotNullable()
-            .WithColumn("name").AsString().NotNullable()
-            .WithColumn("data").AsString().NotNullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);

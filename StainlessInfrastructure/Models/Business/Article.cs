@@ -9,7 +9,7 @@ using StainlessInfrastructure.Models.Reference;
 namespace StainlessInfrastructure.Models.Business;
 
 [Table("article", Schema = Globals.Schema.Business)]
-public sealed class Article : IVersionLocal
+public sealed class Article : IVersionLocal, IUpdatable
 {
     [Key, Column("id"), StringLength(64)]
     public required string Id { get; set; }
@@ -19,6 +19,11 @@ public sealed class Article : IVersionLocal
 
     [Column("poster_url"), StringLength(512)]
     public string PosterUrl { get; set; } = string.Empty;
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
 
     [Column("version_local")]
     public long VersionLocal { get; set; }
@@ -30,7 +35,7 @@ public sealed class Article : IVersionLocal
 }
 
 [Table("article_translation", Schema = Globals.Schema.Business)]
-public sealed class ArticleTranslation : IVersionLocal
+public sealed class ArticleTranslation : IVersionLocal, IUpdatable
 {
     [Key, Column("id")]
     public required Guid Id { get; set; }
@@ -53,6 +58,11 @@ public sealed class ArticleTranslation : IVersionLocal
 
     [Column("content_html")]
     public string ContentHtml { get; set; } = string.Empty;
+    [Column("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
 
     [Column("version_local")]
     public long VersionLocal { get; set; }

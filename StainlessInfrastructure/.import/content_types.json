@@ -8,7 +8,7 @@
             },
             {
                 "LanguageId": "ja",
-                "Name": ""
+                "Name": "伝承"
             }
         ]
     },
@@ -39,7 +39,7 @@
         ]
     },
     {
-        "Id": "Press",
+        "Id": "press",
         "Translations": [
             {
                 "LanguageId": "en",
