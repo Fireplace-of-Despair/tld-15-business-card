@@ -97,5 +97,14 @@
                 "Name": "Void Harmonization Division"
             }
         ]
+    },
+    {
+        "Id": "ESD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Enclave Solutions Division"
+            }
+        ]
     }
 ]

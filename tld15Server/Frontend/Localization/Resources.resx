@@ -339,23 +339,8 @@
   <data name="Common.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="Project" xml:space="preserve">
-    <value>Project</value>
-  </data>
-  <data name="Project.Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="Project.Weight" xml:space="preserve">
-    <value>Weight</value>
-  </data>
-  <data name="Project.IgnoreInCategories" xml:space="preserve">
-    <value>Ignore in categories</value>
-  </data>
   <data name="Issue.Project.SelectProject" xml:space="preserve">
     <value>Select Project</value>
-  </data>
-  <data name="Project.ConfirmDelete" xml:space="preserve">
-    <value>Are you sure you want to delete this project?</value>
   </data>
   <data name="Issue.ConfirmDelete" xml:space="preserve">
     <value>Are you sure you want to delete this issue?</value>
@@ -383,9 +368,6 @@
   </data>
   <data name="Profile" xml:space="preserve">
     <value>Profile</value>
-  </data>
-  <data name="Articles" xml:space="preserve">
-    <value>Articles</value>
   </data>
   <data name="Projects" xml:space="preserve">
     <value>Projects</value>

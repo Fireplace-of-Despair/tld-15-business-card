@@ -88,37 +88,38 @@ public class HomeGetFeature : IFeature
                     .Include(x => x.Division).ThenInclude(x => x.Translations)
                     .ToListAsync(ctn);
 
-                result.Projects = projects.Select(x => new SharedProjectPreview
-                {
-                    Id = x.Id,
-                    DivisionId = x.DivisionId,
-                    Title = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Title,
-                    Subtitle = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Subtitle,
-                    DivisionName = x.Division.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Name,
-                    CreatedAt = x.CreatedAt,
-                    PosterAlt = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.PosterAlt,
-                    PosterUrl = x.PosterUrl,
-                    LinksJson = x.LinksJson
-                })
+                result.Projects = projects
+                    .Where(x => x.ProjectTypeId == Globals.ProjectType.Project)
+                    .Select(x => new SharedProjectPreview
+                    {
+                        Id = x.Id,
+                        DivisionId = x.DivisionId,
+                        Title = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Title,
+                        Subtitle = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Subtitle,
+                        DivisionName = x.Division.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Name,
+                        CreatedAt = x.CreatedAt,
+                        PosterAlt = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.PosterAlt,
+                        PosterUrl = x.PosterUrl,
+                        LinksJson = x.LinksJson
+                    })
                     .OrderByDescending(x => x.CreatedAt)
                     .ToList();
 
 
-                var articles = await contextBusiness.Articles
-                    .Include(x => x.Translations)
-                    .Include(x => x.Division).ThenInclude(x => x.Translations)
-                    .ToListAsync(ctn);
-                result.Articles = articles.Select(x => new SharedArticlePreview
-                {
-                    Id = x.Id,
-                    DivisionId = x.DivisionId,
-                    Title = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Title,
-                    Subtitle = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Subtitle,
-                    DivisionName = x.Division.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Name,
-                    CreatedAt = x.CreatedAt,
-                    PosterAlt = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.PosterAlt,
-                    PosterUrl = x.PosterUrl,
-                })
+
+                result.Articles = projects
+                    .Where(x => x.ProjectTypeId == Globals.ProjectType.Project)
+                    .Select(x => new SharedArticlePreview
+                    {
+                        Id = x.Id,
+                        DivisionId = x.DivisionId,
+                        Title = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Title,
+                        Subtitle = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Subtitle,
+                        DivisionName = x.Division.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.Name,
+                        CreatedAt = x.CreatedAt,
+                        PosterAlt = x.Translations.FirstOrDefault(x => x.LanguageId == query.Language)?.PosterAlt,
+                        PosterUrl = x.PosterUrl,
+                    })
                     .OrderByDescending(x => x.CreatedAt)
                     .ToList();
             }

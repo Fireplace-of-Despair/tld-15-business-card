@@ -18,11 +18,14 @@ public sealed class Project : IVersionLocal, IUpdatable
     [Column("division_id")]
     public string DivisionId { get; set; } = string.Empty;
 
+    [Column("project_type_id")]
+    public string ProjectTypeId { get; set; } = string.Empty;
+
     [Column("poster_url")]
     public string PosterUrl { get; set; } = string.Empty;
 
     [Column("links_json")]
-    public string LinksJson { get; set; } = string.Empty;
+    public string? LinksJson { get; set; }
 
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
@@ -35,6 +38,9 @@ public sealed class Project : IVersionLocal, IUpdatable
 
     [ForeignKey(nameof(DivisionId))]
     public Division Division { get; set; } = null!;
+
+    [ForeignKey(nameof(ProjectTypeId))]
+    public ProjectType ProjectType { get; set; } = null!;
 
     public ICollection<ProjectTranslation> Translations { get; set; } = [];
 

@@ -339,23 +339,8 @@
   <data name="Common.Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
-  <data name="Project" xml:space="preserve">
-    <value>プロジェクト</value>
-  </data>
-  <data name="Project.Name" xml:space="preserve">
-    <value>名前</value>
-  </data>
-  <data name="Project.Weight" xml:space="preserve">
-    <value>重み</value>
-  </data>
-  <data name="Project.IgnoreInCategories" xml:space="preserve">
-    <value>カテゴリで無視</value>
-  </data>
   <data name="Issue.Project.SelectProject" xml:space="preserve">
     <value>プロジェクトを選択</value>
-  </data>
-  <data name="Project.ConfirmDelete" xml:space="preserve">
-    <value>このプロジェクトを削除してもよろしいですか？</value>
   </data>
   <data name="Issue.ConfirmDelete" xml:space="preserve">
     <value>このタスクを削除してもよろしいですか？</value>
@@ -383,9 +368,6 @@
   </data>
   <data name="Profile" xml:space="preserve">
     <value>プロフィール</value>
-  </data>
-  <data name="Articles" xml:space="preserve">
-    <value>記事</value>
   </data>
   <data name="Projects" xml:space="preserve">
     <value>プロジェクト</value>

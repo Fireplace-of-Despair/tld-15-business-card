@@ -205,15 +205,6 @@ namespace tld15Server.Frontend.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Articles.
-        /// </summary>
-        internal static string Articles {
-            get {
-                return ResourceManager.GetString("Articles", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Fireplace of Despair.
         /// </summary>
         internal static string Brand {
@@ -723,51 +714,6 @@ namespace tld15Server.Frontend.Localization {
         internal static string Profile {
             get {
                 return ResourceManager.GetString("Profile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Project.
-        /// </summary>
-        internal static string Project {
-            get {
-                return ResourceManager.GetString("Project", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to delete this project?.
-        /// </summary>
-        internal static string Project_ConfirmDelete {
-            get {
-                return ResourceManager.GetString("Project.ConfirmDelete", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ignore in categories.
-        /// </summary>
-        internal static string Project_IgnoreInCategories {
-            get {
-                return ResourceManager.GetString("Project.IgnoreInCategories", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name.
-        /// </summary>
-        internal static string Project_Name {
-            get {
-                return ResourceManager.GetString("Project.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Weight.
-        /// </summary>
-        internal static string Project_Weight {
-            get {
-                return ResourceManager.GetString("Project.Weight", resourceCulture);
             }
         }
         

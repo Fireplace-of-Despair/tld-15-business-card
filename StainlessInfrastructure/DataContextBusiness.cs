@@ -12,7 +12,6 @@ namespace StainlessInfrastructure;
 [RequiresDynamicCode("EF Core is not fully compatible with NativeAOT. See https://aka.ms/efcore-docs-trimming for guidance.")]
 public class DataContextBusiness : DbContext
 {
-    public virtual DbSet<Article> Articles => Set<Article>();
     public virtual DbSet<Content> Contents => Set<Content>();
     public virtual DbSet<Project> Projects => Set<Project>();
     public DataContextBusiness() { }

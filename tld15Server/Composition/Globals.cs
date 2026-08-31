@@ -9,6 +9,50 @@ public static class Globals
 {
     public static string Error => "ERROR SERVER";
 
+    internal static class Divisions
+    {
+        /// <summary> Fireplace of Despair (Main) </summary>
+        internal const string FOD = "FOD";
+
+        /// <summary> Ashen Chronicles Division (Archive)</summary>
+        internal const string ACD = "ACD";
+
+        /// <summary> Double Standards Division (Public Relation and Ethics)</summary>
+        internal const string DSD = "DSD";
+
+        /// <summary> Fractured Lens Division (Video Production) </summary>
+        internal const string FLD = "FLD";
+
+        /// <summary> Inkwell Reverie Division (Writing)</summary>
+        internal const string IRD = "IRD";
+
+        /// <summary> Omnia Constructs Division (IRL Production)</summary>
+        internal const string OCD = "OCD";
+
+        /// <summary> Obscure Esoteric Division (Lore and Knowledge)</summary>
+        internal const string OED = "OED";
+
+        /// <summary> Stellar Logistics Division (Logistics)</summary>
+        internal const string SLD = "SLD";
+
+        /// <summary> Stellar Sky Division (Does not exist)</summary>
+        internal const string SSD = "SSD";
+
+        /// <summary> Tamed Logic Division (IT)</summary>
+        internal const string TLD = "TLD";
+
+        /// <summary> Void Harmonization Division (Music Production)</summary>
+        internal const string VHD = "VHD";
+
+        /// <summary> Enclave Solutions Division (Enclave Solutions)</summary>
+        internal const string ESD = "ESD";
+    }
+
+    public static class ProjectType
+    {
+        public static string Project => "project";
+        public static string Article => "article";
+    }
     public static class Content
     {
         public static string Lore => "lore";
