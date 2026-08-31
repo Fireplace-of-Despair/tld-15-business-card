@@ -10,7 +10,7 @@ public static class IconHelper
 
         if (string.IsNullOrEmpty(language) || language.Length > 3)
         {
-            return "〇";
+            return "〇〇";
         }
 
         return language.ToUpper();
