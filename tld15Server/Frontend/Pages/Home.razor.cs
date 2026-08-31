@@ -1,0 +1,9 @@
+﻿// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (c) 2025 Fireplace of Despair
+
+namespace tld15Server.Frontend.Pages;
+
+public partial class Home
+{
+    public const string Url = "/";
+}

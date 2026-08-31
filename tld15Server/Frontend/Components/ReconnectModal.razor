@@ -1,0 +1,37 @@
+﻿@using Microsoft.Extensions.Localization
+<script type="module" src="@Assets["Frontend/Components/ReconnectModal.razor.js"]"></script>
+
+<dialog id="components-reconnect-modal" data-nosnippet>
+    <div class="components-reconnect-container">
+        <div class="components-rejoining-animation" aria-hidden="true">
+            <div></div>
+            <div></div>
+        </div>
+        <p class="components-reconnect-first-attempt-visible">
+            @localizer["Reconnect.Rejoining"]
+        </p>
+        <p class="components-reconnect-repeated-attempt-visible">
+            @localizer["Reconnect.RejoinFailed"]<br />
+            @((MarkupString)string.Format(@localizer["Common.TryingAgainIn"], "<span id=\"components-seconds-to-next-attempt\"></span>"))
+        </p>
+        <p class="components-reconnect-failed-visible">
+            @localizer["Reconnect.RejoinFailed"]<br />@localizer["Reconnect.RetryReload"]
+        </p>
+        <button id="components-reconnect-button" class="components-reconnect-failed-visible">
+            @localizer["Common.Retry"]
+        </button>
+        <p class="components-pause-visible">
+            @localizer["Reconnect.SessionPaused"]
+        </p>
+        <button id="components-resume-button" class="components-pause-visible">
+            @localizer["Common.Resume"]
+        </button>
+        <p class="components-resume-failed-visible">
+            @localizer["Reconnnect.Failed"]<br />@localizer["Common.ReloadPage"]
+        </p>
+    </div>
+</dialog>
+
+@code {
+    [Inject] private IStringLocalizer<Localization.Resources> localizer { get; set; } = default!;
+}

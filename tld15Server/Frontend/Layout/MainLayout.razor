@@ -1,0 +1,63 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common.LocalTime
+@using tld15Server.Frontend.Components.Icons
+@using tld15Server.Frontend.Components.Navigations
+@using tld15Server.Composition
+@using tld15Server.Frontend.Navigations
+@inject NavigationState NavState
+
+<InitializeBrowserTime @rendermode="InteractiveServer" />
+
+<header>
+    <a class="name" href="@Pages.Home.Url" rel="canonical">
+        <img class="logo" src="@Assets["images/logo.png"]" alt="@Localizer["Brand"]" />
+        @Localizer["Brand"]
+    </a>
+
+    <div class="filler"></div>
+    <AuthorizeView>
+        <Authorized>
+            <a class="icon-button logo"
+               href="@Pages.Identity.LogoutPage.Url">
+               <Logout /></a>
+        </Authorized>
+        <NotAuthorized>
+            <a class="icon-button logo"
+               href="@Pages.Identity.LoginPage.Url"><Login /></a>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <a class="icon-button logo"
+       href="@Pages.Settings.ChangeLanguagePage.Url">
+       <Translate />
+   </a>
+</header>
+
+<div class="page">
+    <CascadingValue Value="NavState">
+    <AuthorizeView>
+        <Authorized>
+            <Navigation @rendermode="InteractiveServer" />
+        </Authorized>
+    </AuthorizeView>
+
+    <main>
+        <article>
+            @Body
+        </article>
+    </main>
+    </CascadingValue>
+</div>
+
+<footer>
+    <div class="copyright">
+        @DateTimeOffset.UtcNow.Year © @Localizer["Brand.Company"]
+    </div>
+    @* AGPL-3.0-only, section 13. A remote user must reach the source of the running build. *@
+    <div class="source">
+        <a href="@SourceUrl" rel="noopener noreferrer" target="_blank" title="@Globals.License.Spdx">
+            @Localizer["Common.SourceCode"]
+        </a>
+    </div>
+</footer>

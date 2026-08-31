@@ -1,0 +1,81 @@
+@using Microsoft.Extensions.Localization
+
+@if (MaxPage == 0) { return; }
+
+@{
+    // Built once. Reading the property inside the loop rebuilt the list for each link.
+    var pages = VisiblePages;
+    var lastVisible = pages[^1];
+}
+
+<div class="pagination-container">
+    <!-- Large screen -->
+    <div class="pagination-large">
+        @if (CurrentPage > 0)
+        {
+            <a href="@BuildUrl(CurrentPage - 1)">@localizer["Pagination.Previous"]</a>
+            <a href="@BuildUrl(0)">@localizer["Pagination.First"]</a>
+        }
+
+        @foreach (var item in pages)
+        {
+            <a href="@BuildUrl(item)"
+               class="@(item == CurrentPage ? "active" : "")">
+                @(item != MaxPage && item == lastVisible ? "..." : item.ToString())
+            </a>
+        }
+
+        @if (CurrentPage < MaxPage)
+        {
+            <a href="@BuildUrl(MaxPage)">@localizer["Pagination.Last"]</a>
+            <a href="@BuildUrl(CurrentPage + 1)">@localizer["Pagination.Next"]</a>
+        }
+    </div>
+
+    <!-- Small screen -->
+    <div class="pagination-small">
+        @if (CurrentPage > 0)
+        {
+            <a href="@BuildUrl(CurrentPage - 1)">@localizer["Pagination.Previous"]</a>
+        }
+
+        <span class="current">@CurrentPage / @MaxPage</span>
+
+        @if (CurrentPage < MaxPage)
+        {
+            <a href="@BuildUrl(CurrentPage + 1)">@localizer["Pagination.Next"]</a>
+        }
+    </div>
+</div>
+
+@code {
+    [Inject] private IStringLocalizer<Localization.Resources> localizer { get; set; } = default!;
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public int MaxPage { get; set; }
+    [Parameter] public int MaxVisible { get; set; }
+    [Parameter] public string BaseUrl { get; set; } = "/";
+
+    private List<int> VisiblePages
+    {
+        get
+        {
+            var visible = Math.Max(1, Math.Min(MaxVisible, MaxPage + 1));
+
+            // The window follows the current page and stops at both ends of the range.
+            var start = Math.Clamp(CurrentPage - (visible / 2), 0, MaxPage - visible + 1);
+
+            var pages = new List<int>(visible);
+            for (var i = start; i < start + visible; i++)
+            {
+                pages.Add(i);
+            }
+
+            return pages;
+        }
+    }
+
+    private string BuildUrl(int page)
+    {
+        return $"{BaseUrl}/{page}";
+    }
+}

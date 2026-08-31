@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <StartupObject>tld15Server.Program</StartupObject>
+    <NeutralLanguage>en</NeutralLanguage>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en;ja</SatelliteResourceLanguages>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Analysis">
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-minimum</AnalysisLevel>
+    <!-- IDE0005 (remove unnecessary usings) runs only when the compiler writes the documentation
+         file. This project is an application, not a library, so CS1591 stays off. CLAUDE.md section 9
+         asks for an XML summary on a library project such as StainlessCore. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Brand">
+    <Product>tld15</Product>
+    <AssemblyTitle>Stainless Business Card</AssemblyTitle>
+    <Authors>Stan "Chief" Shevtsov</Authors>
+    <Company>Fireplace Of Despair</Company>
+    <Copyright>Fireplace Of Despair</Copyright>
+    <Version>1.0.1</Version>
+    <PackageProjectUrl>https://github.com/Fireplace-of-Despair/tld-15-business-card</PackageProjectUrl>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="3.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StainlessCore\StainlessCore.csproj" />
+    <ProjectReference Include="..\StainlessInfrastructure\StainlessInfrastructure.csproj" />
+    <!-- A Roslyn component, not a dependency: it writes StainlessGenerated.Registry into this build. -->
+    <ProjectReference Include="..\StainlessGenerators\StainlessGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Frontend\Localization\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Frontend\Localization\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="tld15ServerTests" />
+  </ItemGroup>
+</Project>

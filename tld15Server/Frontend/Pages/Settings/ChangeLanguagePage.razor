@@ -1,0 +1,41 @@
+﻿@attribute [Route(ChangeLanguagePage.Url)]
+@inherits BasePage
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Language"]
+</PageTitle>
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident code="@IncidentCode" />
+    </div>
+    return;
+}
+
+
+<EditForm Model="formData" FormName="language_form" OnSubmit="HandleSubmit" class="component-container-column">
+    <InputCheckbox hidden @bind-Value=@formData.HasBeenInitialized />
+
+    <div class="component-container">
+        <InputRadioGroup @bind-Value="formData.SelectedLanguage">
+            @foreach (var locale in Globals.Locales)
+            {
+                <label class="radio-container">
+                    <InputRadio Value="@locale.Key" />
+                    <span class="custom-radio">
+                        <svg viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="9" />
+                            <circle cx="10" cy="10" r="5" class="radio-dot" />
+                        </svg>
+                    </span>
+                    <span>@locale.Value</span>
+                </label>
+            }
+        </InputRadioGroup>
+    </div>
+
+    <button type="submit">@Localizer["Common.Save"]</button>
+</EditForm>

@@ -1,0 +1,520 @@
+﻿# Stainless Tasks reverse proxy.
+#
+# Copy this file to /config/caddy/Caddyfile. Then replace two values:
+#   1. tasks.example.com  -> your domain
+#   2. admin@example.com  -> your address for the certificate authority
+#
+# Caddy gets the certificate. Caddy renews the certificate. Caddy also redirects http:// to https://.
+# Point the A record and the AAAA record of the domain at the server first. The certificate authority
+# reads the server on port 80.
+#
+# Check the file after each edit. The first command needs a running Caddy. The second one starts a
+# throw-away container, so it also answers before the first start of the stack.
+#   docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile
+#   docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
+#
+# Give a new file to a running Caddy. A reload needs a live process, so this command has no second
+# form.
+#   docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# ---------------------------------------------------------------------------
+# The layout of this file
+# ---------------------------------------------------------------------------
+# The file holds four parts:
+#   1. The global options. They cover every site.
+#   2. Five snippets. They hold the rules that a site shares with another site.
+#   3. One site block for each domain. It imports the snippets, and it adds what only it needs.
+#   4. The notes at the end.
+#
+# A named matcher belongs to one site block. Caddy gives no way to declare a matcher for every site
+# at the same time. A snippet solves this. Caddy puts the lines of the snippet into the site block
+# that imports it. Each site therefore gets its own copy of the same rules.
+#
+# A second service on a second subdomain therefore adds one short site block, and it repeats no
+# rule. The template sits after the site block below.
+
+# ---------------------------------------------------------------------------
+# 1. Global options
+# ---------------------------------------------------------------------------
+{
+	# Let's Encrypt sends the expiry warnings to this address. A wrong address loses the warning.
+	email admin@example.com
+
+	# These options belong to the listener, not to one site. Every site on port 443 reads the same
+	# values. A site that needs another timeout needs another listen address.
+	servers {
+		protocols h1 h2 h3
+
+		# read_body is a limit on the full upload. It is not a stall detector. At this limit Caddy
+		# cuts the body. It then sends the incomplete request to the server.
+		#
+		# 5 minutes carries the 8 MB of a large snapshot at 68 KB each second. A phone on a weak link
+		# keeps that rate. A short limit such as 10s needs 800 KB each second. It stops a correct sync
+		# before the sync completes.
+		#
+		# Keep this limit low. Until the body arrives in full, Caddy writes no line into the access
+		# log, so fail2ban cannot see a caller that sends one byte at a time. The rate limiter of the
+		# server cannot see it either, because the request never reaches the server. This timeout is
+		# the only rule that closes such a connection.
+		#
+		# The write timeout and the idle timeout keep their default values. Blazor holds one long
+		# connection for its circuit.
+		timeouts {
+			read_header 5s
+			read_body 5m
+		}
+	}
+}
+
+# ---------------------------------------------------------------------------
+# 2. Snippets
+# ---------------------------------------------------------------------------
+# Edit a rule here one time, and every site that imports it takes the change.
+#
+# site_base and filter_matchers go into the site block. The three abort snippets go into the route
+# block, and a site takes only the ones that it needs.
+
+# --- The base of a site ----------------------------------------------------
+# It holds the TLS settings, the access log, and the response headers that every site sends.
+#
+# {args[0]} names the log file. Each site writes its own file, so one busy site cannot hide the
+# lines of another one. A second site therefore needs a pattern such as access*.log in the logpath
+# of the fail2ban jail. Step 9 of README.md holds that jail, and it names one file today.
+#
+# The Content-Security-Policy is not here. It belongs to the site, because it describes the pages of
+# that site. Read the note at the end of this file.
+(site_base) {
+	tls {
+		protocols tls1.2 tls1.3
+	}
+
+	# fail2ban reads this file. README.md holds the filter and the jail.
+	log {
+		output file /var/log/caddy/{args[0]} {
+			roll_size 10MiB
+			roll_keep 10
+		}
+		format json {
+			# fail2ban reads the date with a simple pattern. Caddy writes a Unix float by default.
+			time_format iso8601
+		}
+	}
+
+	header {
+		# One year of HTTPS only. Add the domain to the preload list only when you are sure. A
+		# browser then refuses plain HTTP for the full year.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+		# A browser must not guess a content type. A guess makes a script out of an upload.
+		X-Content-Type-Options "nosniff"
+
+		# No frame, and therefore no clickjacking. frame-ancestors in the policy of the site gives
+		# the same rule to a modern browser.
+		X-Frame-Options "DENY"
+
+		Referrer-Policy "strict-origin-when-cross-origin"
+
+		# The application needs no sensor and no camera. Disable each one of them.
+		Permissions-Policy "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()"
+
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Resource-Policy "same-origin"
+
+		# Do not give the name of the server software. A scanner selects its attacks from this answer.
+		-Server
+	}
+}
+
+# --- The matchers of the filters -------------------------------------------
+# The application answers on /, /accounts, /identity, /profile, /sessions, /settings, /api,
+# /_framework, /_blazor and the static files. Keep each rule below clear of those paths. Never
+# block /.well-known, because the certificate authority reads it.
+#
+# A rule that ends with a star matches a prefix. A rule with a star on each side matches the name at
+# any position, such as /static/.env. The path matcher of Caddy ignores the case of the letters.
+(filter_matchers) {
+	# The matcher holds two blocks.
+	#   1. Software that this deployment does not run. A scanner asks for it on every host.
+	#   2. The files of this project. The web root never holds one of them, so a request for one
+	#      means that a deployment copied a file into the wrong folder. The rule keeps that mistake
+	#      private, and it gives the next deployment a ready list.
+	@scanner_path {
+		# ----- 1. Software that this deployment does not run -----
+
+		# WordPress. The internet scans it more than any other software.
+		path /wp-admin* /wp-login* /wp-includes* /wp-json* /wp-config* /wordpress* /xmlrpc.php /wp-cron.php
+		path */wp-content/*
+
+		# A secret that a careless deployment leaves in the web root.
+		path /.env* /.git* /.svn* /.hg* /.bzr* /.aws* /.ssh* /.npmrc /.htpasswd /.htaccess
+		path /.vscode* /.idea* /.DS_Store /.well-known/security.txt.bak
+		path /secrets* /config.json /config.php* /settings.py /web.config
+		path *.env* */.streamlit/* */.sentryclirc*
+
+		# A cloud key and a cloud token.
+		path *credential* */.aws/* */.gcloud/* */.kube/* */aws/iam/* */aws/s3/* */aws/metadata*
+		path *service-account* *service_account* *serviceaccountkey*
+		path *aws.json* *aws-config* *aws.config* *aws-keys* *aws_creds* *key.json* *rclone.conf*
+
+		# A configuration file of an AI agent. Each one holds an API key of a paid account.
+		path */.anthropic/* */.openai/* */.codex/* */.continue/* */.claude/* */.claude.json*
+		path *anthropic.json* *openai.json*
+
+		# A shell profile, a client configuration and a private key.
+		path /.bash_history /.bashrc /.bash_profile /.profile /.zshrc /.netrc /.pgpass /.my.cnf
+		path /.boto /.pypirc /.s3cfg /.dockercfg /.vault-token /error_log /nginx_status
+		path */.docker/* */.azure/* */.terraform/* */.hermes/* */.openclaw/* */.aider*
+		path */id_rsa* */id_dsa* */id_ecdsa* */id_ed25519* */private-key*
+
+		# An infrastructure state file and a deployment recipe. Each one names live resources.
+		path *terraform.tfstate* *terraform.tfvars* *kubeconfig* *appspec.yml* *buildspec.yml*
+		path */k8s/secrets* *vault.yml* *values.yaml*
+
+		# The settings of another runtime. This application runs none of them.
+		path /application.properties /application.yml /bootstrap.properties /gradle.properties
+		path /database.yml /local.settings.json /sftp-config.json /kubeconfig
+		path */application-prod.* */config/application.* */config/database.*
+		path *googleservice-info.plist* *amplifyconfiguration.json* *firebase-admin*
+		path *gc-service.json* *gcp-service.json* /sa.json */config/gcp.json* */__/firebase/*
+
+		# A debug console of a framework. It prints the environment of the process.
+		path /elmah* /trace.axd* /_debugbar* /__clockwork* /__debug__* /log-viewer* /horizon/dashboard*
+		path */rails/info/*
+
+		# A database console.
+		path /phpmyadmin* /phpMyAdmin* /pma* /myadmin* /mysqladmin* /adminer* /dbadmin* /sqlite* /pgadmin*
+
+		# A web shell from an earlier attack. A scanner looks for one before it attacks.
+		path /shell* /cmd* /alfa* /wso* /c99* /r57* /b374k* /indoxploit* /uploader* /upload.php*
+		path /filemanager* /fm.php* /backdoor* /webshell*
+
+		# A framework or a runtime that gives a page with useful data.
+		path /vendor* /telescope* /_ignition* /_profiler* /debug* /actuator* /druid* /nacos*
+		path /solr* /jenkins* /hudson* /manager/html* /host-manager* /struts* /console*
+		path /geoserver* /jmx-console* /invoker* /api/jsonws* /axis2*
+		path */_profiler* */management/env* */api/v1/status/config*
+
+		# A router, a camera and a network box. The Mirai family scans for these each day.
+		path /cgi-bin* /boaform* /setup.cgi* /HNAP1* /GponForm* /device.rsp* /tmUnblock.cgi
+		path /picsdesc.xml /wanipcn.xml /UD/act /soap.cgi* /dana-na* /remote/fgt_lang* /+CSCOE+*
+
+		# A mail server and a groupware, from the Exchange attacks and the Zimbra attacks.
+		path /owa* /ecp* /autodiscover* /Autodiscover* /zimbra* /mail/* /webmail*
+
+		# A cloud credential and a container control plane.
+		path /latest/meta-data* /computeMetadata* /v2/keys* /portainer* /docker* /kubernetes*
+
+		# A status page that gives the name and the version of the software.
+		path /server-status /server-info /status.php /info.php /phpinfo* /test.php
+
+		# ----- 2. The files of this project -----
+		# The deployment gives the settings as a read-only bind mount, and each client keeps its
+		# database on the device of the user. No file below belongs in a web root. Keep this block
+		# next to the code, so that a new file of this kind joins the list.
+
+		# The settings of the server. They hold the pepper and the connection string. A star in the
+		# middle of a pattern does not cross a path separator, so keep each rule in the *name* form.
+		path *appsettings*
+
+		# The local database of a client, its key file and its backups. See Globals.Storage.
+		path *tld18.db* *tld18.kdf* *backup-tld18-* */backups/*
+
+		# The deployment. The Caddyfile names the proxy of the site, and the compose file names the
+		# bind mounts.
+		path *caddyfile* *docker-compose* *dockerfile* *.dockerignore*
+		path */lists/region.caddy* */lists/cloud.caddy* *address-lists.sh*
+
+		# The build. A .pdb file carries the paths of the build machine and the symbols.
+		path *global.json* *.slnx* *.csproj* *.pdb*
+	}
+
+	# The same rule by file name ending. This application serves no PHP page and no archive.
+	@scanner_suffix {
+		path_regexp (?i)\.(php|phtml|php[3-8]|asp|aspx|jsp|jspx|cgi|pl|py|rb|sql|db|bak|old|orig|save|swp|zip|tar|gz|tgz|rar|7z|env|ini|conf|log|sh|bash|pem|key|crt|p12|pfx)$
+	}
+
+	# A path rule reads the path alone. The scan also carried a payload in the query string, such as
+	# /pms?file_name=../../../.aws/credentials. Caddy never gives that text to a path matcher. The
+	# request body limit and the rate limit of the server cover that case today.
+	# A walk out of the web root. Caddy cleans a plain ../ before it routes, so a scanner hides the
+	# step behind an encoding. Three forms reached the log of 2026-08-26: /..;/, /%2e and /..%252F.
+	# The matcher reads the path after one decode, so it names the forms that survive that decode.
+	@scanner_traversal {
+		path_regexp (?i)(\.\.;|\.\./|%2e|%2f)
+	}
+
+	# --- Client and robot names --------------------------------------------
+	# A tool that gives its own name in the User-Agent header. An honest browser sends no such name.
+	#
+	# Three matchers follow, in three groups:
+	#   1. A security scanner and an attack tool.
+	#   2. A default library name. A real product does not keep python-requests in the header. Such a
+	#      name comes from a script.
+	#   3. A crawler that takes the content and gives nothing back. This group holds the AI
+	#      harvesters.
+	@bad_agent {
+		header_regexp User-Agent "(?i)(nikto|sqlmap|nmap|masscan|zmap|zgrab|zmeu|nuclei|wpscan|joomscan|droopescan|whatweb|dirbuster|dirsearch|gobuster|feroxbuster|ffuf|wfuzz|arachni|acunetix|nessus|openvas|qualys|netsparker|havij|metasploit|hydra|xmrig|mozlila|l9explore|l9tcpid|expanse|internetmeasurement|censys|shodan|projectdiscovery|criminalip|odin|netsystemsresearch)"
+	}
+
+	@bad_library_agent {
+		header_regexp User-Agent "(?i)^(python-requests|python-urllib|python-httpx|aiohttp|urllib|requests|scrapy|libwww-perl|lwp-request|java|okhttp|axios|node-fetch|got|guzzlehttp|winhttp|wininet|zabbix|ruby|go-http-client|http_request|httpclient|apache-httpclient|mechanize|colly|httrack)"
+	}
+
+	# An AI harvester and a marketing crawler. A private task tracker gets no value from them.
+	#
+	# Three names are wide on purpose. "chatgpt" covers ChatGPT-User and every later ChatGPT name.
+	# "openai" covers a name that does not start with OAI. "applebot" covers Applebot and
+	# Applebot-Extended. "twitterbot" stops the link preview of X, which this site does not need.
+	@bad_crawler_agent {
+		header_regexp User-Agent "(?i)(gptbot|chatgpt|openai|oai-searchbot|claudebot|claude|claude-web|anthropic|perplexitybot|perplexity-user|ccbot|bytespider|bytedance|amazonbot|applebot|twitterbot|meta-externalagent|facebookbot|diffbot|imagesiftbot|omgili|timpibot|webzio|dataforseobot|petalbot|semrushbot|ahrefsbot|mj12bot|dotbot|blexbot|serpstatbot|seekportbot|barkrowler|zoominfobot)"
+	}
+
+	# No User-Agent header, or an empty User-Agent header. A flood tool often sends one of these.
+	#
+	# These two rules need a client that gives its own name. The desktop client and the iOS client
+	# send "tld18ClientDesktop/<version>" and "tld18ClientMobile/<version>" from Globals.Sync.UserAgent.
+	# A new site that answers a caller without a User-Agent header must not import these two rules.
+	@no_agent {
+		not header User-Agent *
+	}
+	@empty_agent {
+		header_regexp User-Agent "^\s*$"
+	}
+
+	# --- Region filter ------------------------------------------------------
+	# The filter drops a request by the country of its address. Everything runs on this machine. No
+	# request reaches a third party, and no answer waits for one.
+	#
+	# /etc/caddy/lists/region.caddy holds the address ranges. address-lists.sh writes that file from the
+	# delegation files of the five address registries. docker-compose.yml mounts the folder that holds
+	# it. Step 14 of README.md holds the steps and the cron job that keeps the list fresh.
+	#
+	# Caddy does not start without that file. This is deliberate. A missing file must never turn a
+	# whitelist off in silence. Run address-lists.sh one time before the first start.
+	#
+	# Two variants follow. Keep one of them. Both read the same generated file. Each site that
+	# imports this snippet takes the variant that you keep here.
+	#
+	#   Variant 1, the blacklist. The file names the countries that you block. Every other country
+	#   reaches the site. This variant is the default. An empty country list blocks nobody, so the
+	#   default deployment behaves as before.
+	#
+	#   Variant 2, the whitelist. The file names the countries that you allow. Every other country
+	#   gets nothing. This rule is the stronger one, and it holds the larger risk. It blocks you
+	#   from a country that the list does not name. A trip and a mobile carrier each give such a
+	#   country.
+	#
+	# The first line of each variant keeps the path of the certificate challenge open for every
+	# address. Let's Encrypt validates a domain from several countries at the same time. One blocked
+	# validation stops a renewal, and the site then loses its certificate.
+	#
+	# remote_ip reads the address of the connection. Caddy stands at the edge here, so that address
+	# belongs to the client. Behind a second proxy, use client_ip and set trusted_proxies. Never read
+	# X-Forwarded-For here, because a client writes that header itself.
+	#
+	# The matcher compares the address against the ranges in order, until one range matches. One
+	# country gives about 5,500 ranges, and three countries give about 30,000. That work stays
+	# small next to the TLS handshake of the same request. A much larger list belongs at the
+	# firewall instead, where a set gives one lookup. Step 14 of README.md holds that note.
+
+	# Variant 1: the blacklist.
+	@region_denied {
+		not path /.well-known/acme-challenge/*
+		import /etc/caddy/lists/region.caddy
+	}
+
+	# Variant 2: the whitelist. Delete the four lines above, then remove the comment marks below.
+	# @region_denied {
+	# 	not path /.well-known/acme-challenge/*
+	# 	not {
+	# 		import /etc/caddy/lists/region.caddy
+	# 	}
+	# }
+
+	# --- Cloud filter -------------------------------------------------------
+	# The filter drops a request from the ranges of a cloud provider. A person browses from a home
+	# network or from a mobile network. A scanner, a scraper and a flood tool run on a rented machine.
+	#
+	# /etc/caddy/lists/cloud.caddy holds the ranges. address-lists.sh writes that file from the public
+	# range file of Amazon. Amazon publishes that file itself, and it needs no account. The list is off
+	# until you name a service. Step 14 of README.md holds the steps.
+	#
+	# This rule always denies, and it never inverts with the region variant above. A whitelist that
+	# names your country must still block a rented machine inside that country.
+	#
+	# The first line keeps the path of the certificate challenge open. Let's Encrypt validates a domain
+	# from several networks, and a cloud provider hosts some of them. Keep that line.
+	@cloud_denied {
+		not path /.well-known/acme-challenge/*
+		import /etc/caddy/lists/cloud.caddy
+	}
+}
+
+# --- The filters -----------------------------------------------------------
+# Three snippets follow. Each one goes inside a route block. Caddy runs the imports in the order
+# that the site block writes them, so keep the two address filters first. They need no header and
+# no path.
+#
+# abort closes the connection and writes no answer. A scanner learns nothing. The server does no
+# work.
+#
+# Three snippets instead of one let each site take its own set:
+#   - A site that answers an integration from a cloud range does not import abort_cloud.
+#   - A site that must answer every country does not import abort_region.
+#   - A site that serves a machine caller without a User-Agent header does not import abort_bots.
+#     It keeps the two address filters.
+#
+# A site imports filter_matchers in each case. That snippet declares every matcher, and Caddy
+# accepts a matcher that no line uses.
+(abort_region) {
+	abort @region_denied
+}
+
+(abort_cloud) {
+	abort @cloud_denied
+}
+
+(abort_bots) {
+	abort @scanner_path
+	abort @scanner_suffix
+	abort @scanner_traversal
+	abort @bad_agent
+	abort @bad_library_agent
+	abort @bad_crawler_agent
+	abort @no_agent
+	abort @empty_agent
+}
+
+# ---------------------------------------------------------------------------
+# 3. The site
+# ---------------------------------------------------------------------------
+tasks.example.com {
+	import site_base access.log
+	import filter_matchers
+
+	# --- Content-Security-Policy -------------------------------------------
+	# This value stays in the site block, and it never moves into a snippet. It describes the pages
+	# of this site alone. Read the note below the site block before you make it stricter.
+	#
+	# The ">" prefix defers the operation until Caddy writes the response headers, so this value
+	# replaces the header of the server. Blazor sends its own "frame-ancestors 'self'" from
+	# AddInteractiveServerRenderMode on each page of a component. A plain "header" line runs before
+	# the answer of the server arrives, so a page then carries two Content-Security-Policy headers. A
+	# browser applies both of them together, and the strictest value of the two wins.
+	header >Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+
+	# --- Request limits ----------------------------------------------------
+	# The largest correct body is an encrypted snapshot from a client. 40 MB holds a large task list
+	# with a margin. The limit also stops a body that only fills the disk.
+	#
+	# read_body above works together with this value. A body of 40 MB needs 340 KB each second to
+	# arrive inside 2 minutes. A snapshot of five thousand issues stays near 8 MB, which needs
+	# 68 KB each second. Raise read_body when your own snapshot comes close to this limit.
+	request_body {
+		max_size 40MB
+	}
+
+	# --- Handling ----------------------------------------------------------
+	# route keeps the order of the lines below. Without route, Caddy sorts the directives by its own
+	# table.
+	route {
+		import abort_region
+		import abort_cloud
+		import abort_bots
+		encode zstd gzip
+
+		# The server listens on port 8080 inside the network. Caddy adds X-Forwarded-For and
+		# X-Forwarded-Proto. Caddy also carries the WebSocket upgrade that the Blazor circuit needs.
+		# The server trusts those two headers from the Compose subnet only, through
+		# Security:ForwardedHeaders in appsettings.json.
+		#
+		# The health check reads the root page. It does not read /api/public/ping. A database failure
+		# must not make the full site unavailable. The HEALTHCHECK of the image watches the database.
+		#
+		# health_headers gives the Host header of the check. Without this block Caddy sends
+		# "server:8080", which is the dial address. HostFilteringMiddleware of the server then reads
+		# AllowedHosts in appsettings.json, finds no match, and answers 400. Caddy marks the only
+		# upstream unhealthy, and the site answers 502 to every visitor. This value must hold the
+		# same domain as the site block above.
+		reverse_proxy tld18-server:8080 {
+			health_uri /
+			health_interval 30s
+			health_timeout 5s
+			health_headers {
+				Host tasks.example.com
+			}
+		}
+	}
+}
+
+# ---------------------------------------------------------------------------
+# A second service on a second subdomain
+# ---------------------------------------------------------------------------
+# Do these five steps:
+#   1. Remove the comment marks from the block below.
+#   2. Replace four values: the domain, the log file, the policy, and the name and port of the
+#      container.
+#   3. Add the container to docker-compose.yml.
+#   4. Add its name to the depends_on list of Caddy.
+#   5. Add the DNS record before the first start. Caddy asks for the certificate at once.
+#
+# Check three points before you copy this block:
+#   1. The policy. The value below fits an API that serves no page. A site with pages needs its own
+#      policy.
+#   2. The body limit. Give the smallest size that the service needs.
+#   3. The imports of the route block. Take only the filters that the site needs. A caller such as
+#      a webhook often sends no User-Agent header, and abort_bots then drops it. Omit that import,
+#      or write the lines of the snippet into the site block without the two agent rules.
+#
+# reports.example.com {
+# 	import site_base access-reports.log
+# 	import filter_matchers
+#
+# 	header Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
+#
+# 	request_body {
+# 		max_size 2MB
+# 	}
+#
+# 	route {
+# 		import abort_region
+# 		import abort_cloud
+# 		import abort_bots
+# 		encode zstd gzip
+# 		reverse_proxy reports:8080 {
+# 			health_uri /health
+# 			health_interval 30s
+# 			health_timeout 5s
+# 		}
+# 	}
+# }
+
+# ---------------------------------------------------------------------------
+# 4. A note on the Content-Security-Policy
+# ---------------------------------------------------------------------------
+# The policy above allows an inline script and an inline style. Blazor writes an inline import map
+# into the page. The reconnect dialog holds an inline style. A policy without 'unsafe-inline'
+# therefore stops the application at start-up.
+#
+# Open the site. Then open the browser console. Read the console after each change to the policy. A
+# blocked resource gives a "Refused to load" line there.
+#
+# A new site must not take this value. It carries the needs of Blazor, and it weakens the policy of
+# a site that runs no Blazor.
+#
+# ---------------------------------------------------------------------------
+# What this file does not do
+# ---------------------------------------------------------------------------
+# Rate limiting at the proxy. The standard build of Caddy holds no rate limiter. Three rules cover
+# this today, and each one works at a different level:
+#   1. The server. Security:RateLimit in appsettings.json limits each caller address. It runs after
+#      UseForwardedHeaders, so it reads the caller and not this proxy. This is the main rule.
+#   2. fail2ban on the host. It reads the access log above, and README.md holds the jails. It blocks
+#      the repeated scanner at the firewall, before a packet reaches a container.
+#   3. A custom Caddy image with the mholt/caddy-ratelimit plugin. Add it when you want the proxy to
+#      drop the request before it reaches the server at all.
+#
+# A challenge page and a managed WAF. The region filter above blocks a country, and it runs on this
+# machine alone. A challenge page and a WAF need a service in front of the site. Put the site behind
+# such a provider when you expect a large flood. One server cannot absorb a large flood, and a
+# region filter does not change that. It cuts the noise of a scan, not the volume of a flood.

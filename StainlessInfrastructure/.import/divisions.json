@@ -1,0 +1,101 @@
+﻿[
+    {
+        "Id": "FOD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Fireplace of Despair"
+            }
+        ]
+    },
+    {
+        "Id": "ACD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Ashen Chronicles Division"
+            }
+        ]
+    },
+    {
+        "Id": "DSD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Double Standards Division"
+            }
+        ]
+    },
+    {
+        "Id": "FLD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Fractured Lens Division"
+            }
+        ]
+    },
+    {
+        "Id": "IRD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Inkwell Reverie Division"
+            }
+        ]
+    },
+    {
+        "Id": "OCD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Omnia Constructs Division"
+            }
+        ]
+    },
+    {
+        "Id": "OED",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Obscure Esoteric Division"
+            }
+        ]
+    },
+    {
+        "Id": "SLD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Stellar Logistics Division"
+            }
+        ]
+    },
+    {
+        "Id": "SSD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Stellar Sky Division"
+            }
+        ]
+    },
+    {
+        "Id": "TLD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Tamed Logic Division"
+            }
+        ]
+    },
+    {
+        "Id": "VHD",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Void Harmonization Division"
+            }
+        ]
+    }
+]

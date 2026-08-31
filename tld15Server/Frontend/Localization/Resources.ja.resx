@@ -1,0 +1,387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Account.ConfirmDelete" xml:space="preserve">
+    <value>このアカウントを削除してもよろしいですか？</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>アカウント</value>
+  </data>
+  <data name="Account.Login" xml:space="preserve">
+    <value>ログイン名</value>
+  </data>
+  <data name="Account.Status" xml:space="preserve">
+    <value>ステータス</value>
+  </data>
+  <data name="Accounts" xml:space="preserve">
+    <value>アカウント一覧</value>
+  </data>
+  <data name="Account.ApiKey" xml:space="preserve">
+    <value>APIキー</value>
+  </data>
+  <data name="Account.ApiKey.Created" xml:space="preserve">
+    <value>作成日時</value>
+  </data>
+  <data name="Account.ApiKey.LastUsed" xml:space="preserve">
+    <value>最終使用</value>
+  </data>
+  <data name="Account.ApiKey.NeverUsed" xml:space="preserve">
+    <value>未使用</value>
+  </data>
+  <data name="Account.ApiKey.CopyNow" xml:space="preserve">
+    <value>新しいキーを今すぐコピーしてください。保存すると表示されなくなります。また、保存するまで有効になりません。</value>
+  </data>
+  <data name="Account.Features" xml:space="preserve">
+    <value>機能</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>Fireplace of Despair</value>
+  </data>
+  <data name="Brand.Company" xml:space="preserve">
+    <value>Fireplace of Despair</value>
+  </data>
+  <data name="Common.CreatedAt" xml:space="preserve">
+    <value>作成日時</value>
+  </data>
+  <data name="Common.DateTimeLong" xml:space="preserve">
+    <value>yyyy/MM/dd HH:mm:ss</value>
+  </data>
+  <data name="Common.Delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Common.ExpireAt" xml:space="preserve">
+    <value>有効期限</value>
+  </data>
+  <data name="Common.IP" xml:space="preserve">
+    <value>IPアドレス</value>
+  </data>
+  <data name="Common.Main" xml:space="preserve">
+    <value>基本情報</value>
+  </data>
+  <data name="Common.Manage" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Common.Create" xml:space="preserve">
+    <value>作成</value>
+  </data>
+  <data name="Common.NothingWasFound" xml:space="preserve">
+    <value>該当するデータがありません</value>
+  </data>
+  <data name="Common.Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Common.UserAgent" xml:space="preserve">
+    <value>ユーザーエージェント</value>
+  </data>
+  <data name="Identity" xml:space="preserve">
+    <value>認証</value>
+  </data>
+  <data name="Identity.DoLogin" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="Incident" xml:space="preserve">
+    <value>インシデント</value>
+  </data>
+  <data name="Incident.Forbidden" xml:space="preserve">
+    <value>アクセス禁止</value>
+  </data>
+  <data name="Incident.General" xml:space="preserve">
+    <value>一般エラー</value>
+  </data>
+  <data name="Incident.NotFound" xml:space="preserve">
+    <value>レコードが見つかりません</value>
+  </data>
+  <data name="Incident.Unauthorized" xml:space="preserve">
+    <value>認証されていません</value>
+  </data>
+  <data name="Incident.Validation" xml:space="preserve">
+    <value>検証エラー</value>
+  </data>
+  <data name="Incident.VersionMismatch" xml:space="preserve">
+    <value>バージョン不一致</value>
+  </data>
+  <data name="Incident.WrongPassword" xml:space="preserve">
+    <value>ログイン名またはパスワードが正しくありません</value>
+  </data>
+  <data name="Incident.TooManyAttempts" xml:space="preserve">
+    <value>ログイン試行が多すぎます。しばらくしてからもう一度お試しください。</value>
+  </data>
+  <data name="Sessions" xml:space="preserve">
+    <value>セッション</value>
+  </data>
+  <data name="Sessions.ConfirmDelete" xml:space="preserve">
+    <value>このセッションを削除してもよろしいですか？</value>
+  </data>
+  <data name="System.Author" xml:space="preserve">
+    <value>Shevtsov "Chief" Stan</value>
+  </data>
+  <data name="System.Keywords" xml:space="preserve">
+    <value>Stan</value>
+  </data>
+  <data name="System.Language" xml:space="preserve">
+    <value>ja</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>ようこそ</value>
+  </data>
+  <data name="Account.Password" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="Account.Password.Current" xml:space="preserve">
+    <value>現在のパスワード</value>
+  </data>
+  <data name="Account.Password.New" xml:space="preserve">
+    <value>新しいパスワード</value>
+  </data>
+  <data name="Common.Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="Common.UpdatedAt" xml:space="preserve">
+    <value>更新日時</value>
+  </data>
+  <data name="Menu.System" xml:space="preserve">
+    <value>システム</value>
+  </data>
+  <data name="Common.Version" xml:space="preserve">
+    <value>バージョン</value>
+  </data>
+  <data name="Common.SourceCode" xml:space="preserve">
+    <value>ソースコード</value>
+  </data>
+  <data name="Reconnect.Rejoining" xml:space="preserve">
+    <value>サーバーに再接続しています。</value>
+  </data>
+  <data name="Reconnect.RejoinFailed" xml:space="preserve">
+    <value>再接続に失敗しました。</value>
+  </data>
+  <data name="Common.TryingAgainIn" xml:space="preserve">
+    <value>{0}秒後に再試行します</value>
+  </data>
+  <data name="Reconnect.RetryReload" xml:space="preserve">
+    <value>再試行するか、ページを再読み込みしてください。</value>
+  </data>
+  <data name="Common.Retry" xml:space="preserve">
+    <value>再試行</value>
+  </data>
+  <data name="Reconnect.SessionPaused" xml:space="preserve">
+    <value>サーバーによってセッションが一時停止されました。</value>
+  </data>
+  <data name="Common.Resume" xml:space="preserve">
+    <value>再開</value>
+  </data>
+  <data name="Reconnnect.Failed" xml:space="preserve">
+    <value>セッションの再開に失敗しました。</value>
+  </data>
+  <data name="Common.ReloadPage" xml:space="preserve">
+    <value>ページを再読み込みしてください。</value>
+  </data>
+  <data name="Common.Search" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="Common.NotFound" xml:space="preserve">
+    <value>404</value>
+  </data>
+  <data name="Incident.NotFoundPage" xml:space="preserve">
+    <value>ページが見つかりません。</value>
+  </data>
+  <data name="Account.Type" xml:space="preserve">
+    <value>種別</value>
+  </data>
+  <data name="Issue" xml:space="preserve">
+    <value>タスク</value>
+  </data>
+  <data name="Issue.Name" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="Issue.Category" xml:space="preserve">
+    <value>カテゴリ</value>
+  </data>
+  <data name="Issue.Project" xml:space="preserve">
+    <value>プロジェクト</value>
+  </data>
+  <data name="Issue.Deadline" xml:space="preserve">
+    <value>期限</value>
+  </data>
+  <data name="Issue.IsTopPriority" xml:space="preserve">
+    <value>最優先</value>
+  </data>
+  <data name="Issue.IsDone" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="Issue.Note" xml:space="preserve">
+    <value>メモ</value>
+  </data>
+  <data name="Brand.Slogan" xml:space="preserve">
+    <value>苦難は人を形作る</value>
+  </data>
+  <data name="Common.Yes" xml:space="preserve">
+    <value>はい</value>
+  </data>
+  <data name="Common.No" xml:space="preserve">
+    <value>いいえ</value>
+  </data>
+  <data name="Common.Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>プロジェクト</value>
+  </data>
+  <data name="Project.Name" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="Project.Weight" xml:space="preserve">
+    <value>重み</value>
+  </data>
+  <data name="Project.IgnoreInCategories" xml:space="preserve">
+    <value>カテゴリで無視</value>
+  </data>
+  <data name="Issue.Project.SelectProject" xml:space="preserve">
+    <value>プロジェクトを選択</value>
+  </data>
+  <data name="Project.ConfirmDelete" xml:space="preserve">
+    <value>このプロジェクトを削除してもよろしいですか？</value>
+  </data>
+  <data name="Issue.ConfirmDelete" xml:space="preserve">
+    <value>このタスクを削除してもよろしいですか？</value>
+  </data>
+  <data name="Issue.Done" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>アーカイブ</value>
+  </data>
+  <data name="Incident.BusinessCannotRestoreIssueInProject" xml:space="preserve">
+    <value>プロジェクトに割り当てられたタスクは復元できません</value>
+  </data>
+  <data name="Pagination.First" xml:space="preserve">
+    <value>最初</value>
+  </data>
+  <data name="Pagination.Previous" xml:space="preserve">
+    <value>前へ</value>
+  </data>
+  <data name="Pagination.Last" xml:space="preserve">
+    <value>最後</value>
+  </data>
+  <data name="Pagination.Next" xml:space="preserve">
+    <value>次へ</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>プロフィール</value>
+  </data>
+</root>

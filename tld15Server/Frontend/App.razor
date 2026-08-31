@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Localization
+@using tld15Server.Frontend.Components
+
+<!DOCTYPE html>
+<html lang="@localizer["System.Language"]">
+
+<head>
+    <base href="/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="keywords" content="@localizer["System.Keywords"]">
+    <meta name="language" content="@localizer["System.Language"]" />
+    <meta name="author" content="@localizer["System.Author"]" />
+    <meta name="designer" content="@localizer["System.Author"]" />
+    <meta name="publisher" content="@localizer["Brand.Company"]" />
+    <meta name="copyright" content="@localizer["Brand.Company"]">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index,follow">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="General">
+
+    <!-- Mobile meta tags -->
+    <meta name="format-detection" content="telephone=yes" />
+    <meta name="HandheldFriendly" content="true" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["tld15Server.styles.css"]" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="@Assets["favicon.png"]" />
+    <link rel="icon" type="image/x-icon" href="@Assets["favicon.ico"]" />
+    <link rel="apple-touch-icon" href="@Assets["images/logo.png"]" />
+
+    <ImportMap />
+    <HeadOutlet />
+    <ResourcePreloader />
+</head>
+
+<body>
+    <Routes />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+
+</html>
+
+@code {
+    [Inject] private IStringLocalizer<Localization.Resources> localizer { get; set; } = default!;
+}

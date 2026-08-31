@@ -1,0 +1,3 @@
+# Keep a shell script with Unix line endings. A CRLF file fails on a Linux server, because the
+# kernel reads the carriage return as a part of the interpreter path.
+*.sh text eol=lf

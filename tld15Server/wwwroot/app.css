@@ -1,0 +1,478 @@
+﻿:root {
+    --color-background: #0A0E11;
+    --color-container: #151D21;
+    --color-text: #ffeeee;
+    --color-text-rgb: 255,238,238;
+    --color-highlight-soft: #A65B5A;
+    --color-highlight-soft-rgb: 166, 91, 90;
+    --color-highlight-hard: #AB2C2B;
+    --color-control: #661F1F;
+    --color-control-rgb: 102, 31, 31;
+}
+
+html {
+    height: 100%;
+    font-family: 'Georgia', "Yu Mincho", serif;
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    font-size: 17px;
+}
+
+h1 {
+    font-size: 40px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-weight: 450;
+}
+
+h2 {
+    font-size: 30px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-weight: 450;
+}
+
+/* ------------------------------------------------------------ */
+
+/* Inputs ----------------------------------------------------- */
+/* Container for form group */
+.input-group {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Label styling */
+label {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+/* Input and select shared styling */
+input,
+input.valid {
+    display: block;
+    padding: 5px 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-background);
+    background-color: var(--color-text);
+    background-clip: padding-box;
+    border: 1px solid var(--color-background);
+    width: 230px;
+}
+
+textarea,
+textarea.valid {
+    display: block;
+    padding: 5px 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-background);
+    background-color: var(--color-text);
+    background-clip: padding-box;
+    border: 1px solid var(--color-background);
+    width: 230px;
+}
+
+select,
+select.valid {
+    display: block;
+    padding: 5px 10px;
+    width: 256px;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--color-background);
+    background-color: var(--color-text);
+    background-clip: padding-box;
+    border: 1px solid var(--color-background);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23495057'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 15px;
+    padding-right: 30px;
+}
+
+    /* Focus state */
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: 0;
+        box-shadow: 0 0 0 3px var(--color-background);
+    }
+
+    /* Disabled state */
+    input:disabled,
+    textarea:disabled,
+    select:disabled {
+        background-color: var(--color-background);
+        opacity: 1;
+        color: var(--color-text);
+        cursor: not-allowed;
+    }
+
+
+/* Placeholder styling */
+input::placeholder {
+    color: var(--color-text);
+    opacity: 1;
+}
+
+/* Invalid state */
+input.invalid,
+textarea.invalid,
+select.invalid {
+    display: block;
+    padding: 5px 10px;
+    width: 256px;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--color-background);
+    background-color: var(--color-text);
+    background-clip: padding-box;
+    border: 1px solid var(--color-highlight-soft);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23495057'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 15px;
+    padding-right: 30px;
+}
+
+    input.invalid:focus,
+    select.invalid:focus {
+        box-shadow: 0 0 0 3px var(--color-highlight-soft);
+    }
+/* ------------------------------------------------------------ */
+
+/* Containers ------------------------------------------------- */
+.component-container-column {
+    background-color: var(--color-container);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    gap: 5px;
+}
+
+.component-container-column-full {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.component-container-row {
+    background-color: var(--color-container);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    gap: 5px;
+}
+
+.container-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ------------------------------------------------------------ */
+
+/* Link ------------------------------------------------------- */
+a {
+    &:link {
+        color: var(--color-text);
+    }
+
+    &:visited {
+        color: var(--color-text);
+    }
+
+    &:hover {
+        color: var(--color-highlight-soft);
+    }
+
+    &:active {
+        color: var(--color-highlight-soft);
+    }
+}
+/* ------------------------------------------------------------ */
+
+/* Checkbox --------------------------------------------------- */
+.checkbox-container {
+    display: flex;
+    flex-flow: nowrap;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+    .custom-checkbox svg {
+        width: 100%;
+        height: 100%;
+    }
+
+        .custom-checkbox svg rect {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .custom-checkbox svg path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+input[type="checkbox"]:checked + .custom-checkbox svg path {
+    opacity: 1;
+}
+
+.checkbox-container:hover {
+    color: var(--color-highlight-soft);
+}
+/* ------------------------------------------------------------ */
+
+/* Radio ------------------------------------------------------ */
+.radio-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.custom-radio {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+    .custom-radio svg {
+        width: 100%;
+        height: 100%;
+    }
+
+        .custom-radio svg circle {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .custom-radio svg .radio-dot {
+            fill: currentColor;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+input[type="radio"]:checked + .custom-radio svg .radio-dot {
+    opacity: 1;
+}
+
+.radio-container:hover {
+    color: var(--color-highlight-soft);
+}
+/* ------------------------------------------------------------ */
+
+/* Table ------------------------------------------------------ */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+thead {
+    font-weight: 500;
+    background-color: var(--color-background);
+}
+
+
+    thead tr:hover {
+        background-color: var(--color-background);
+    }
+
+td, th {
+    border: 1px solid var(--color-text);
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(var(--color-control-rgb), 0.1);
+}
+
+tr:hover {
+    background-color: rgba(var(--color-control-rgb), 0.3);
+}
+
+/* ------------------------------------------------------------ */
+
+/* Icon Button ------------------------------------------------ */
+.icon-button-selected {
+    background: transparent;
+    color: var(--color-highlight-hard);
+}
+
+.icon-button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    display: flex;
+    justify-content: center;
+
+    &:hover {
+        background: transparent;
+        color: var(--color-highlight-hard);
+        transform: scale(0.9);
+    }
+
+    &:focus {
+        background: transparent;
+        outline: none;
+        transform: scale(0.9);
+    }
+
+    &:active {
+        background: transparent;
+        color: var(--color-highlight-hard);
+        transform: scale(0.9);
+    }
+}
+
+.icon-button-small {
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 20px !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    display: flex;
+    justify-content: center;
+    margin-right: 10px;
+
+    &:hover {
+        background: transparent;
+        color: var(--color-highlight-hard);
+        transform: scale(0.9);
+    }
+
+    &:focus {
+        background: transparent;
+        outline: none;
+        transform: scale(0.9);
+    }
+
+    &:active {
+        background: transparent;
+        color: var(--color-highlight-hard);
+        transform: scale(0.9);
+    }
+}
+/* ------------------------------------------------------------ */
+
+/* ----- */
+.icon-button .icon-square {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid currentColor;
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    color: currentColor;
+    background: transparent;
+    line-height: 1;
+}
+/* ----- */
+
+
+/* Button ----------------------------------------------------- */
+button {
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 100px;
+    padding: 5px 10px;
+    margin: 8px 0;
+    border-radius: 0px;
+    border: 1px solid var(--color-text);
+    background-color: var(--color-control);
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: scale(0.9);
+    }
+
+    &:active {
+        color: var(--color-control);
+        background-color: var(--color-text);
+        transform: scale(0.9);
+    }
+
+    &:focus {
+        outline: none;
+        transform: scale(0.9);
+    }
+}
+/* ------------------------------------------------------------ */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1040;
+    transition: opacity 0.35s ease;
+}

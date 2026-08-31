@@ -1,0 +1,101 @@
+﻿@using Mediator
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@using tld15Server.Composition
+@using tld15Server.Frontend
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Navigations
+@using tld15Server.Services
+@implements IDisposable
+
+<input type="checkbox" class="navbar-toggler" />
+
+<nav>
+    <NavAccordion Title="@Localizer["Menu.System"]"
+                  ActiveUrls='new[]
+                                      {
+                                          Pages.Sessions.SessionSearchPage.Url, Pages.Account.AccountSearchPage.Url,
+                                                    Pages.Account.AccountReadPage.Url, Pages.Profiles.ProfileReadPage.Url
+                                      }'>
+
+        <Restricted Feature="@Features.Profiles.ProfileGetFeature.Id">
+            <NavLink href="@Pages.Profiles.ProfileReadPage.Url">
+                @Localizer["Profile"]
+            </NavLink>
+        </Restricted>
+
+        <Restricted Feature="@Features.Accounts.AccountsSearchFeature.Id">
+            <NavLink href="@Pages.Account.AccountSearchPage.Url">
+                @Localizer["Accounts"]
+            </NavLink>
+        </Restricted>
+
+        <Restricted Feature="@Features.Sessions.SessionsSearchFeature.Id">
+            <NavLink href="@Pages.Sessions.SessionSearchPage.Url">
+                @Localizer["Sessions"]
+            </NavLink>
+        </Restricted>
+    </NavAccordion>
+</nav>
+
+@code {
+    [Inject] private IStringLocalizer<Localization.Resources> Localizer { get; set; } = default!;
+    [Inject] private IMediator Mediator { get; set; } = default!;
+    [Inject] private CookieStateProvider CookieStateProvider { get; set; } = default!;
+    [Inject] private CacheManager CacheManager { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private NavigationState NavigationState { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == false) { return; }
+
+        var accountId = await GetAccountIdAsync();
+        if (accountId == null) { return; }
+
+        StateHasChanged();
+    }
+
+    private async Task<Guid?> GetAccountIdAsync()
+    {
+        var authState = await CookieStateProvider.GetAuthenticationStateAsync();
+
+        var session = authState.User.Claims.FirstOrDefault(c => c.Type == Globals.CustomClaim.Session);
+        if (session == null) { return null; }
+
+        if (!Guid.TryParse(session.Value, out var sessionId)) { return null; }
+
+        return CacheManager.GetSessionById(sessionId)?.AccountId;
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationState.OnChange += StateHasChanged;
+        CookieStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    private void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    #region IDisposable
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing) //managed
+        {
+            NavigationState.OnChange -= StateHasChanged;
+            CookieStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+        }
+
+        // unmanaged
+    }
+    #endregion
+}

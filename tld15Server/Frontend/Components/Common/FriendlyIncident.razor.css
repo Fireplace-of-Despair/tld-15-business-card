@@ -1,0 +1,5 @@
+﻿.friendly-incident-container {
+    color: var(--color-highlight-hard);
+    display: flex;
+    justify-content: center;
+}

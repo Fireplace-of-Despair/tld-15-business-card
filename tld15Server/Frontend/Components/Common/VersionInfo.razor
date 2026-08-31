@@ -1,0 +1,47 @@
+﻿@using Microsoft.Extensions.Localization
+@using StainlessCore.Models
+
+<div class="component-container-column">
+    <h2>@localizer["Common.Version"]</h2>
+    <div class="component-container-row">
+        @if (UpdatableModel != null)
+        {
+            <div class="input-group">
+                <label>@localizer["Common.CreatedAt"]</label>
+                <span class="input-like">
+                    <BrowserTime DateTimeOffset="@UpdatableModel.CreatedAt"
+                                 Format="@localizer["Common.DateTimeLong"]" />
+                </span>
+            </div>
+            <div class="input-group">
+                <label>@localizer["Common.UpdatedAt"]</label>
+                <span class="input-like">
+                    <BrowserTime DateTimeOffset="@UpdatableModel.UpdatedAt"
+                                 Format="@localizer["Common.DateTimeLong"]" />
+                </span>
+            </div>
+        }
+        @if (VersionLocalModel != null)
+        {
+            <div class="input-group">
+                <label>@localizer["Common.Version"]</label>
+                <span class="input-like">@VersionLocalModel.VersionLocal</span>
+            </div>
+        }
+        @if (VersionGlobalModel != null)
+        {
+            <div class="input-group">
+                <label>@localizer["Common.Version"]</label>
+                <span class="input-like">@VersionGlobalModel.VersionGlobal</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    [Inject] private IStringLocalizer<Localization.Resources> localizer { get; set; } = default!;
+    [Parameter] public IVersionGlobal? VersionGlobalModel { get; set; }
+    [Parameter] public IVersionLocal? VersionLocalModel { get; set; }
+    [Parameter] public IUpdatable? UpdatableModel { get; set; }
+}

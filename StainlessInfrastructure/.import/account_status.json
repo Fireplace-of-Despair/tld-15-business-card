@@ -1,0 +1,28 @@
+﻿[
+    {
+        "Id": "enabled",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Enabled"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "有効"
+            }
+        ]
+    },
+    {
+        "Id": "disabled",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Disabled"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "無効"
+            }
+        ]
+    }
+]

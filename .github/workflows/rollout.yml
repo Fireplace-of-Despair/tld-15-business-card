@@ -20,11 +20,11 @@ jobs:
       - name: Build Backend
         run: |
           mkdir rollout
-          cd TLD15
-          docker build -t tld-15 .
-          docker tag tld-15 tld-15:latest
-          docker save -o tld-15.tar tld-15:latest
-          mv tld-15.tar ../rollout/tld-15.tar
+          cd tld15Server
+          docker build -t tld15Server .
+          docker tag tld15Server tld15Server:latest
+          docker save -o tld15Server.tar tld15Server:latest
+          mv tld15Server.tar ../rollout/tld15Server.tar
 
       - name: rsync deployments
         uses: burnett01/rsync-deployments@7.0.1
@@ -67,11 +67,11 @@ jobs:
       - name: Stop all
         run: ssh staging 'sudo docker stop $(sudo docker ps -a -q)'
 
-      - name: Delete tld-15
-        run: ssh staging 'sudo docker rm /tld-15 && sudo docker rmi tld-15'
+      - name: Delete tld15Server
+        run: ssh staging 'sudo docker rm /tld15Server && sudo docker rmi tld15Server'
 
-      - name: Import tld-15
-        run: ssh staging 'cd /uploads/rollout && sudo docker load --input tld-15.tar'
+      - name: Import tld15Server
+        run: ssh staging 'cd /uploads/rollout && sudo docker load --input tld15Server.tar'
 
       - name: Start
         run: ssh staging 'cd /config && sudo docker compose up -d'
