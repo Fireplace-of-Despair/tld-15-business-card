@@ -57,6 +57,15 @@ public static class Globals
         public static string Projects => "projects";
     }
 
+    public static class Archive
+    {
+        /// <summary>
+        /// The division whose works are kept in the archive. They are the same rows as any other
+        /// work and open on the same page; only the list they appear in is a different one.
+        /// </summary>
+        public static string DivisionId => Divisions.ACD;
+    }
+
     public static class Route
     {
         /// <summary>

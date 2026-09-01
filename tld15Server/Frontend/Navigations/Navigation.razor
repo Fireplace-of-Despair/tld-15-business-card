@@ -17,7 +17,8 @@
                                           Pages.Contents.ContentSearchPage.Url, Pages.Contents.ContentLinkEditPage.Url,
 
                                           Pages.Contents.ContentTextEditPage.Url, Pages.Projects.ProjectSearchPage.Url,
-                                          Pages.Projects.ProjectEditPage.Url
+                                          Pages.Projects.ProjectEditPage.Url, Pages.Presses.PressSearchPage.Url,
+                                          Pages.Presses.PressEditPage.Url
                                       }'>
 
         <Restricted Feature="@Features.Contents.ContentSearchFeature.Id">
@@ -29,6 +30,12 @@
         <Restricted Feature="@Features.Projects.ProjectSearchFeature.Id">
             <NavLink href="@Pages.Projects.ProjectSearchPage.Url">
                 @Localizer["Projects"]
+            </NavLink>
+        </Restricted>
+
+        <Restricted Feature="@Features.Presses.PressSearchFeature.Id">
+            <NavLink href="@Pages.Presses.PressSearchPage.Url">
+                @Localizer["Press"]
             </NavLink>
         </Restricted>
     </NavAccordion>

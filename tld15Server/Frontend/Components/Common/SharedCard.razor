@@ -4,7 +4,8 @@
 <div id="@SharedCardContent.Id" class="article-card">
     <div class="article-image-container">
 
-        <NavLink href="@_url">
+        @* A card that leads off the site opens where it leads and hands that page nothing. *@
+        <a href="@_url" target="@(_external ? "_blank" : null)" rel="@(_external ? "noopener noreferrer" : null)">
             @if (string.IsNullOrEmpty(SharedCardContent.PosterUrl))
             {
                 <img class="article-image" loading="lazy"
@@ -17,11 +18,14 @@
                      src="@SharedCardContent.PosterUrl"
                      alt="@SharedCardContent.PosterAlt">
             }
-        </NavLink>
-        <div class="article-image-overlay-division tooltip"
-             data-tooltip="@SharedCardContent.DivisionName">
-            @SharedCardContent.DivisionId.ToUpper()
-        </div>
+        </a>
+        @if (!string.IsNullOrEmpty(SharedCardContent.DivisionId))
+        {
+            <div class="article-image-overlay-division tooltip"
+                 data-tooltip="@SharedCardContent.DivisionName">
+                @SharedCardContent.DivisionId.ToUpper()
+            </div>
+        }
 
         <div class="article-image-overlay-date">
             <time datetime="@SharedCardContent.PublishedAt.UtcDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
@@ -30,9 +34,12 @@
         </div>
     </div>
 
-    <NavLink href="@_url" class="article-title">
+    <a href="@_url"
+       class="article-title"
+       target="@(_external ? "_blank" : null)"
+       rel="@(_external ? "noopener noreferrer" : null)">
         <b>@SharedCardContent.Title</b>
-    </NavLink>
+    </a>
 
     <div class="article-description">
         @SharedCardContent.Subtitle

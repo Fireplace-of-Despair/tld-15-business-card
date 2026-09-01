@@ -9,13 +9,22 @@ namespace tld15Server.Frontend.Components.Common;
 public partial class SharedCard
 {
     [Parameter]
-    public required SharedProjectPreview SharedCardContent { get; set; }
+    public required SharedCardPreview SharedCardContent { get; set; }
 
     internal string _url = string.Empty;
 
+    /// <summary> Whether the card leads off this site, which decides how its links behave. </summary>
+    internal bool _external;
+
     protected override void OnParametersSet()
     {
-        _url = $"{Pages.Projects.ProjectReadPage.Url}/{SharedCardContent.Id}";
+        _external = !string.IsNullOrWhiteSpace(SharedCardContent.ExternalUrl);
+
+        // A project and an article are the same row split by a type and are read on the same page.
+        // Anything that names an address of its own is read wherever that address leads.
+        _url = _external
+            ? SharedCardContent.ExternalUrl!
+            : $"{Pages.Projects.ProjectReadPage.Url}/{SharedCardContent.Id}";
     }
 }
 

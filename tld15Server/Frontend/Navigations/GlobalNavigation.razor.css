@@ -1,0 +1,40 @@
+﻿.global-navigation {
+    align-self: center;
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+/* The same fill as the local links, without the border: this row sits inside the header and a row
+   of boxes there would fight the brand above it. */
+.global-navigation-link {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    padding: 5px 10px;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .global-navigation-link::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        background: var(--color-control);
+        transition: all 0.3s ease;
+    }
+
+    .global-navigation-link:hover::after {
+        top: 0;
+        height: 100%;
+    }
+
+/* The page a reader is already on. */
+.active {
+    background: var(--color-background);
+}

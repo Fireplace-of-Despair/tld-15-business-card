@@ -148,8 +148,8 @@ public sealed class Program
 
     /// <summary>
     /// Writes the sitemap once, out of the works the database carries at this moment. It is the
-    /// whole of the public site: the front page and one address per work. Everything else either
-    /// sits under the admin segment or is a door rather than a page.
+    /// whole of the public site: the two walls of cards and one address per work. Everything else
+    /// either sits under the admin segment or is a door rather than a page.
     /// </summary>
     private static void BuildTheSitemap(WebApplication app)
     {
@@ -172,17 +172,40 @@ public sealed class Program
             var works = context.Projects
                 .Where(x => x.Translations.Count > 0)
                 .OrderByDescending(x => x.PublishedAt)
-                .Select(x => new { x.Id, x.UpdatedAt })
+                .Select(x => new { x.Id, x.UpdatedAt, x.DivisionId })
                 .AsNoTracking()
                 .ToList();
 
-            var entries = new List<SitemapService.Entry>(works.Count + 1)
+            // A wall of cards moved when the newest card on it moved, and the two walls carry
+            // different works: the archive division on one, everything else on the other.
+            var archived = works.FindAll(x => x.DivisionId == Globals.Archive.DivisionId);
+            var current = works.FindAll(x => x.DivisionId != Globals.Archive.DivisionId);
+
+            var entries = new List<SitemapService.Entry>(works.Count + 2)
             {
-                // The front page carries the cards, so it moved when the newest of them moved.
-                new(Frontend.Pages.Home.Url, works.Count == 0
+                new(Frontend.Pages.Home.Url, current.Count == 0
                     ? DateTimeOffset.UtcNow
-                    : works.Max(x => x.UpdatedAt)),
+                    : current.Max(x => x.UpdatedAt)),
             };
+
+            if (archived.Count > 0)
+            {
+                entries.Add(new SitemapService.Entry(
+                    Frontend.Pages.Archive.ArchivePage.Url,
+                    archived.Max(x => x.UpdatedAt)));
+            }
+
+            // The press has a wall of its own. Every card on it leads off this site, so the page is
+            // the only address there is to offer.
+            var mentions = context.Presses
+                .AsNoTracking()
+                .Select(x => x.UpdatedAt)
+                .ToList();
+
+            if (mentions.Count > 0)
+            {
+                entries.Add(new SitemapService.Entry(Frontend.Pages.Presses.PressPage.Url, mentions.Max()));
+            }
 
             entries.AddRange(works.Select(x => new SitemapService.Entry(
                 $"{Frontend.Pages.Projects.ProjectReadPage.Url}/{x.Id}",

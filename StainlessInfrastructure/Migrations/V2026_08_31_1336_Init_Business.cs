@@ -164,6 +164,9 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
         Insert.Feature("content.search", new Dictionary<string, string> {
             { "en", "Content: Search" }, { "ja", "コンテンツ：検索" } });
 
+        Insert.Feature("archive.get", new Dictionary<string, string> {
+            { "en", "Archive: Get" }, { "ja", "アーカイブ：取得" } });
+
         Insert.Feature("project.get", new Dictionary<string, string> {
             { "en", "Project: Get" }, { "ja", "プロジェクト：取得" } });
         Insert.Feature("project.post", new Dictionary<string, string> {
@@ -179,6 +182,8 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
         Delete.Feature("content.get");
         Delete.Feature("content.post");
         Delete.Feature("content.search");
+
+        Delete.Feature("archive.get");
 
         Delete.Feature("project.get");
         Delete.Feature("project.post");

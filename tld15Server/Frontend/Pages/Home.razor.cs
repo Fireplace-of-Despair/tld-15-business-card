@@ -35,8 +35,8 @@ public partial class Home
     public SharedContent? Lore { get; set; }
     public SharedContent? Social { get; set; }
     public SharedContent? Contacts { get; set; }
-    public List<SharedProjectPreview> Articles { get; set; } = [];
-    public List<SharedProjectPreview> Projects { get; set; } = [];
+    public List<SharedCardPreview> Articles { get; set; } = [];
+    public List<SharedCardPreview> Projects { get; set; } = [];
 
     /// <summary> The one address of the front page, whatever address the reader arrived on. </summary>
     private string _canonical = string.Empty;

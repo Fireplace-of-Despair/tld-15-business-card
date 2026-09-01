@@ -22,6 +22,13 @@
     <div class="brand-header-slogan">
         <i>@Localizer["Brand.Slogan"]</i>
     </div>
+
+    @* The pages a visitor moves between. The section that manages the site keeps its own navigation
+       at the side, and two rows of links pointing at different worlds only confuse the one reading. *@
+    @if (!IsAdmin)
+    {
+        <GlobalNavigation />
+    }
 </header>
 
 <div class="page">

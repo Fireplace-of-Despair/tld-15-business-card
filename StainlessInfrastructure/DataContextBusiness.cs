@@ -14,6 +14,7 @@ public class DataContextBusiness : DbContext
 {
     public virtual DbSet<Content> Contents => Set<Content>();
     public virtual DbSet<Project> Projects => Set<Project>();
+    public virtual DbSet<Press> Presses => Set<Press>();
     public DataContextBusiness() { }
     public DataContextBusiness(DbContextOptions<DataContextBusiness> options) : base(options) { }
 

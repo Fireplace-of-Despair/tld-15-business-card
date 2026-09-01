@@ -685,6 +685,13 @@ button {
     max-width: 220px;
 }
 
+/* An address is longer than a table column wants to be, and a column that will not break sends the
+   whole table off the side of the page. */
+.press-url {
+    max-width: 400px;
+    overflow-wrap: anywhere;
+}
+
 /* A poster is an address, so the editor shows what the address actually loads. */
 .poster-group {
     flex: 1 1 400px;

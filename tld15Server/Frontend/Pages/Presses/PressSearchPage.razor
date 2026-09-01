@@ -1,4 +1,4 @@
-﻿@attribute [Route($"{ProjectSearchPage.Url}/{ProjectSearchPage.UrlParamPage}")]
+﻿@attribute [Route($"{PressSearchPage.Url}/{PressSearchPage.UrlParamPage}")]
 @inherits BasePage
 @rendermode InteractiveServer
 @using tld15Server.Composition
@@ -6,19 +6,19 @@
 @using tld15Server.Frontend.Components.Icons
 
 <PageTitle>
-    @Localizer["Brand"] | @Localizer["Projects"]
+    @Localizer["Brand"] | @Localizer["Press"]
 </PageTitle>
 
 <div class="component-container-column">
     <div class="container-header">
         @if (_canEdit)
         {
-            <a class="icon-button" href="@Pages.Projects.ProjectEditPage.Url">
+            <a class="icon-button" href="@Pages.Presses.PressEditPage.Url">
                 <Plus />
             </a>
         }
 
-        <h1>@Localizer["Projects"]</h1>
+        <h1>@Localizer["Press"]</h1>
     </div>
 </div>
 
@@ -55,23 +55,21 @@
         <thead>
             <tr>
                 <th>@Localizer["Common.Title"]</th>
-                <th>@Localizer["Project.Type"]</th>
-                <th>@Localizer["Project.Division"]</th>
+                <th>@Localizer["Press.Url"]</th>
                 <th>@Localizer["Common.PublishedAt"]</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var project in State.Items)
+            @foreach (var item in State.Items)
             {
-                <tr @key="project.Id">
+                <tr @key="item.Id">
                     <td>
-                        <NavLink href="@($"{Pages.Projects.ProjectEditPage.Url}/{project.Id}")">
-                            @(string.IsNullOrEmpty(project.Title) ? project.Id : project.Title)
+                        <NavLink href="@($"{Pages.Presses.PressEditPage.Url}/{item.Id}")">
+                            @(string.IsNullOrEmpty(item.Title) ? item.Id.ToString() : item.Title)
                         </NavLink>
                     </td>
-                    <td>@project.ProjectTypeId</td>
-                    <td>@project.DivisionId.ToUpperInvariant()</td>
-                    <td>@LocalTime(project.PublishedAt, dateFormat)</td>
+                    <td class="press-url">@item.Url</td>
+                    <td>@LocalTime(item.PublishedAt, dateFormat)</td>
                 </tr>
             }
         </tbody>
@@ -80,5 +78,5 @@
     <Pagination CurrentPage="@State.Page"
                 MaxPage="@MaxPage"
                 MaxVisible="@Globals.Pagination.MaxVisiblePages"
-                BaseUrl="@ProjectSearchPage.Url" />
+                BaseUrl="@PressSearchPage.Url" />
 </div>

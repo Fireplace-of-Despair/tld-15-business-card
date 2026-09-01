@@ -306,6 +306,9 @@
   <data name="Navigation.Sections" xml:space="preserve">
     <value>Sections</value>
   </data>
+  <data name="Navigation.Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
   <data name="Common.Version" xml:space="preserve">
     <value>Version</value>
   </data>
@@ -399,6 +402,9 @@
   <data name="Archive" xml:space="preserve">
     <value>Archive</value>
   </data>
+  <data name="Archive.Description" xml:space="preserve">
+    <value>The works kept in the archive.</value>
+  </data>
   <data name="Incident.BusinessCannotRestoreIssueInProject" xml:space="preserve">
     <value>Can not restore task assigned to the project</value>
   </data>
@@ -417,6 +423,21 @@
   <data name="Profile" xml:space="preserve">
     <value>Profile</value>
   </data>
+  <data name="Press" xml:space="preserve">
+    <value>Press</value>
+  </data>
+  <data name="Press.ConfirmDelete" xml:space="preserve">
+    <value>Delete this mention? This cannot be undone.</value>
+  </data>
+  <data name="Press.Description" xml:space="preserve">
+    <value>Where this body of work has been written about.</value>
+  </data>
+  <data name="Press.Url" xml:space="preserve">
+    <value>Address of the publication</value>
+  </data>
+  <data name="Press.Validation.Url" xml:space="preserve">
+    <value>A mention has to lead somewhere: an http or https address.</value>
+  </data>
   <data name="Project" xml:space="preserve">
     <value>Project</value>
   </data>
@@ -429,19 +450,19 @@
   <data name="Project.Id" xml:space="preserve">
     <value>Id</value>
   </data>
-  <data name="Project.Poster.Alt" xml:space="preserve">
+  <data name="Common.Poster.Alt" xml:space="preserve">
     <value>Poster description</value>
   </data>
-  <data name="Project.Poster.Url" xml:space="preserve">
+  <data name="Common.Poster.Url" xml:space="preserve">
     <value>Poster link</value>
   </data>
-  <data name="Project.PublishedAt" xml:space="preserve">
+  <data name="Common.PublishedAt" xml:space="preserve">
     <value>Published</value>
   </data>
-  <data name="Project.Subtitle" xml:space="preserve">
+  <data name="Common.Subtitle" xml:space="preserve">
     <value>Subtitle</value>
   </data>
-  <data name="Project.Title" xml:space="preserve">
+  <data name="Common.Title" xml:space="preserve">
     <value>Title</value>
   </data>
   <data name="Project.Type" xml:space="preserve">
@@ -450,7 +471,7 @@
   <data name="Project.Validation.Id" xml:space="preserve">
     <value>Lowercase latin letters, digits, and - _ . only.</value>
   </data>
-  <data name="Project.Validation.Poster" xml:space="preserve">
+  <data name="Common.Validation.Poster" xml:space="preserve">
     <value>A poster is linked, not uploaded: the address must be http or https.</value>
   </data>
   <data name="Projects" xml:space="preserve">

@@ -73,14 +73,14 @@
         </div>
 
         <div class="input-group">
-            <label for="project-published">@Localizer["Project.PublishedAt"]</label>
+            <label for="project-published">@Localizer["Common.PublishedAt"]</label>
             <input id="project-published" type="date" @bind="PublishedOn" @bind:format="yyyy-MM-dd" />
         </div>
     </div>
 
     <div class="component-container-row">
         <div class="input-group poster-group">
-            <label for="project-poster">@Localizer["Project.Poster.Url"]</label>
+            <label for="project-poster">@Localizer["Common.Poster.Url"]</label>
             @* Pictures are linked, never uploaded: this server stores an address and nothing else. *@
             <input id="project-poster"
                    type="url"
@@ -89,7 +89,7 @@
                    @bind:event="oninput" />
             @if (!IsPosterValid)
             {
-                <span class="field-error">@Localizer["Project.Validation.Poster"]</span>
+                <span class="field-error">@Localizer["Common.Validation.Poster"]</span>
             }
         </div>
 
@@ -107,17 +107,17 @@
 
     <div class="component-container-row">
         <div class="input-group">
-            <label for="project-title">@Localizer["Project.Title"]</label>
+            <label for="project-title">@Localizer["Common.Title"]</label>
             <input id="project-title" type="text" @bind="Current.Title" />
         </div>
 
         <div class="input-group">
-            <label for="project-subtitle">@Localizer["Project.Subtitle"]</label>
+            <label for="project-subtitle">@Localizer["Common.Subtitle"]</label>
             <input id="project-subtitle" type="text" @bind="Current.Subtitle" />
         </div>
 
         <div class="input-group">
-            <label for="project-alt">@Localizer["Project.Poster.Alt"]</label>
+            <label for="project-alt">@Localizer["Common.Poster.Alt"]</label>
             <input id="project-alt" type="text" @bind="Current.PosterAlt" />
         </div>
     </div>

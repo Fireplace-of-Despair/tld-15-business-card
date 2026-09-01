@@ -155,6 +155,20 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   (`/projects/edit/{id?}`) creates and edits one: the id, type, division, publication date and
   poster address sit above the locale tabs, the title/subtitle/poster text and the markdown body
   inside them. `ProjectPostFeature` replaces a project whole, dropping any locale left blank.
+- The press is its own table (`business.press` + `press_translation`, migration
+  `V2026_09_02_1200_Init_Press`), not a content: a mention carries an outward address, a poster, a
+  `published_at` of its own and no body. `PressPage` (`/press`) draws it with the same `SharedCard`,
+  and the editor lives at `Globals.Route.Admin` + `/press/…`.
+- `SharedCardPreview` fills every card. An entry with an `ExternalUrl` leads off the site (the card
+  then opens a new tab and hands it nothing); one without leads to `ProjectReadPage`. An entry with
+  no `DivisionId` draws no badge, and one with no `ProjectTypeId` draws no link buttons.
+- `GlobalNavigation` (`Frontend/Navigations`) is the row under the brand in `MainLayout`: Home,
+  Press and Archive, with the current page marked `active`. `MainLayout.IsAdmin` keeps it off the pages under
+  `Globals.Route.Admin`, which carry their own navigation at the side.
+- Works of `Globals.Archive.DivisionId` (ACD) are kept **off** the front page and shown on
+  `ArchivePage` (`/archive`) instead — the same wall of cards, leading to the same
+  `ProjectReadPage`. `SharedProjectQuery` holds the columns, the order and the mapping both walls
+  share; a page only chooses which works to ask for.
 - `LocalNavigation` (`Frontend/Navigations`) is the row of anchors at the top of `Home`, one per
   block the page actually renders. The ids it jumps to are `Globals.Content.*` for the blocks that
   stand for a content and `Globals.Anchor.*` for the rest. Do not put `scroll-behavior: smooth` on

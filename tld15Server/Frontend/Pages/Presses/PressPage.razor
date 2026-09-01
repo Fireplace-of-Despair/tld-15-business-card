@@ -1,0 +1,48 @@
+﻿@attribute [Route(PressPage.Url)]
+@inherits BasePage
+@using tld15Server.Frontend.Components.Common
+
+@* No render mode. The page is a wall of links and nothing on it is operated. *@
+
+<PageTitle>@Localizer["Brand"] | @Localizer["Press"]</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="@_description" />
+    <link rel="canonical" href="@_canonical" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@Localizer["Brand"]" />
+    <meta property="og:title" content="@Localizer["Brand"] | @Localizer["Press"]" />
+    <meta property="og:description" content="@_description" />
+    <meta property="og:url" content="@_canonical" />
+    <meta property="og:locale" content="@Language" />
+</HeadContent>
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+    return;
+}
+
+<div class="component-container-column">
+    <h1 id="press" class="component-title">@Localizer["Press"]</h1>
+</div>
+
+@if (Items.Count == 0)
+{
+    <div class="component-container-column">
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    </div>
+    return;
+}
+
+<div class="component-container-column">
+    <div class="articles-container">
+        @foreach (var item in Items)
+        {
+            <SharedCard SharedCardContent="item" />
+        }
+    </div>
+</div>

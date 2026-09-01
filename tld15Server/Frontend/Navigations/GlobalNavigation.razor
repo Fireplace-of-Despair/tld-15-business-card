@@ -1,0 +1,10 @@
+﻿<div class="global-navigation">
+    @foreach (var entry in Entries)
+    {
+        <a class="global-navigation-link @(entry.Url == _path ? "active" : string.Empty)"
+           href="@entry.Url"
+           aria-current="@(entry.Url == _path ? "page" : null)">
+            @entry.Title
+        </a>
+    }
+</div>

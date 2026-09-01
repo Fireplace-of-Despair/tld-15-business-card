@@ -8,8 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
-using StainlessCore.Common.Helpers;
-using StainlessCore.Exceptions;
 using StainlessCore.Features;
 using StainlessInfrastructure;
 using tld15Server.Composition;
@@ -28,8 +26,8 @@ public sealed class HomeGetFeature : IFeature
         public SharedContent Social { get; set; } = new();
         public SharedContent Contacts { get; set; } = new();
 
-        public List<SharedProjectPreview> Projects { get; set; } = [];
-        public List<SharedProjectPreview> Articles { get; set; } = [];
+        public List<SharedCardPreview> Projects { get; set; } = [];
+        public List<SharedCardPreview> Articles { get; set; } = [];
     }
 
     public sealed record Query : IQuery<Result>
@@ -40,18 +38,6 @@ public sealed class HomeGetFeature : IFeature
     public sealed class Handler(IDbContextFactory<DataContextBusiness> dataContextBusiness) : IQueryHandler<Query, Result>
     {
         private sealed record ContentRow(string ContentId, string LanguageId, string Name, string? Markdown, string? Json);
-
-        private sealed record ProjectTranslationRow(string LanguageId, string Title, string Subtitle, string PosterAlt);
-
-        private sealed record ProjectRow(
-            string Id,
-            string ProjectTypeId,
-            string DivisionId,
-            string PosterUrl,
-            string? LinksJson,
-            DateTimeOffset PublishedAt,
-            List<ProjectTranslationRow> Translations,
-            List<KeyValuePair<string, string>> DivisionNames);
 
         public async ValueTask<Result> Handle(Query query, CancellationToken ctn)
         {
@@ -78,48 +64,18 @@ public sealed class HomeGetFeature : IFeature
                 result.Social = MapContent(Globals.Content.Social, contentRows, language);
                 result.Contacts = MapContent(Globals.Content.Contacts, contentRows, language);
 
-                var projectTypeIds = new[] { Globals.ProjectType.Project, Globals.ProjectType.Article };
-
-                // content_html stays out of the projection on purpose. The card carries a title, a subtitle and
-                // a poster, so pulling the body of every article would dominate the payload of the page.
-                var projectRows = await contextBusiness
+                // The works of the archive division are kept off the front page: they have a page of
+                // their own, and the wall here is what the site is doing now rather than what it did.
+                var rows = await contextBusiness
                     .Projects
-                    .Where(x => projectTypeIds.Contains(x.ProjectTypeId))
-                    .OrderByDescending(x => x.PublishedAt)
-                    .Select(x => new ProjectRow(
-                        x.Id,
-                        x.ProjectTypeId,
-                        x.DivisionId,
-                        x.PosterUrl,
-                        x.LinksJson,
-                        x.PublishedAt,
-                        x.Translations
-                            .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
-                            .Select(tr => new ProjectTranslationRow(tr.LanguageId, tr.Title, tr.Subtitle, tr.PosterAlt))
-                            .ToList(),
-                        x.Division.Translations
-                            .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
-                            .Select(tr => new KeyValuePair<string, string>(tr.LanguageId, tr.Name))
-                            .ToList()))
+                    .Where(x => x.DivisionId != Globals.Archive.DivisionId)
+                    .SelectCards(language, fallback)
                     .ToListAsync(ctn);
 
-                // The database already ordered the rows, so a single pass keeps both lists newest first.
-                foreach (var row in projectRows)
-                {
-                    if (row.ProjectTypeId == Globals.ProjectType.Article)
-                    {
-                        result.Articles.Add(MapProject(row, language));
-                        continue;
-                    }
+                var cards = SharedProjectQuery.Split(rows, language);
 
-                    if (row.ProjectTypeId == Globals.ProjectType.Project)
-                    {
-                        result.Projects.Add(MapProject(row, language));
-                        continue;
-                    }
-
-                    throw new IncidentException(IncidentCode.Fatal, $"{row.ProjectTypeId} is not mapped.");
-                }
+                result.Articles = cards.Articles;
+                result.Projects = cards.Projects;
             }
 
             return result;
@@ -140,26 +96,6 @@ public sealed class HomeGetFeature : IFeature
                 Title = row?.Name ?? string.Empty,
                 Markdown = row?.Markdown,
                 Json = row?.Json,
-            };
-        }
-
-        private static SharedProjectPreview MapProject(ProjectRow row, string language)
-        {
-            var translation = row.Translations.Find(x => x.LanguageId == language)
-                ?? row.Translations.FirstOrDefault();
-
-            return new SharedProjectPreview
-            {
-                Id = row.Id,
-                ProjectTypeId = row.ProjectTypeId,
-                DivisionId = row.DivisionId,
-                DivisionName = row.DivisionNames.GetName(language),
-                Title = translation?.Title ?? string.Empty,
-                Subtitle = translation?.Subtitle ?? string.Empty,
-                PosterAlt = translation?.PosterAlt ?? string.Empty,
-                PosterUrl = row.PosterUrl,
-                LinksJson = row.LinksJson,
-                PublishedAt = row.PublishedAt,
             };
         }
     }

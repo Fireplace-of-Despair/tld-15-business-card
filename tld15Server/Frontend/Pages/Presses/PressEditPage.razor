@@ -1,0 +1,122 @@
+﻿@attribute [Route($"{PressEditPage.Url}/{PressEditPage.UrlParamId}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Navigations
+
+<PageTitle>
+    @Localizer["Brand"] | @(_pressId == null ? Localizer["Common.Create"] : Localizer["Common.Update"]) @Localizer["Press"]
+</PageTitle>
+
+<div class="component-container-column">
+    <h1>@(_pressId == null ? Localizer["Common.Create"] : Localizer["Press"])</h1>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (_loaded == null)
+{
+    return;
+}
+
+<div class="component-container-column">
+    <div class="component-container-row">
+        <div class="input-group poster-group">
+            @* The card leads here, and here is somebody else's site. *@
+            <label for="press-url">@Localizer["Press.Url"]</label>
+            <input id="press-url"
+                   type="url"
+                   class="poster-url @(IsUrlValid ? string.Empty : "invalid")"
+                   @bind="_press.Url"
+                   @bind:event="oninput" />
+            @if (!IsUrlValid)
+            {
+                <span class="field-error">@Localizer["Press.Validation.Url"]</span>
+            }
+        </div>
+
+        <div class="input-group">
+            <label for="press-published">@Localizer["Common.PublishedAt"]</label>
+            <input id="press-published" type="date" @bind="PublishedOn" @bind:format="yyyy-MM-dd" />
+        </div>
+    </div>
+
+    <div class="component-container-row">
+        <div class="input-group poster-group">
+            <label for="press-poster">@Localizer["Common.Poster.Url"]</label>
+            <input id="press-poster"
+                   type="url"
+                   class="poster-url @(IsPosterValid ? string.Empty : "invalid")"
+                   @bind="_press.PosterUrl"
+                   @bind:event="oninput" />
+            @if (!IsPosterValid)
+            {
+                <span class="field-error">@Localizer["Common.Validation.Poster"]</span>
+            }
+        </div>
+
+        @if (IsPosterValid && !string.IsNullOrWhiteSpace(_press.PosterUrl))
+        {
+            <div class="poster-preview">
+                <img src="@_press.PosterUrl" alt="@Current.PosterAlt" loading="lazy" />
+            </div>
+        }
+    </div>
+</div>
+
+<div class="component-container-column">
+    <LanguageTabs Languages="@_loaded.Languages" @bind-Selected="_language" HasContent="HasTranslation" />
+
+    <div class="component-container-row">
+        <div class="input-group">
+            <label for="press-title">@Localizer["Common.Title"]</label>
+            <input id="press-title" type="text" @bind="Current.Title" />
+        </div>
+
+        <div class="input-group">
+            <label for="press-subtitle">@Localizer["Common.Subtitle"]</label>
+            <input id="press-subtitle" type="text" @bind="Current.Subtitle" />
+        </div>
+
+        <div class="input-group">
+            <label for="press-alt">@Localizer["Common.Poster.Alt"]</label>
+            <input id="press-alt" type="text" @bind="Current.PosterAlt" />
+        </div>
+    </div>
+</div>
+
+@if (_pressId != null)
+{
+    <VersionInfo UpdatableModel="@_loaded" VersionLocalModel="@_loaded" />
+}
+
+<div class="component-container-row">
+    <AuthorizeView Policy="@Features.Presses.PressPostFeature.Id">
+        <Authorized>
+            <button disabled="@(!CanSave)" @onclick="() => Save()">@Localizer["Common.Save"]</button>
+        </Authorized>
+    </AuthorizeView>
+
+    @if (_pressId != null)
+    {
+        <AuthorizeView Policy="@Features.Presses.PressDeleteFeature.Id">
+            <Authorized>
+                <button @onclick="() => Delete()">@Localizer["Common.Delete"]</button>
+            </Authorized>
+        </AuthorizeView>
+    }
+</div>
