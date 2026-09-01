@@ -1,0 +1,102 @@
+﻿@attribute [Route($"{ProjectReadPage.Url}/{ProjectReadPage.UrlParamId}")]
+@inherits BasePage
+@using tld15Server.Frontend.Components.Common
+
+@* No render mode on purpose. The page is read, not operated: rendering it statically puts the whole
+   text into the first response, which is what a reader waits for and what a crawler indexes. *@
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+    return;
+}
+
+@if (_project == null || _translation == null)
+{
+    return;
+}
+
+<PageTitle>@Title | @Localizer["Brand"]</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="@Subtitle" />
+    <link rel="canonical" href="@_canonical" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="@Localizer["Brand"]" />
+    <meta property="og:title" content="@Title" />
+    <meta property="og:description" content="@Subtitle" />
+    <meta property="og:url" content="@_canonical" />
+    <meta property="og:locale" content="@_translation.LanguageId" />
+    @foreach (var locale in _otherLocales)
+    {
+        <meta property="og:locale:alternate" content="@locale" />
+    }
+    @if (!string.IsNullOrWhiteSpace(_project.PosterUrl))
+    {
+        <meta property="og:image" content="@Absolute(_project.PosterUrl)" />
+        <meta property="og:image:alt" content="@_translation.PosterAlt" />
+    }
+
+    <meta property="article:published_time" content="@Stamp(_project.PublishedAt)" />
+    <meta property="article:modified_time" content="@Stamp(_updatedAt)" />
+    <meta property="article:author" content="@Localizer["System.Author"]" />
+</HeadContent>
+
+<div class="reading-container">
+    <div class="reading">
+        <header class="reading-header">
+            <div class="reading-facts">
+                <span class="reading-division tooltip tooltip-below" data-tooltip="@_divisionName">
+                    @_project.DivisionId.ToUpperInvariant()
+                </span>
+
+                <span class="reading-fact">
+                    <span class="reading-label">@Localizer["Project.PublishedAt"]</span>
+                    <time datetime="@Stamp(_project.PublishedAt)">@Date(_project.PublishedAt)</time>
+                </span>
+
+                <span class="reading-fact">
+                    <span class="reading-label">@Localizer["Common.UpdatedAt"]</span>
+                    <time datetime="@Stamp(_updatedAt)">@Date(_updatedAt)</time>
+                </span>
+
+                <span class="reading-fact">
+                    <span class="reading-label">@Localizer["Common.Version"]</span>
+                    <span>@_versionLocal</span>
+                </span>
+            </div>
+
+            <h1 class="reading-title">@Title</h1>
+        </header>
+
+        @if (!string.IsNullOrWhiteSpace(Subtitle))
+        {
+            <p class="reading-subtitle">@Subtitle</p>
+        }
+
+        @if (_project.Links.Count > 0)
+        {
+            <nav class="reading-links" aria-label="@Localizer["Content.Links"]">
+                <LinkButtons Links="@_project.Links" />
+            </nav>
+        }
+
+        <MarkdownView Markdown="@_translation.Markdown" />
+
+        @if (_project.Links.Count > 0)
+        {
+            <section class="reading-section" aria-labelledby="links">
+                <h2 id="links" class="reading-heading">@Localizer["Content.Links"]</h2>
+                <nav class="reading-links">
+                    <LinkButtons Links="@_project.Links" />
+                </nav>
+            </section>
+        }
+    </div>
+</div>
+
+@* Read by a crawler *@
+@_structuredData

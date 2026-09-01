@@ -16,7 +16,7 @@ namespace tld15Server.Frontend.Pages.Sessions;
 [Authorize(Policy = SessionsSearchFeature.Id)]
 public partial class SessionSearchPage
 {
-    public const string Url = "/sessions/search";
+    public const string Url = $"{Globals.Route.Admin}/sessions/search";
     public const string UrlParamPage = "{page:int?}";
 
     [Parameter] public int? Page { get; set; }

@@ -155,6 +155,24 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   (`/projects/edit/{id?}`) creates and edits one: the id, type, division, publication date and
   poster address sit above the locale tabs, the title/subtitle/poster text and the markdown body
   inside them. `ProjectPostFeature` replaces a project whole, dropping any locale left blank.
+- `/sitemap.xml` is built **once, at start** (`Program.BuildTheSitemap` into the `SitemapService`
+  singleton) out of `Application:Host`, the front page and one address per work that carries a
+  translation. A work published later appears on the next start. Without `Application:Host` the
+  route answers 404 rather than serving relative addresses.
+- Every page that manages the site lives under `Globals.Route.Admin` (`/admin/…`), which is the one
+  line `robots.txt` has to carry. `InitializeBrowserTime` and `Navigation` sit inside an
+  `AuthorizeView` in `MainLayout`, so a visitor loads no interactive component at all and no circuit
+  is opened for a public page — verified by there being no `_blazor/negotiate` on one.
+- The public pages — `Home` and `ProjectReadPage` — declare **no render mode**. Nothing on them is
+  operated, so they render statically and the first response carries every block. `MarkdownService`
+  also flattens a text into the meta description (`ToSummary`), so the description is the page's own
+  opening rather than a line kept by hand beside it.
+- `ProjectReadPage` (`/projects/{id}`) is the public page for both types and the one the cards link
+  to. It declares **no render mode**: a page that is read, not operated, ships whole in the first
+  response. It sets the canonical link from `Application:Host` (falling back to the request), the
+  OpenGraph and `article:*` meta, a schema.org block as `application/ld+json`, and a real **404**
+  status for an id the table does not carry — a friendly message under a 200 is a soft 404. Ids in
+  `Globals.Project.IdReserved` are refused, because they are literal segments of the admin routes.
 - **Posters are addresses, never uploads.** Nothing is written to disk by an editor; `UrlPolicy`
   decides what a browser may load or follow, and both `MarkdownService` and the post features ask it.
 - `business.project.published_at` is the editor's date and the one the cards order and show;

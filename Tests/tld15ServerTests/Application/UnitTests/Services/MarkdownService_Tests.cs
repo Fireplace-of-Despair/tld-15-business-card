@@ -129,4 +129,42 @@ public class MarkdownService_Tests
     }
 
     #endregion
+
+    #region Summaries
+
+    [Fact]
+    public void ToSummary_FlattensTheTextToWords()
+    {
+        var summary = _service.ToSummary("# A title\n\n- one\n- two\n\nAnd **a** line.", 200);
+
+        Assert.Equal("A title one two And a line.", summary);
+    }
+
+    [Fact]
+    public void ToSummary_LeavesTheWordsOfAPictureOut()
+    {
+        var summary = _service.ToSummary("![a portrait of nobody](https://example.org/x.png)\n\nThe text itself.", 200);
+
+        Assert.Equal("The text itself.", summary);
+    }
+
+    [Fact]
+    public void ToSummary_CutsOnAWord_AndSaysTheSentenceGoesOn()
+    {
+        var summary = _service.ToSummary("alpha bravo charlie delta", 16);
+
+        Assert.Equal("alpha bravo…", summary);
+        Assert.True(summary.Length <= 16);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void ToSummary_ReturnsEmpty_WhenThereIsNothingToSummarise(string? markdown)
+    {
+        Assert.Equal(string.Empty, _service.ToSummary(markdown, 160));
+    }
+
+    #endregion
 }

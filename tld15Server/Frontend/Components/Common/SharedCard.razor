@@ -4,35 +4,33 @@
 <div id="@SharedCardContent.Id" class="article-card">
     <div class="article-image-container">
 
-        <NavLink href="@_url" rel="canonical">
+        <NavLink href="@_url">
             @if (string.IsNullOrEmpty(SharedCardContent.PosterUrl))
             {
                 <img class="article-image" loading="lazy"
                      src="/images/placeholder/project.png"
-                     alt="@SharedCardContent.PosterAlt"
-                     aria-labelledby="@SharedCardContent.PosterAlt">
+                     alt="@SharedCardContent.PosterAlt">
             }
             else
             {
                 <img class="article-image" loading="lazy"
                      src="@SharedCardContent.PosterUrl"
-                     alt="@SharedCardContent.PosterAlt"
-                     aria-labelledby="@SharedCardContent.PosterAlt">
+                     alt="@SharedCardContent.PosterAlt">
             }
         </NavLink>
-        <div class="article-image-overlay-division"
+        <div class="article-image-overlay-division tooltip"
              data-tooltip="@SharedCardContent.DivisionName">
             @SharedCardContent.DivisionId.ToUpper()
         </div>
 
         <div class="article-image-overlay-date">
-            @SharedCardContent.PublishedAt.ToString(Globals.Settings.DateFormat, CultureInfo.InvariantCulture)
+            <time datetime="@SharedCardContent.PublishedAt.UtcDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                @SharedCardContent.PublishedAt.ToString(Globals.Settings.DateFormat, CultureInfo.InvariantCulture)
+            </time>
         </div>
     </div>
 
-    <NavLink href="@_url"
-        rel="canonical"
-        class="article-title">
+    <NavLink href="@_url" class="article-title">
         <b>@SharedCardContent.Title</b>
     </NavLink>
 

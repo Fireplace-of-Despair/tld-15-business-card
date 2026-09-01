@@ -15,7 +15,7 @@ namespace tld15Server.Frontend.Pages.Account;
 [Authorize(Policy = AccountsSearchFeature.Id)]
 public partial class AccountSearchPage
 {
-    public const string Url = "/accounts/search";
+    public const string Url = $"{Globals.Route.Admin}/accounts/search";
     public const string UrlParamPage = "{page:int?}";
 
     [Parameter] public int? Page { get; set; }

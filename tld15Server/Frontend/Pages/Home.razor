@@ -1,14 +1,39 @@
 ﻿@using tld15Server.Frontend.Components.Common
 @attribute [Route(Home.Url)]
-@rendermode InteractiveServer
 @inherits BasePage
+
+@* No render mode on purpose. Nothing on this page is operated: the cards are links and the icons
+   are inline svg, so rendering it statically puts every block into the first response. *@
 
 <PageTitle> @Localizer["Brand"] | @Localizer["Brand.Slogan"] </PageTitle>
 
-@if (Lore != null && !string.IsNullOrEmpty(Lore.Markdown))
+<HeadContent>
+    <meta name="description" content="@_description" />
+    <link rel="canonical" href="@_canonical" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@Localizer["Brand"]" />
+    <meta property="og:title" content="@Localizer["Brand"] | @Localizer["Brand.Slogan"]" />
+    <meta property="og:description" content="@_description" />
+    <meta property="og:url" content="@_canonical" />
+    <meta property="og:locale" content="@Language" />
+    <meta property="og:image" content="@_logo" />
+</HeadContent>
+
+@if (IncidentCode != null)
 {
     <div class="component-container-column">
-        <h2 id="@Lore.Id" class="component-title">@Lore.Title</h2>
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+    return;
+}
+
+@if (Lore != null && !string.IsNullOrEmpty(Lore.Markdown))
+{
+    @* The opening block is the heading of the page, so it is the h1 the rest of the sections hang
+       under. The class holds it to the size the other section titles carry. *@
+    <div class="component-container-column">
+        <h1 id="@Lore.Id" class="component-title">@Lore.Title</h1>
         <MarkdownView Markdown="@Lore.Markdown" />
     </div>
 }
@@ -69,3 +94,7 @@
         </div>
     </div>
 }
+
+@* Read by a crawler, never executed: it names who the site belongs to and where else the same body
+   is published, which the page itself only shows as a row of icons. *@
+@_structuredData

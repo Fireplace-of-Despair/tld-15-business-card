@@ -67,7 +67,7 @@
             <select id="project-division" @bind="_project.DivisionId">
                 @foreach (var division in _loaded.Divisions)
                 {
-                    <option value="@division.Key">@division.Value</option>
+                    <option value="@division.Key">@division.Key.ToUpperInvariant() — @division.Value</option>
                 }
             </select>
         </div>

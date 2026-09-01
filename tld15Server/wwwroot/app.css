@@ -43,6 +43,16 @@ h2 {
     font-weight: 450;
 }
 
+/* The title of a block on the front page. The opening block carries the h1 of the page and the rest
+   carry h2, and this holds all of them to one size: the outline is for a crawler, not for the eye. */
+.component-title {
+    font-family: "Park Lane NF";
+    font-size: 35px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-weight: 450;
+}
+
 @font-face {
     font-family: "Park Lane NF";
     src: url(../fonts/park_lane_nf.woff2) format("woff2"), url(../fonts/park_lane_nf.woff) format("woff");
@@ -568,8 +578,11 @@ button {
         overflow-x: auto;
     }
 
-    /* The picture of a text keeps the treatment the lore block carried before: grey until read. */
+    /* The picture of a text stands on its own line, centred, and keeps the treatment the lore block
+       carried before: grey until read. */
     .markdown-body img {
+        display: block;
+        margin: 25px auto;
         max-width: 100%;
         height: auto;
         filter: grayscale(100%) contrast(130%);
@@ -686,5 +699,211 @@ button {
     max-height: 200px;
     max-width: 300px;
     object-fit: cover;
+}
+/* ------------------------------------------------------------ */
+
+/* External links --------------------------------------------- */
+/* The icon of a link with the language it speaks stood on its side. A card and a reading page
+   write the same markup, so the rules live here rather than beside one of them. */
+.external-button {
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    text-decoration: none;
+    color: var(--color-background) !important;
+    margin-right: 10px;
+}
+
+    .external-button:hover {
+        color: var(--color-highlight-hard) !important;
+    }
+
+        .external-button:hover .external-button-language {
+            border-color: var(--color-highlight-hard);
+        }
+
+.external-button-language {
+    border: 1px solid var(--color-text);
+    color: var(--color-text);
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+}
+
+/* The icon is inline SVG painted with currentColor, so the colour of the button is the colour of the icon. */
+.external-button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    color: var(--color-text);
+}
+
+    .external-button-icon svg {
+        width: 100%;
+        height: 100%;
+    }
+/* ------------------------------------------------------------ */
+
+/* Tooltip ---------------------------------------------------- */
+/* A short word that spells itself out on hover. The element carrying it keeps its own position when
+   it declares one — a card badge is an overlay, a badge in a line of facts is not. */
+.tooltip {
+    position: relative;
+}
+
+    .tooltip::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 125%; /* Above the element, so a finger or a cursor does not sit on top of it. */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--color-background);
+        color: var(--color-text);
+        border: 1px solid var(--color-text);
+        padding: 5px 10px;
+        font-size: 15px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s;
+        z-index: 1;
+    }
+
+    .tooltip:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Under the element instead, for a badge that stands at the top edge of what carries it: above
+       it the note would hang over the header with nothing behind it. */
+    .tooltip-below::after {
+        bottom: auto;
+        top: 125%;
+    }
+/* ------------------------------------------------------------ */
+
+/* Reading ---------------------------------------------------- */
+/* The panel a work is read in: the container of a page, held to the width of the column it carries
+   rather than to the width of the window. */
+.reading-container {
+    background-color: var(--color-container);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    max-width: 840px;
+    box-sizing: border-box;
+    margin: 5px auto 0 auto;
+}
+
+/* One column, centred in the panel, held to a width an eye can track without losing the line. The
+   header is centred and the prose is not: centred body text costs a reader the left edge. */
+.reading {
+    width: 100%;
+    max-width: 820px;
+    box-sizing: border-box;
+    padding: 20px 0 30px 0;
+}
+
+.reading-header {
+    text-align: center;
+    padding: 0 20px;
+}
+
+/* What the work is, when it was published, when it last moved, and which version of it this is. */
+.reading-facts {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 5px 20px;
+    font-size: 15px;
+    color: rgba(var(--color-text-rgb), 0.75);
+}
+
+.reading-division {
+    border: 1px solid var(--color-highlight-soft);
+    padding: 1px 8px;
+    letter-spacing: 2px;
+    color: var(--color-text);
+}
+
+.reading-fact {
+    display: inline-flex;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.reading-label {
+    color: var(--color-highlight-soft);
+}
+
+.reading-title {
+    margin: 15px 0 0 0;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+}
+
+/* The line under the title is the description a share card and a search result show. */
+.reading-subtitle {
+    max-width: 700px;
+    margin: 10px auto 0 auto;
+    padding: 0 20px;
+    text-align: center;
+    font-style: italic;
+    color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.reading-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0 5px 0;
+    padding: 0 20px;
+}
+
+    /* The buttons carry their own spacing on a card; in a row of them the gap does the work. */
+    .reading-links .external-button {
+        margin-right: 0;
+    }
+
+/* What follows the prose: the links again, under a heading of their own. */
+.reading-section {
+    width: 100%;
+    margin-top: 20px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.reading-heading {
+    text-align: center;
+    border-top: 1px solid var(--color-highlight-soft);
+    padding-top: 20px;
+}
+
+/* On a narrow screen the facts stack into a column rather than a line nobody can read, and the
+   column gives back the side padding the text needs. */
+@media (max-width: 640.98px) {
+    .reading {
+        padding: 15px 0 20px 0;
+    }
+
+    .reading-facts {
+        gap: 4px 12px;
+        font-size: 14px;
+    }
+
+    .reading-title {
+        font-size: 30px;
+    }
+
+    .reading-subtitle {
+        font-size: 18px;
+    }
 }
 /* ------------------------------------------------------------ */

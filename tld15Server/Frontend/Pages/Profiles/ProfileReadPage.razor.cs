@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using StainlessCore;
+using tld15Server.Composition;
 using StainlessCore.Service;
 using tld15Server.Features.Profiles;
 using tld15Server.Features.Sessions;
@@ -16,7 +17,7 @@ namespace tld15Server.Frontend.Pages.Profiles;
 [Authorize(Policy = ProfileGetFeature.Id)]
 public partial class ProfileReadPage
 {
-    public const string Url = "/profile";
+    public const string Url = $"{Globals.Route.Admin}/profile";
 
     [Inject] private NavigationManager _navigationManager { get; set; } = default!;
 

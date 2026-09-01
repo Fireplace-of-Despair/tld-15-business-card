@@ -3,7 +3,12 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Markdig;
+using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -44,6 +49,9 @@ public sealed class MarkdownService
     /// </summary>
     private readonly ConcurrentDictionary<string, string> _cache = new(StringComparer.Ordinal);
 
+    /// <summary> The same bargain for the flattened openings a page uses as its description. </summary>
+    private readonly ConcurrentDictionary<string, string> _summaries = new(StringComparer.Ordinal);
+
     /// <summary> The html of a markdown text, or an empty string when there is nothing to render. </summary>
     public string ToHtml(string? markdown)
     {
@@ -58,6 +66,82 @@ public sealed class MarkdownService
         _cache[markdown] = html;
 
         return html;
+    }
+
+    /// <summary>
+    /// The opening of a text, flattened to words. A page hands this to a search engine as its
+    /// description, so it has to be prose rather than markup, and it has to be the text itself: a
+    /// description written by hand drifts away from the page the moment either one is edited.
+    /// </summary>
+    public string ToSummary(string? markdown, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(markdown) || maxLength <= 0) { return string.Empty; }
+
+        var key = $"{maxLength}:{markdown}";
+
+        if (_summaries.TryGetValue(key, out var cached)) { return cached; }
+
+        var summary = Summarise(markdown, maxLength);
+
+        if (_summaries.Count >= CacheLimit) { _summaries.Clear(); }
+
+        _summaries[key] = summary;
+
+        return summary;
+    }
+
+    private string Summarise(string markdown, int maxLength)
+    {
+        var document = Markdown.Parse(markdown, _pipeline);
+
+        // A picture leaves its alt text behind when a document is flattened, and a description that
+        // opens with the words describing a portrait is describing the wrong thing.
+        foreach (var image in document.Descendants<LinkInline>().Where(x => x.IsImage).ToList())
+        {
+            image.Remove();
+        }
+
+        var writer = new StringWriter(CultureInfo.InvariantCulture);
+        var renderer = new HtmlRenderer(writer)
+        {
+            EnableHtmlForBlock = false,
+            EnableHtmlForInline = false,
+            EnableHtmlEscape = false,
+        };
+
+        _pipeline.Setup(renderer);
+        renderer.Render(document);
+        writer.Flush();
+
+        var text = writer.ToString();
+        var builder = new StringBuilder(text.Length);
+
+        // Headings, list markers and line breaks all leave their own whitespace behind. One space
+        // between words is what a description reads as, whatever the source looked like.
+        var space = true;
+
+        foreach (var character in text)
+        {
+            if (char.IsWhiteSpace(character))
+            {
+                if (!space) { builder.Append(' '); }
+
+                space = true;
+                continue;
+            }
+
+            builder.Append(character);
+            space = false;
+        }
+
+        var flat = builder.ToString().Trim();
+
+        if (flat.Length <= maxLength) { return flat; }
+
+        // Cut on a word, not through one, and say that the sentence goes on.
+        var cut = flat.LastIndexOf(' ', maxLength - 1);
+
+        return (cut > 0 ? flat[..cut] : flat[..(maxLength - 1)]).TrimEnd(',', '.', ';', ':') + "…";
     }
 
     private string Render(string markdown)

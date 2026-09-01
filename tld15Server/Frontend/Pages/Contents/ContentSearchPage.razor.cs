@@ -15,7 +15,7 @@ namespace tld15Server.Frontend.Pages.Contents;
 [Authorize(Policy = ContentSearchFeature.Id)]
 public partial class ContentSearchPage
 {
-    public const string Url = "/contents";
+    public const string Url = $"{Globals.Route.Admin}/contents";
 
     private List<ContentSearchFeature.Item> _items = [];
 

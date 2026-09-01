@@ -159,7 +159,7 @@ public sealed class ProjectGetFeature : IFeature
                     })
                     .ToListAsync(ctn);
 
-                result.Divisions = divisions.ToDictionary(x => x.Id, x => $"{x.Id.ToUpperInvariant()} — {x.Names.GetName(languageId)}", StringComparer.Ordinal);
+                result.Divisions = divisions.ToDictionary(x => x.Id, x => x.Names.GetName(languageId), StringComparer.Ordinal);
                 result.ProjectTypes = types.ToDictionary(x => x.Id, x => x.Names.GetName(languageId), StringComparer.Ordinal);
             }
         }

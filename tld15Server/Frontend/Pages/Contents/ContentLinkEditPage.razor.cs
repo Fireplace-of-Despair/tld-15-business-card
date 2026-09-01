@@ -18,7 +18,7 @@ namespace tld15Server.Frontend.Pages.Contents;
 [Authorize(Policy = ContentGetFeature.Id)]
 public partial class ContentLinkEditPage
 {
-    public const string Url = "/contents/links";
+    public const string Url = $"{Globals.Route.Admin}/contents/links";
     public const string UrlParamId = "{id}";
 
     /// <summary> What keeps a row of the table from being stored. </summary>

@@ -27,7 +27,7 @@ namespace tld15Server.Frontend.Pages.Projects;
 [Authorize(Policy = ProjectGetFeature.Id)]
 public sealed partial class ProjectEditPage
 {
-    public const string Url = "/projects/edit";
+    public const string Url = $"{Globals.Route.Admin}/projects/edit";
     public const string UrlParamId = "{id?}";
 
     [GeneratedRegex(Globals.Project.IdPattern)]
@@ -93,7 +93,8 @@ public sealed partial class ProjectEditPage
     private bool IsIdValid =>
         _project.Id.Length > 0
         && _project.Id.Length <= Globals.Project.IdMaxLength
-        && IdShape().IsMatch(_project.Id);
+        && IdShape().IsMatch(_project.Id)
+        && !Globals.Project.IdReserved.Contains(_project.Id, StringComparer.Ordinal);
 
     private bool IsPosterValid => UrlPolicy.IsImageSource(UrlPolicy.Clean(_project.PosterUrl));
 

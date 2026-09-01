@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using StainlessCore;
+using tld15Server.Composition;
 using StainlessCore.Common.Helpers;
 using StainlessCore.Service;
 using tld15Server.Features.Accounts;
@@ -18,7 +19,7 @@ namespace tld15Server.Frontend.Pages.Account;
 [Authorize(Policy = AccountsGetFeature.Id)]
 public partial class AccountReadPage
 {
-    public const string Url = "/accounts";
+    public const string Url = $"{Globals.Route.Admin}/accounts";
     public const string UrlParamId = "{id?}";
 
     [Inject] private NavigationManager _navigationManager { get; set; } = default!;

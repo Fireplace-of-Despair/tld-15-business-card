@@ -2,9 +2,12 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +63,8 @@ public sealed class Program
         // One renderer for the whole application: it carries the pipeline and the cache of
         // the texts it already rendered, and neither belongs to a single circuit.
         builder.Services.AddSingleton<MarkdownService>();
+        // Written once at start and read from memory by every crawler that asks for it.
+        builder.Services.AddSingleton<SitemapService>();
 
         builder.InjectCore();
         builder.AddAuthentication(builder.Configuration);
@@ -103,6 +108,12 @@ public sealed class Program
         app.MapRazorComponents<App>()
            .AddInteractiveServerRenderMode();
 
+        // A crawler looks for the sitemap at the root of the site and will not go hunting under
+        // /api/public, so this one route is mapped here instead of through the endpoint registry.
+        app.MapGet("/sitemap.xml", (SitemapService sitemap) => sitemap.Xml.Length == 0
+            ? Results.NotFound()
+            : Results.Content(sitemap.Xml, "application/xml", Encoding.UTF8));
+
         var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
 
         lifetime.ApplicationStopping.Register(() =>
@@ -116,6 +127,7 @@ public sealed class Program
 
             Log.Warning("Application: Starting");
             AddAllApiKeysToTheCache(app);
+            BuildTheSitemap(app);
             app.Run();
 
             return ExitSuccess;
@@ -131,6 +143,54 @@ public sealed class Program
         finally
         {
             Log.CloseAndFlush();
+        }
+    }
+
+    /// <summary>
+    /// Writes the sitemap once, out of the works the database carries at this moment. It is the
+    /// whole of the public site: the front page and one address per work. Everything else either
+    /// sits under the admin segment or is a door rather than a page.
+    /// </summary>
+    private static void BuildTheSitemap(WebApplication app)
+    {
+        var origin = app.Configuration[Globals.Settings.ApplicationHost];
+
+        if (string.IsNullOrWhiteSpace(origin))
+        {
+            // Without an address of its own the site cannot write the absolute urls a sitemap is
+            // made of, so it serves none rather than a document full of relative ones.
+            Log.Warning("Sitemap: {Setting} is not set, so no sitemap is served", Globals.Settings.ApplicationHost);
+            return;
+        }
+
+        var factory = app.Services.GetRequiredService<IDbContextFactory<DataContextBusiness>>();
+
+        using (var context = factory.CreateDbContext())
+        {
+            // A work nobody has written a word of has no page to point at: ProjectReadPage answers
+            // 404 for one, and a sitemap that lists 404s is worse than a sitemap that lists less.
+            var works = context.Projects
+                .Where(x => x.Translations.Count > 0)
+                .OrderByDescending(x => x.PublishedAt)
+                .Select(x => new { x.Id, x.UpdatedAt })
+                .AsNoTracking()
+                .ToList();
+
+            var entries = new List<SitemapService.Entry>(works.Count + 1)
+            {
+                // The front page carries the cards, so it moved when the newest of them moved.
+                new(Frontend.Pages.Home.Url, works.Count == 0
+                    ? DateTimeOffset.UtcNow
+                    : works.Max(x => x.UpdatedAt)),
+            };
+
+            entries.AddRange(works.Select(x => new SitemapService.Entry(
+                $"{Frontend.Pages.Projects.ProjectReadPage.Url}/{x.Id}",
+                x.UpdatedAt)));
+
+            app.Services.GetRequiredService<SitemapService>().Build(origin, entries);
+
+            Log.Warning("Sitemap: {Count} addresses written", entries.Count);
         }
     }
 

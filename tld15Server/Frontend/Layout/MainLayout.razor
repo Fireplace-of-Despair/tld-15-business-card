@@ -7,10 +7,16 @@
 @using tld15Server.Frontend.Navigations
 @inject NavigationState NavState
 
-<InitializeBrowserTime @rendermode="InteractiveServer" />
+@* Only the pages behind the login show a time in the reader's own zone, and this is the component
+   that opens a circuit to ask the browser for it. A visitor pays for neither. *@
+<AuthorizeView>
+    <Authorized>
+        <InitializeBrowserTime @rendermode="InteractiveServer" />
+    </Authorized>
+</AuthorizeView>
 
 <header>
-    <a class="brand-header-name" href="@Pages.Home.Url" rel="canonical">
+    <a class="brand-header-name" href="@Pages.Home.Url">
         @Localizer["Brand"]
     </a>
     <div class="brand-header-slogan">

@@ -59,7 +59,10 @@ public sealed partial class ProjectPostFeature : IFeature
         {
             var id = cmd.Project.Id.Trim().ToLowerInvariant();
 
-            if (id.Length == 0 || id.Length > Globals.Project.IdMaxLength || !IdShape().IsMatch(id))
+            if (id.Length == 0
+                || id.Length > Globals.Project.IdMaxLength
+                || !IdShape().IsMatch(id)
+                || Globals.Project.IdReserved.Contains(id, StringComparer.Ordinal))
             {
                 throw new IncidentException(IncidentCode.Validation);
             }

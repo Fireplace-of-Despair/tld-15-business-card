@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using Microsoft.AspNetCore.Components;
-using tld15Server.Composition;
 using tld15Server.Features.Shared.Business;
 
 namespace tld15Server.Frontend.Components.Common;
@@ -16,16 +15,7 @@ public partial class SharedCard
 
     protected override void OnParametersSet()
     {
-        if (SharedCardContent.ProjectTypeId == Globals.ProjectType.Project)
-        {
-            _url = $"{Pages.Account.AccountReadPage.Url}/{SharedCardContent.Id}";
-            return;
-        }
-        if (SharedCardContent.ProjectTypeId == Globals.ProjectType.Article)
-        {
-            _url = $"{Pages.Account.AccountReadPage.Url}/{SharedCardContent.Id}";
-            return;
-        }
+        _url = $"{Pages.Projects.ProjectReadPage.Url}/{SharedCardContent.Id}";
     }
 }
 

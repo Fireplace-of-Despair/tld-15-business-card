@@ -1,0 +1,13 @@
+﻿@using tld15Server.Features.Shared.Business
+
+@foreach (var link in Links)
+{
+    <a class="external-button"
+       href="@link.Url"
+       rel="noopener noreferrer"
+       target="_blank"
+       aria-label="@link.Icon">
+        <span class="external-button-language">@IconHelper.GetLanguage(link.Language)</span>
+        <span class="external-button-icon">@IconHelper.GetIcon(link.Icon)</span>
+    </a>
+}

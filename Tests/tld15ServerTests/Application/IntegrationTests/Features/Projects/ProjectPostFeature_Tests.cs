@@ -259,4 +259,17 @@ public class ProjectPostFeature_Tests
         Assert.NotEmpty(result.Divisions);
         Assert.NotEmpty(result.ProjectTypes);
     }
+
+    [Theory]
+    [InlineData("search")]
+    [InlineData("edit")]
+    public async Task Handle_Throws_WhenTheIdIsOneThePagesAlreadyAnswer(string id)
+    {
+        var provider = IntegrationTestSetup.GetServices();
+
+        var incident = await Assert.ThrowsAsync<IncidentException>(async () =>
+            await StoreAsync(provider, NewProject(id)));
+
+        Assert.Equal(IncidentCode.Validation, incident.Code);
+    }
 }

@@ -20,7 +20,7 @@ namespace tld15Server.Frontend.Pages.Contents;
 [Authorize(Policy = ContentGetFeature.Id)]
 public partial class ContentTextEditPage
 {
-    public const string Url = "/contents/text";
+    public const string Url = $"{Globals.Route.Admin}/contents/text";
     public const string UrlParamId = "{id}";
 
     [Parameter] public string Id { get; set; } = string.Empty;

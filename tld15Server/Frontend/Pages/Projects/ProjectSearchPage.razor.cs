@@ -16,7 +16,7 @@ namespace tld15Server.Frontend.Pages.Projects;
 [Authorize(Policy = ProjectSearchFeature.Id)]
 public partial class ProjectSearchPage
 {
-    public const string Url = "/projects/search";
+    public const string Url = $"{Globals.Route.Admin}/projects/search";
     public const string UrlParamPage = "{page:int?}";
 
     [Parameter] public int? Page { get; set; }

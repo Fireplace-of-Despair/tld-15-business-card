@@ -49,6 +49,16 @@ public static class Globals
         internal const string ESD = "ESD";
     }
 
+    public static class Route
+    {
+        /// <summary>
+        /// Every page that manages the site sits under this segment. One prefix is one line in
+        /// <c>robots.txt</c>, and a page added later is covered by it without anyone remembering to
+        /// go and say so.
+        /// </summary>
+        public const string Admin = "/admin";
+    }
+
     public static class ProjectType
     {
         public static string Project => "project";
@@ -62,6 +72,7 @@ public static class Globals
 
         /// <summary> The shape of an id, matching the check the reference tables carry. </summary>
         public const string IdPattern = "^[a-z0-9_.-]+$";
+        public static string[] IdReserved => ["search", "edit"];
     }
     public static class Content
     {
