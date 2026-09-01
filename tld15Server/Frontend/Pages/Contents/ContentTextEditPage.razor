@@ -1,0 +1,92 @@
+﻿@attribute [Route($"{ContentTextEditPage.Url}/{ContentTextEditPage.UrlParamId}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Common.Update"] @Localizer["Content"]
+</PageTitle>
+
+<div class="component-container-column">
+    <h1>@(_content == null ? Localizer["Content"].Value : _content.Title)</h1>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (_content == null)
+{
+    return;
+}
+
+<div class="component-container-column">
+    <div class="tab-strip" role="tablist">
+        @foreach (var language in _content.Languages)
+        {
+            <button type="button"
+                    role="tab"
+                    class="tab @(language.Key == _language ? "tab-selected" : string.Empty)"
+                    aria-selected="@(language.Key == _language ? "true" : "false")"
+                    @onclick="() => SelectLanguage(language.Key)">
+                @LanguageLabel(language)
+            </button>
+        }
+    </div>
+
+    <div class="tab-strip" role="tablist">
+        <button type="button"
+                role="tab"
+                class="tab @(_tab == Tab.Source ? "tab-selected" : string.Empty)"
+                aria-selected="@(_tab == Tab.Source ? "true" : "false")"
+                @onclick="() => SelectTab(Tab.Source)">
+            @Localizer["Content.Markdown"]
+        </button>
+        <button type="button"
+                role="tab"
+                class="tab @(_tab == Tab.Preview ? "tab-selected" : string.Empty)"
+                aria-selected="@(_tab == Tab.Preview ? "true" : "false")"
+                @onclick="() => SelectTab(Tab.Preview)">
+            @Localizer["Content.Preview"]
+        </button>
+    </div>
+
+    <div class="tab-panel">
+        @if (_tab == Tab.Source)
+        {
+            @* The key ties the field to its locale: switching a tab replaces the field rather than
+               carrying over the text of the locale that was left. *@
+            <textarea @key="_language"
+                      class="markdown-source"
+                      rows="24"
+                      spellcheck="false"
+                      @bind="Text"></textarea>
+        }
+        else
+        {
+            <MarkdownView Markdown="@Text" />
+        }
+    </div>
+</div>
+
+<VersionInfo UpdatableModel="@_content" VersionLocalModel="@_content" />
+
+<div class="component-container-row">
+    <AuthorizeView Policy="@Features.Contents.ContentPostFeature.Id">
+        <Authorized>
+            <button @onclick="() => Save()">@Localizer["Common.Save"]</button>
+        </Authorized>
+    </AuthorizeView>
+</div>

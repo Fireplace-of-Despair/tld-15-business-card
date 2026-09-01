@@ -485,3 +485,98 @@ button {
     z-index: 1040;
     transition: opacity 0.35s ease;
 }
+
+/* Markdown --------------------------------------------------- */
+/* The body of a stored text. MarkdownService writes this markup and nothing else does, so the rules
+   below are the whole vocabulary a text can reach for. Scoped css cannot style it: the markup is
+   handed to the component as a string, and the css isolation attributes never land on it. */
+.markdown-body {
+    width: 100%;
+    max-width: 1000px;
+    box-sizing: border-box;
+    padding: 0 20px 20px 20px;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+}
+
+    .markdown-body > :first-child {
+        margin-top: 0;
+    }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4 {
+        font-family: "Park Lane NF";
+        font-weight: 450;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .markdown-body h1 { font-size: 35px; }
+    .markdown-body h2 { font-size: 30px; }
+    .markdown-body h3 { font-size: 25px; }
+    .markdown-body h4 { font-size: 22px; }
+
+    .markdown-body ul,
+    .markdown-body ol {
+        padding-left: 30px;
+    }
+
+    .markdown-body a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .markdown-body blockquote {
+        margin: 20px 0;
+        padding: 5px 20px;
+        border-left: 3px solid var(--color-highlight-soft);
+        color: rgba(var(--color-text-rgb), 0.8);
+    }
+
+    .markdown-body code {
+        font-family: 'Cascadia Mono', 'Consolas', monospace;
+        font-size: 0.85em;
+        padding: 2px 5px;
+        background-color: rgba(var(--color-control-rgb), 0.35);
+    }
+
+    .markdown-body pre {
+        padding: 10px 15px;
+        background-color: var(--color-background);
+        overflow-x: auto;
+    }
+
+        /* The block already carries the background, so the spans inside it only carry the font. */
+        .markdown-body pre code {
+            padding: 0;
+            background-color: transparent;
+        }
+
+    .markdown-body hr {
+        border: none;
+        border-top: 1px solid var(--color-highlight-soft);
+        margin: 30px 0;
+    }
+
+    /* A table is as wide as its content and scrolls inside the text rather than widening the page. */
+    .markdown-body table {
+        display: block;
+        width: max-content;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* The picture of a text keeps the treatment the lore block carried before: grey until read. */
+    .markdown-body img {
+        max-width: 100%;
+        height: auto;
+        filter: grayscale(100%) contrast(130%);
+        transition: filter 0.8s ease 0s;
+    }
+
+        .markdown-body img:hover {
+            filter: grayscale(0) contrast(100%);
+        }
+/* ------------------------------------------------------------ */

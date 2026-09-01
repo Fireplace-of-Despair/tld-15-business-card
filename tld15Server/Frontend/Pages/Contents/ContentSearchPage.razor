@@ -47,7 +47,7 @@
             {
                 <tr @key="item.Id">
                     <td>
-                        <NavLink href="@($"{ContentEditPage.Url}/{item.Id}")">
+                        <NavLink href="@EditUrl(item.Id)">
                             @item.Title
                         </NavLink>
                     </td>

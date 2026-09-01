@@ -16,9 +16,9 @@ using tld15Server.Frontend.Components.Common;
 namespace tld15Server.Frontend.Pages.Contents;
 
 [Authorize(Policy = ContentGetFeature.Id)]
-public partial class ContentEditPage
+public partial class ContentLinkEditPage
 {
-    public const string Url = "/contents/edit";
+    public const string Url = "/contents/links";
     public const string UrlParamId = "{id}";
 
     /// <summary> What keeps a row of the table from being stored. </summary>
@@ -165,7 +165,10 @@ public partial class ContentEditPage
                 {
                     Id = _content.Id,
                     VersionLocal = _content.VersionLocal,
-                    Links = _links
+                    Links = _links,
+                    // The body of the content belongs to the other editor. It travels back exactly
+                    // as it was read: the command replaces the whole content, not one side of it.
+                    Markdown = _content.Markdown.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal)
                 }, _cts.Token
             );
         });

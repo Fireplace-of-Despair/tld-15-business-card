@@ -142,6 +142,15 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   `en;ja` — the Docker runtime uses the `-extra` tag so ICU and tzdata are present.
 - Styling is a global `wwwroot/app.css` with CSS custom properties (dark palette, `Park Lane NF`
   display font) plus per-component scoped CSS. `Frontend/Components/Icons/*.razor` are inline SVGs.
+- Stored prose is **markdown**, never html. `content_translation.markdown` holds the source;
+  `Services/MarkdownService` renders it (Markdig, `DisableHtml`, link schemes limited to
+  http/https/mailto, rendered html cached by source) and `Components/Common/MarkdownView` is the only
+  component that hands the result to a `MarkupString`. Styling lives in `app.css` under
+  `.markdown-body` — scoped css cannot reach markup a component did not write itself.
+- Content editors are split by what a content carries: `ContentLinkEditPage` for the table of links
+  (`Globals.Content.LinkEditable`), `ContentTextEditPage` for the markdown body
+  (`Globals.Content.TextEditable`). `ContentPostFeature` replaces a content **whole**, so a page that
+  edits one side sends the other side back exactly as `ContentGetFeature` handed it over.
 - Magic strings (content ids, cookie names, claim types, config keys, page metadata) belong in
   `tld15Server/Composition/Globals`.
 

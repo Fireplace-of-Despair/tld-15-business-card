@@ -57,6 +57,9 @@ public sealed class Program
         builder.AddGeneral();
         builder.Services.AddScoped<NavigationState>();
         builder.Services.AddScoped<BrowserTimeProvider>();
+        // One renderer for the whole application: it carries the pipeline and the cache of
+        // the texts it already rendered, and neither belongs to a single circuit.
+        builder.Services.AddSingleton<MarkdownService>();
 
         builder.InjectCore();
         builder.AddAuthentication(builder.Configuration);
