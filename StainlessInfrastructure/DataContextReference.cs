@@ -21,6 +21,9 @@ public class DataContextReference : DbContext
     public virtual DbSet<Division> Divisions => Set<Division>();
     public virtual DbSet<DivisionTranslation> DivisionTranslations => Set<DivisionTranslation>();
 
+    public virtual DbSet<ProjectType> ProjectTypes => Set<ProjectType>();
+    public virtual DbSet<ProjectTypeTranslation> ProjectTypeTranslations => Set<ProjectTypeTranslation>();
+
     public DataContextReference() { }
     public DataContextReference(DbContextOptions<DataContextReference> options) : base(options) { }
 
