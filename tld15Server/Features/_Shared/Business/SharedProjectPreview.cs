@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 
 namespace tld15Server.Features.Shared.Business;
 
@@ -15,12 +14,14 @@ public class SharedProjectPreview
     public string PosterAlt { get; set; } = string.Empty;
     public string Subtitle { get; set; } = string.Empty;
     public string? LinksJson { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary> The date the work was published. The cards order and show this one. </summary>
+    public DateTimeOffset PublishedAt { get; set; }
 
     public Dictionary<string, string> LinksToDictionary()
     {
         if (string.IsNullOrEmpty(LinksJson)) { return []; }
 
-        return JsonSerializer.Deserialize<Dictionary<string, string>>(LinksJson) ?? [];
+        return LinkJson.ToDictionary(LinksJson);
     }
 }

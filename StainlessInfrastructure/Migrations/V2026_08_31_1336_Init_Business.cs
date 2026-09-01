@@ -113,16 +113,20 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .WithColumn("project_type_id").AsString(Globals.ColumnLength.ProjectTypeId).NotNullable()
                 .ForeignKey("fk_project_type_id_to_project_type", Globals.Schema.Reference, "project_type", "id")
                 .OnDelete(Rule.Cascade)
-            .WithColumn("poster_url").AsString(100).NotNullable().WithDefaultValue(string.Empty)
+            .WithColumn("poster_url").AsString(1024).NotNullable().WithDefaultValue(string.Empty)
             .WithColumn("links_json").AsString().Nullable()
+            // The date the work was published, which is the editor's to set: created_at says when the
+            // row appeared, and an article carried over from the old site did not appear when it was
+            // written. The cards read this one.
+            .WithColumn("published_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);
         // The home page filters by type and orders by date, so the index carries both and the read never sorts.
-        Create.Index("idx_project__project_type_id__created_at")
+        Create.Index("idx_project__project_type_id__published_at")
             .OnTable("project").InSchema(Globals.Schema.Business)
             .OnColumn("project_type_id").Ascending()
-            .OnColumn("created_at").Descending();
+            .OnColumn("published_at").Descending();
         // PostgreSQL indexes no foreign key on its own, and the cascade from division takes this direction.
         Create.Index("idx_project__division_id")
             .OnTable("project").InSchema(Globals.Schema.Business)
@@ -141,7 +145,7 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .WithColumn("poster_alt").AsString().NotNullable()
             .WithColumn("title").AsString().NotNullable()
             .WithColumn("subtitle").AsString().NotNullable()
-            .WithColumn("content_html").AsString().NotNullable()
+            .WithColumn("markdown").AsString().Nullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);
@@ -164,6 +168,8 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             { "en", "Project: Get" }, { "ja", "プロジェクト：取得" } });
         Insert.Feature("project.post", new Dictionary<string, string> {
             { "en", "Project: Create/Update" }, { "ja", "プロジェクト：作成/更新" } });
+        Insert.Feature("project.delete", new Dictionary<string, string> {
+            { "en", "Project: Delete" }, { "ja", "プロジェクト：削除" } });
         Insert.Feature("project.search", new Dictionary<string, string> {
             { "en", "Project: Search" }, { "ja", "プロジェクト：検索" } });
     }
@@ -176,6 +182,7 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
 
         Delete.Feature("project.get");
         Delete.Feature("project.post");
+        Delete.Feature("project.delete");
         Delete.Feature("project.search");
 
         Delete.Table("project_translation").InSchema(Globals.Schema.Business);

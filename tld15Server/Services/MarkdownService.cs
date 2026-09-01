@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Text;
 using Markdig;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
@@ -23,9 +22,6 @@ namespace tld15Server.Services;
 /// </remarks>
 public sealed class MarkdownService
 {
-    /// <summary> Schemes a link or an image may carry. An address on any other loses its address. </summary>
-    private static readonly string[] _allowedSchemes = ["http", "https", "mailto"];
-
     /// <summary>
     /// How many rendered texts the cache holds. The site carries a handful of them, so this is a
     /// backstop against a cache that only ever grows, not a working size.
@@ -88,10 +84,10 @@ public sealed class MarkdownService
     /// </summary>
     private static void SanitizeLink(LinkInline link)
     {
-        var url = Clean(link.Url);
-        var scheme = SchemeOf(url);
+        var url = UrlPolicy.Clean(link.Url);
+        var allowed = link.IsImage ? UrlPolicy.IsImageSource(url) : UrlPolicy.IsFollowable(url);
 
-        if (scheme.Length > 0 && !IsAllowed(scheme))
+        if (!allowed)
         {
             link.Url = string.Empty;
             return;
@@ -101,7 +97,7 @@ public sealed class MarkdownService
 
         // An address inside the site keeps the tab it was read in. An image is not something the
         // reader follows, so neither carries the attributes of an outward link.
-        if (link.IsImage || scheme.Length == 0) { return; }
+        if (link.IsImage || UrlPolicy.SchemeOf(url).Length == 0) { return; }
 
         AddOutwardAttributes(link);
     }
@@ -112,9 +108,9 @@ public sealed class MarkdownService
         // A mail autolink carries no scheme of its own: the renderer writes the mailto itself.
         if (autolink.IsEmail) { return; }
 
-        var url = Clean(autolink.Url);
+        var url = UrlPolicy.Clean(autolink.Url);
 
-        if (!IsAllowed(SchemeOf(url)))
+        if (UrlPolicy.SchemeOf(url).Length == 0 || !UrlPolicy.IsFollowable(url))
         {
             autolink.Url = string.Empty;
             return;
@@ -132,44 +128,5 @@ public sealed class MarkdownService
 
         attributes.AddPropertyIfNotExist("target", "_blank");
         attributes.AddPropertyIfNotExist("rel", "noopener noreferrer");
-    }
-
-    /// <summary> The address with its control characters removed and its ends trimmed. </summary>
-    /// <remarks>
-    /// A tab or a newline inside a scheme is not something a reader typed on purpose, and a browser
-    /// drops it before it follows the address. The check has to read what the browser will read.
-    /// </remarks>
-    private static string Clean(string? url)
-    {
-        if (string.IsNullOrEmpty(url)) { return string.Empty; }
-
-        var builder = new StringBuilder(url.Length);
-
-        foreach (var character in url)
-        {
-            if (!char.IsControl(character)) { builder.Append(character); }
-        }
-
-        return builder.ToString().Trim();
-    }
-
-    /// <summary>
-    /// The scheme of an address, or an empty string when it carries none. A colon that follows a
-    /// slash, a query or a fragment belongs to the path, not to a scheme.
-    /// </summary>
-    private static string SchemeOf(string url)
-    {
-        var colon = url.IndexOf(':');
-
-        if (colon <= 0) { return string.Empty; }
-
-        var boundary = url.AsSpan().IndexOfAny('/', '?', '#');
-
-        return (boundary >= 0 && boundary < colon) ? string.Empty : url[..colon];
-    }
-
-    private static bool IsAllowed(string scheme)
-    {
-        return Array.Exists(_allowedSchemes, x => string.Equals(x, scheme, StringComparison.OrdinalIgnoreCase));
     }
 }

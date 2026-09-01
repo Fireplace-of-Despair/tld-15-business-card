@@ -1,0 +1,84 @@
+﻿@attribute [Route($"{ProjectSearchPage.Url}/{ProjectSearchPage.UrlParamPage}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Projects"]
+</PageTitle>
+
+<div class="component-container-column">
+    <div class="container-header">
+        @if (_canEdit)
+        {
+            <a class="icon-button" href="@Pages.Projects.ProjectEditPage.Url">
+                <Plus />
+            </a>
+        }
+
+        <h1>@Localizer["Projects"]</h1>
+    </div>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (State == null || State.Items.Count == 0)
+{
+    <div class="component-container-column">
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    </div>
+    return;
+}
+
+@{
+    // Read once. Inside the loop this asks the resource manager for each row.
+    var dateFormat = Localizer["Common.DateTimeLong"].Value;
+}
+
+<div class="component-container-column">
+    <table>
+        <thead>
+            <tr>
+                <th>@Localizer["Project.Title"]</th>
+                <th>@Localizer["Project.Type"]</th>
+                <th>@Localizer["Project.Division"]</th>
+                <th>@Localizer["Project.PublishedAt"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in State.Items)
+            {
+                <tr @key="project.Id">
+                    <td>
+                        <NavLink href="@($"{Pages.Projects.ProjectEditPage.Url}/{project.Id}")">
+                            @(string.IsNullOrEmpty(project.Title) ? project.Id : project.Title)
+                        </NavLink>
+                    </td>
+                    <td>@project.ProjectTypeId</td>
+                    <td>@project.DivisionId.ToUpperInvariant()</td>
+                    <td>@LocalTime(project.PublishedAt, dateFormat)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <Pagination CurrentPage="@State.Page"
+                MaxPage="@MaxPage"
+                MaxVisible="@Globals.Pagination.MaxVisiblePages"
+                BaseUrl="@ProjectSearchPage.Url" />
+</div>

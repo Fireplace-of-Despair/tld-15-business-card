@@ -14,6 +14,7 @@ using StainlessCore.Features;
 using StainlessInfrastructure;
 using StainlessInfrastructure.Models.Business;
 using tld15Server.Features.Shared.Business;
+using tld15Server.Services;
 
 namespace tld15Server.Features.Contents;
 
@@ -89,7 +90,7 @@ public sealed class ContentPostFeature : IFeature
                 foreach (var translation in content.Translations)
                 {
                     translation.Json = links.TryGetValue(translation.LanguageId, out var storedLinks)
-                        ? ContentJson.ToJson(storedLinks)
+                        ? LinkJson.ToJson(storedLinks)
                         : null;
 
                     translation.Markdown = markdown.TryGetValue(translation.LanguageId, out var storedText)
@@ -166,7 +167,9 @@ public sealed class ContentPostFeature : IFeature
 
                 if (string.IsNullOrEmpty(icon) || string.IsNullOrEmpty(url)) { continue; }
 
-                if (!languages.Contains(link.TranslationLanguageId) || !SharedContentLink.IsLanguageValid(language))
+                if (!languages.Contains(link.TranslationLanguageId)
+                    || !SharedContentLink.IsLanguageValid(language)
+                    || !UrlPolicy.IsFollowable(UrlPolicy.Clean(url)))
                 {
                     throw new IncidentException(IncidentCode.Validation);
                 }

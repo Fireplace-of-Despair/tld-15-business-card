@@ -54,6 +54,15 @@ public static class Globals
         public static string Project => "project";
         public static string Article => "article";
     }
+
+    public static class Project
+    {
+        /// <summary> The width of <c>business.project.id</c>, which an editor must not overrun. </summary>
+        public const int IdMaxLength = 64;
+
+        /// <summary> The shape of an id, matching the check the reference tables carry. </summary>
+        public const string IdPattern = "^[a-z0-9_.-]+$";
+    }
     public static class Content
     {
         public static string Lore => "lore";

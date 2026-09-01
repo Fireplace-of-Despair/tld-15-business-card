@@ -15,24 +15,13 @@ namespace tld15Server.Frontend.Pages.Contents;
 
 /// <summary>
 /// The editor of a content whose body is prose: one tab per locale, and inside it the markdown
-/// source next to the preview. The preview renders through the very component the public page
-/// renders through, so what an editor approves is what a visitor reads.
+/// source next to its preview.
 /// </summary>
 [Authorize(Policy = ContentGetFeature.Id)]
 public partial class ContentTextEditPage
 {
     public const string Url = "/contents/text";
     public const string UrlParamId = "{id}";
-
-    /// <summary> Which side of a locale the editor is showing. </summary>
-    internal enum Tab
-    {
-        /// <summary> The markdown itself, in a text area. </summary>
-        Source = 0,
-
-        /// <summary> The markdown as the site renders it. </summary>
-        Preview = 1,
-    }
 
     [Parameter] public string Id { get; set; } = string.Empty;
 
@@ -42,7 +31,6 @@ public partial class ContentTextEditPage
     private Dictionary<string, string> _texts = [];
 
     private string _language = string.Empty;
-    private Tab _tab = Tab.Source;
 
     /// <summary> The body of the locale the editor is on. </summary>
     private string Text
@@ -95,25 +83,6 @@ public partial class ContentTextEditPage
         }
 
         IsLoading = false;
-    }
-
-    private void SelectLanguage(string languageId)
-    {
-        _language = languageId;
-    }
-
-    private void SelectTab(Tab tab)
-    {
-        _tab = tab;
-    }
-
-    /// <summary>
-    /// The name of a locale on its tab. A locale that carries no text says so with the mark this
-    /// application uses for nothing stored.
-    /// </summary>
-    private string LanguageLabel(KeyValuePair<string, string> language)
-    {
-        return HasText(language.Key) ? language.Value : $"{language.Value} 〇";
     }
 
     /// <summary> Whether a locale carries a body at all. </summary>

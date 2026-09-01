@@ -1,0 +1,12 @@
+﻿<div class="tab-strip" role="tablist">
+    @foreach (var language in Languages)
+    {
+        <button type="button"
+                role="tab"
+                class="tab @(language.Key == Selected ? "tab-selected" : string.Empty)"
+                aria-selected="@(language.Key == Selected ? "true" : "false")"
+                @onclick="() => SelectAsync(language.Key)">
+            @Label(language)
+        </button>
+    }
+</div>

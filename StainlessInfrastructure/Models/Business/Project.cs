@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json;
 using StainlessCore.Models;
 using StainlessInfrastructure.Composition;
 using StainlessInfrastructure.Models.Reference;
@@ -27,6 +26,9 @@ public sealed class Project : IVersionLocal, IUpdatable
     [Column("links_json")]
     public string? LinksJson { get; set; }
 
+    [Column("published_at")]
+    public DateTimeOffset PublishedAt { get; set; }
+
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -43,19 +45,6 @@ public sealed class Project : IVersionLocal, IUpdatable
     public ProjectType ProjectType { get; set; } = null!;
 
     public ICollection<ProjectTranslation> Translations { get; set; } = [];
-
-    [NotMapped]
-    public static string LinksDefault
-    {
-        get
-        {
-            return JsonSerializer.Serialize(new Dictionary<string, string>()
-                {
-                    { "github_", "%url%" },
-                    { "amazon_en", "%url%" },
-                });
-        }
-    }
 }
 
 [Table("project_translation", Schema = Globals.Schema.Business)]
@@ -79,8 +68,10 @@ public sealed class ProjectTranslation : IVersionLocal, IUpdatable
     [Column("subtitle")]
     public string Subtitle { get; set; } = string.Empty;
 
-    [Column("content_html")]
-    public string ContentHtml { get; set; } = string.Empty;
+    /// <summary> The body of the translation, as the markdown an editor typed. </summary>
+    [Column("markdown")]
+    public string? Markdown { get; set; }
+
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
 

@@ -414,6 +414,42 @@
   <data name="Profile" xml:space="preserve">
     <value>Profile</value>
   </data>
+  <data name="Project" xml:space="preserve">
+    <value>Project</value>
+  </data>
+  <data name="Project.ConfirmDelete" xml:space="preserve">
+    <value>Delete this work? This cannot be undone.</value>
+  </data>
+  <data name="Project.Division" xml:space="preserve">
+    <value>Division</value>
+  </data>
+  <data name="Project.Id" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="Project.Poster.Alt" xml:space="preserve">
+    <value>Poster description</value>
+  </data>
+  <data name="Project.Poster.Url" xml:space="preserve">
+    <value>Poster link</value>
+  </data>
+  <data name="Project.PublishedAt" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="Project.Subtitle" xml:space="preserve">
+    <value>Subtitle</value>
+  </data>
+  <data name="Project.Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Project.Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Project.Validation.Id" xml:space="preserve">
+    <value>Lowercase latin letters, digits, and - _ . only.</value>
+  </data>
+  <data name="Project.Validation.Poster" xml:space="preserve">
+    <value>A poster is linked, not uploaded: the address must be http or https.</value>
+  </data>
   <data name="Projects" xml:space="preserve">
     <value>Projects</value>
   </data>

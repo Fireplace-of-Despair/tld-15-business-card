@@ -14,13 +14,21 @@
     <NavAccordion Title="@Localizer["Menu.Content"]"
                   ActiveUrls='new[]
                                       {
-                                          Pages.Contents.ContentSearchPage.Url, Pages.Contents.ContentLinkEditPage.Url,
-                                          Pages.Contents.ContentTextEditPage.Url
+                                          Pages.Contents.ContentSearchPage.Url, Pages.Contents.ContentLinkEditPage.Url,
+
+                                          Pages.Contents.ContentTextEditPage.Url, Pages.Projects.ProjectSearchPage.Url,
+                                          Pages.Projects.ProjectEditPage.Url
                                       }'>
 
         <Restricted Feature="@Features.Contents.ContentSearchFeature.Id">
             <NavLink href="@Pages.Contents.ContentSearchPage.Url">
                 @Localizer["Contents"]
+            </NavLink>
+        </Restricted>
+
+        <Restricted Feature="@Features.Projects.ProjectSearchFeature.Id">
+            <NavLink href="@Pages.Projects.ProjectSearchPage.Url">
+                @Localizer["Projects"]
             </NavLink>
         </Restricted>
     </NavAccordion>

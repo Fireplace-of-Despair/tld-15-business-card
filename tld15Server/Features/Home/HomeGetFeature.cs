@@ -49,7 +49,7 @@ public sealed class HomeGetFeature : IFeature
             string DivisionId,
             string PosterUrl,
             string? LinksJson,
-            DateTimeOffset CreatedAt,
+            DateTimeOffset PublishedAt,
             List<ProjectTranslationRow> Translations,
             List<KeyValuePair<string, string>> DivisionNames);
 
@@ -85,14 +85,14 @@ public sealed class HomeGetFeature : IFeature
                 var projectRows = await contextBusiness
                     .Projects
                     .Where(x => projectTypeIds.Contains(x.ProjectTypeId))
-                    .OrderByDescending(x => x.CreatedAt)
+                    .OrderByDescending(x => x.PublishedAt)
                     .Select(x => new ProjectRow(
                         x.Id,
                         x.ProjectTypeId,
                         x.DivisionId,
                         x.PosterUrl,
                         x.LinksJson,
-                        x.CreatedAt,
+                        x.PublishedAt,
                         x.Translations
                             .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
                             .Select(tr => new ProjectTranslationRow(tr.LanguageId, tr.Title, tr.Subtitle, tr.PosterAlt))
@@ -159,7 +159,7 @@ public sealed class HomeGetFeature : IFeature
                 PosterAlt = translation?.PosterAlt ?? string.Empty,
                 PosterUrl = row.PosterUrl,
                 LinksJson = row.LinksJson,
-                CreatedAt = row.CreatedAt,
+                PublishedAt = row.PublishedAt,
             };
         }
     }

@@ -151,6 +151,16 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   (`Globals.Content.LinkEditable`), `ContentTextEditPage` for the markdown body
   (`Globals.Content.TextEditable`). `ContentPostFeature` replaces a content **whole**, so a page that
   edits one side sends the other side back exactly as `ContentGetFeature` handed it over.
+- Projects and articles are the same table, split by `project_type_id`. `ProjectEditPage`
+  (`/projects/edit/{id?}`) creates and edits one: the id, type, division, publication date and
+  poster address sit above the locale tabs, the title/subtitle/poster text and the markdown body
+  inside them. `ProjectPostFeature` replaces a project whole, dropping any locale left blank.
+- **Posters are addresses, never uploads.** Nothing is written to disk by an editor; `UrlPolicy`
+  decides what a browser may load or follow, and both `MarkdownService` and the post features ask it.
+- `business.project.published_at` is the editor's date and the one the cards order and show;
+  `created_at` belongs to the version trigger and says when the row appeared.
+- Reusable editor parts live in `Frontend/Components/Common`: `LanguageTabs` (one tab per locale,
+  marking an empty one with 〇), `MarkdownEditor` (source next to preview), `MarkdownView`.
 - Magic strings (content ids, cookie names, claim types, config keys, page metadata) belong in
   `tld15Server/Composition/Globals`.
 

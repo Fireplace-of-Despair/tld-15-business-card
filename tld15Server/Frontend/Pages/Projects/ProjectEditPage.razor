@@ -1,0 +1,220 @@
+﻿@attribute [Route($"{ProjectEditPage.Url}/{ProjectEditPage.UrlParamId}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @(_projectId == null ? Localizer["Common.Create"] : Localizer["Common.Update"]) @Localizer["Project"]
+</PageTitle>
+
+<div class="component-container-column">
+    <h1>@(_projectId == null ? Localizer["Common.Create"] : _project.Id)</h1>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (_loaded == null)
+{
+    return;
+}
+
+<div class="component-container-column">
+    <div class="component-container-row">
+        <div class="input-group">
+            <label for="project-id">@Localizer["Project.Id"]</label>
+            @* The id is the address of the work. It is chosen once: changing it later would break
+               every link that already points here. *@
+            <input id="project-id"
+                   type="text"
+                   class="@(IsIdValid ? string.Empty : "invalid")"
+                   maxlength="64"
+                   disabled="@(_projectId != null)"
+                   @bind="_project.Id"
+                   @bind:event="oninput" />
+            @if (!IsIdValid)
+            {
+                <span class="field-error">@Localizer["Project.Validation.Id"]</span>
+            }
+        </div>
+
+        <div class="input-group">
+            <label for="project-type">@Localizer["Project.Type"]</label>
+            <select id="project-type" @bind="_project.ProjectTypeId">
+                @foreach (var type in _loaded.ProjectTypes)
+                {
+                    <option value="@type.Key">@type.Value</option>
+                }
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="project-division">@Localizer["Project.Division"]</label>
+            <select id="project-division" @bind="_project.DivisionId">
+                @foreach (var division in _loaded.Divisions)
+                {
+                    <option value="@division.Key">@division.Value</option>
+                }
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="project-published">@Localizer["Project.PublishedAt"]</label>
+            <input id="project-published" type="date" @bind="PublishedOn" @bind:format="yyyy-MM-dd" />
+        </div>
+    </div>
+
+    <div class="component-container-row">
+        <div class="input-group poster-group">
+            <label for="project-poster">@Localizer["Project.Poster.Url"]</label>
+            @* Pictures are linked, never uploaded: this server stores an address and nothing else. *@
+            <input id="project-poster"
+                   type="url"
+                   class="poster-url @(IsPosterValid ? string.Empty : "invalid")"
+                   @bind="_project.PosterUrl"
+                   @bind:event="oninput" />
+            @if (!IsPosterValid)
+            {
+                <span class="field-error">@Localizer["Project.Validation.Poster"]</span>
+            }
+        </div>
+
+        @if (IsPosterValid && !string.IsNullOrWhiteSpace(_project.PosterUrl))
+        {
+            <div class="poster-preview">
+                <img src="@_project.PosterUrl" alt="@Current.PosterAlt" loading="lazy" />
+            </div>
+        }
+    </div>
+</div>
+
+<div class="component-container-column">
+    <LanguageTabs Languages="@_loaded.Languages" @bind-Selected="_language" HasContent="HasTranslation" />
+
+    <div class="component-container-row">
+        <div class="input-group">
+            <label for="project-title">@Localizer["Project.Title"]</label>
+            <input id="project-title" type="text" @bind="Current.Title" />
+        </div>
+
+        <div class="input-group">
+            <label for="project-subtitle">@Localizer["Project.Subtitle"]</label>
+            <input id="project-subtitle" type="text" @bind="Current.Subtitle" />
+        </div>
+
+        <div class="input-group">
+            <label for="project-alt">@Localizer["Project.Poster.Alt"]</label>
+            <input id="project-alt" type="text" @bind="Current.PosterAlt" />
+        </div>
+    </div>
+
+    <MarkdownEditor @bind-Value="Current.Markdown" />
+</div>
+
+<div class="component-container-column">
+    <div class="container-header">
+        <button class="icon-button" type="button" @onclick="AddLink">
+            <Plus />
+        </button>
+        <h2>@Localizer["Content.Links"]</h2>
+    </div>
+
+    @if (_project.Links.Count == 0)
+    {
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>@Localizer["Content.Icon"]</th>
+                    <th>@Localizer["Content.Icon.Language"]</th>
+                    <th>@Localizer["Content.Link"]</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var link in _project.Links)
+                {
+                    var issue = Validate(link);
+
+                    <tr @key="link">
+                        <td>
+                            <div class="link-icon-cell">
+                                <span class="link-icon">@IconHelper.GetIcon(link.Icon)</span>
+                                <select @bind="link.Icon">
+                                    @foreach (var option in IconOptions(link))
+                                    {
+                                        <option value="@option">@option</option>
+                                    }
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <input class="link-language @(issue == RowIssue.None ? string.Empty : "invalid")"
+                                   type="text"
+                                   maxlength="3"
+                                   placeholder="@IconHelper.GetLanguage(string.Empty)"
+                                   @bind="link.Language"
+                                   @bind:event="oninput" />
+
+                            @if (issue == RowIssue.Language)
+                            {
+                                <span class="field-error">@Localizer["Content.Validation.Language"]</span>
+                            }
+                            else if (issue == RowIssue.Duplicate)
+                            {
+                                <span class="field-error">@Localizer["Content.Validation.Duplicate"]</span>
+                            }
+                        </td>
+                        <td>
+                            <input class="link-url" type="url" @bind="link.Url" />
+                        </td>
+                        <td>
+                            <button class="icon-button" type="button" @onclick="() => DeleteLink(link)">
+                                <Minus />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (_projectId != null)
+{
+    <VersionInfo UpdatableModel="@_loaded" VersionLocalModel="@_loaded" />
+}
+
+<div class="component-container-row">
+    <AuthorizeView Policy="@Features.Projects.ProjectPostFeature.Id">
+        <Authorized>
+            <button disabled="@(!CanSave)" @onclick="() => Save()">@Localizer["Common.Save"]</button>
+        </Authorized>
+    </AuthorizeView>
+
+    @if (_projectId != null)
+    {
+        <AuthorizeView Policy="@Features.Projects.ProjectDeleteFeature.Id">
+            <Authorized>
+                <button @onclick="() => Delete()">@Localizer["Common.Delete"]</button>
+            </Authorized>
+        </AuthorizeView>
+    }
+</div>

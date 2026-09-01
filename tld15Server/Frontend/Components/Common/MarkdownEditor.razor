@@ -1,0 +1,36 @@
+﻿@using Microsoft.Extensions.Localization
+
+<div class="tab-strip" role="tablist">
+    <button type="button"
+            role="tab"
+            class="tab @(_tab == Tab.Source ? "tab-selected" : string.Empty)"
+            aria-selected="@(_tab == Tab.Source ? "true" : "false")"
+            @onclick="() => _tab = Tab.Source">
+        @Localizer["Content.Markdown"]
+    </button>
+    <button type="button"
+            role="tab"
+            class="tab @(_tab == Tab.Preview ? "tab-selected" : string.Empty)"
+            aria-selected="@(_tab == Tab.Preview ? "true" : "false")"
+            @onclick="() => _tab = Tab.Preview">
+        @Localizer["Content.Preview"]
+    </button>
+</div>
+
+<div class="tab-panel">
+    @if (_tab == Tab.Source)
+    {
+        @* The field carries the text on change, not on every keystroke: a circuit round trip per
+           typed character is a price nobody asked to pay. Switching a tab blurs the field first, so
+           the preview reads what was typed. *@
+        <textarea class="markdown-source"
+                  rows="@Rows"
+                  spellcheck="false"
+                  value="@Value"
+                  @onchange="OnChangedAsync"></textarea>
+    }
+    else
+    {
+        <MarkdownView Markdown="@Value" />
+    }
+</div>

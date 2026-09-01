@@ -17,6 +17,6 @@ public sealed class SharedContent
 
     public Dictionary<string, string> JsonToDictionary()
     {
-        return ContentJson.ToDictionary(Json);
+        return LinkJson.ToDictionary(Json);
     }
 }
