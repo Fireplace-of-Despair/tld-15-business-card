@@ -303,6 +303,9 @@
   <data name="Menu.System" xml:space="preserve">
     <value>システム</value>
   </data>
+  <data name="Navigation.Sections" xml:space="preserve">
+    <value>セクション</value>
+  </data>
   <data name="Common.Version" xml:space="preserve">
     <value>バージョン</value>
   </data>

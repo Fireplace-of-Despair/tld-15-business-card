@@ -155,6 +155,10 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   (`/projects/edit/{id?}`) creates and edits one: the id, type, division, publication date and
   poster address sit above the locale tabs, the title/subtitle/poster text and the markdown body
   inside them. `ProjectPostFeature` replaces a project whole, dropping any locale left blank.
+- `LocalNavigation` (`Frontend/Navigations`) is the row of anchors at the top of `Home`, one per
+  block the page actually renders. The ids it jumps to are `Globals.Content.*` for the blocks that
+  stand for a content and `Globals.Anchor.*` for the rest. Do not put `scroll-behavior: smooth` on
+  the document: a browser drops a smooth jump of a few thousand pixels and the anchors stop working.
 - `/sitemap.xml` is built **once, at start** (`Program.BuildTheSitemap` into the `SitemapService`
   singleton) out of `Application:Host`, the front page and one address per work that carries a
   translation. A work published later appears on the next start. Without `Application:Host` the

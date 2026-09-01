@@ -11,6 +11,7 @@ using StainlessCore;
 using tld15Server.Composition;
 using tld15Server.Features.Home;
 using tld15Server.Features.Shared.Business;
+using tld15Server.Frontend.Navigations;
 using tld15Server.Services;
 
 namespace tld15Server.Frontend.Pages;
@@ -52,6 +53,9 @@ public partial class Home
     /// <summary> The site as schema.org describes it, wrapped in the element that carries it. </summary>
     private MarkupString _structuredData;
 
+    /// <summary> The blocks this page renders, for the row of links that jumps between them. </summary>
+    private List<LocalNavigation.Section> _sections = [];
+
     protected override async Task OnInitializedAsync()
     {
         var result = await Execute.Run(async () =>
@@ -77,9 +81,44 @@ public partial class Home
         Projects = result.Data.Projects;
 
         BuildAddresses();
+        BuildSections();
         BuildStructuredData();
 
         IsLoading = false;
+    }
+
+    /// <summary>
+    /// The blocks the page actually renders, in the order it renders them. A link to a heading that
+    /// is not on the page scrolls a reader nowhere, so an empty block does not get one.
+    /// </summary>
+    private void BuildSections()
+    {
+        _sections = [];
+
+        if (Lore != null && !string.IsNullOrEmpty(Lore.Markdown))
+        {
+            _sections.Add(new LocalNavigation.Section(Lore.Id, Lore.Title));
+        }
+
+        if (Articles.Count > 0)
+        {
+            _sections.Add(new LocalNavigation.Section(Globals.Anchor.Articles, Localizer["Articles"].Value));
+        }
+
+        if (Projects.Count > 0)
+        {
+            _sections.Add(new LocalNavigation.Section(Globals.Anchor.Projects, Localizer["Projects"].Value));
+        }
+
+        if (Social != null && !string.IsNullOrEmpty(Social.Json))
+        {
+            _sections.Add(new LocalNavigation.Section(Social.Id, Social.Title));
+        }
+
+        if (Contacts != null && !string.IsNullOrEmpty(Contacts.Json))
+        {
+            _sections.Add(new LocalNavigation.Section(Contacts.Id, Contacts.Title));
+        }
     }
 
     /// <summary>

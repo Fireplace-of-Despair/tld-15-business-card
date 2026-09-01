@@ -1,4 +1,6 @@
-﻿@using tld15Server.Frontend.Components.Common
+﻿@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Navigations
 @attribute [Route(Home.Url)]
 @inherits BasePage
 
@@ -28,6 +30,8 @@
     return;
 }
 
+<LocalNavigation Sections="@_sections" />
+
 @if (Lore != null && !string.IsNullOrEmpty(Lore.Markdown))
 {
     @* The opening block is the heading of the page, so it is the h1 the rest of the sections hang
@@ -41,7 +45,7 @@
 @if (Articles.Any())
 {
     <div class="component-container-column">
-        <h2 id="articles" class="component-title">@Localizer["Articles"]</h2>
+        <h2 id="@Globals.Anchor.Articles" class="component-title">@Localizer["Articles"]</h2>
 
         <div class="articles-container">
             @foreach (var article in Articles)
@@ -55,7 +59,7 @@
 @if (Projects.Any())
 {
     <div class="component-container-column">
-        <h2 id="projects" class="component-title">@Localizer["Projects"]</h2>
+        <h2 id="@Globals.Anchor.Projects" class="component-title">@Localizer["Projects"]</h2>
         <div class="articles-container">
             @foreach (var project in Projects)
             {

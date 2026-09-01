@@ -49,6 +49,14 @@ public static class Globals
         internal const string ESD = "ESD";
     }
 
+    /// <summary> The ids the blocks of the front page carry, which its local links jump to. </summary>
+    /// <remarks> A block that stands for a content takes the id of that content instead. </remarks>
+    public static class Anchor
+    {
+        public static string Articles => "articles";
+        public static string Projects => "projects";
+    }
+
     public static class Route
     {
         /// <summary>
