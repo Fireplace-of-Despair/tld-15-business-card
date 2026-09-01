@@ -90,7 +90,7 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
                 .ForeignKey("fk_content_translation_to_language", Globals.Schema.Reference, "language", "id")
                 .OnDelete(Rule.Cascade)
             .WithColumn("name").AsString().NotNullable()
-            .WithColumn("html").AsString().Nullable()
+            .WithColumn("markdown").AsString().Nullable()
             .WithColumn("json").AsString().Nullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)

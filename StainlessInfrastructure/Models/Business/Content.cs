@@ -39,9 +39,10 @@ public sealed class ContentTranslation : IVersionLocal, IUpdatable
     [Column("name")]
     public string Name { get; set; } = string.Empty;
 
-    /// <summary> html </summary>
-    [Column("html")]
-    public string? Html { get; set; }
+    /// <summary> The body of the translation, as the markdown an editor typed. </summary>
+    /// <remarks> The rendered html is never stored: it is built on read and cached in memory. </remarks>
+    [Column("markdown")]
+    public string? Markdown { get; set; }
 
     /// <summary>
     /// Dictionary in format %key-name%_%language% to %url%

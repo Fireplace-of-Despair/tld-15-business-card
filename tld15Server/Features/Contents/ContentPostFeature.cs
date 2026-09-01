@@ -18,10 +18,15 @@ using tld15Server.Features.Shared.Business;
 namespace tld15Server.Features.Contents;
 
 /// <summary>
-/// Stores the links of a content, replacing every locale at once. The content and all of its
-/// translations are written on the same save, so their dates and versions stay in step and the
-/// version of the content alone says whether a caller is holding a stale copy.
+/// Stores a content whole — the body and the links of every locale — replacing what was there. The
+/// content and all of its translations are written on the same save, so their dates and versions
+/// stay in step and the version of the content alone says whether a caller holds a stale copy.
 /// </summary>
+/// <remarks>
+/// The command is the new state of the content, not a patch of it: a locale the command leaves out
+/// loses what it held. A page that edits one side of a content therefore sends the other side back
+/// exactly as <see cref="ContentGetFeature"/> handed it over.
+/// </remarks>
 public sealed class ContentPostFeature : IFeature
 {
     public const string Id = "content.post";
@@ -31,6 +36,7 @@ public sealed class ContentPostFeature : IFeature
     {
         public required string Id { get; set; }
         public List<SharedContentLink> Links { get; set; } = [];
+        public Dictionary<string, string?> Markdown { get; set; } = [];
 
         public required long VersionLocal { get; set; }
     }
@@ -49,6 +55,7 @@ public sealed class ContentPostFeature : IFeature
         {
             var languages = await LoadLanguages(ctn);
             var links = ToLinks(cmd.Links, languages);
+            var markdown = ToMarkdown(cmd.Markdown, languages);
 
             await using (var contextBusiness = await contextBusinessFactory.CreateDbContextAsync(ctn))
             {
@@ -63,7 +70,10 @@ public sealed class ContentPostFeature : IFeature
                     throw new IncidentException(IncidentCode.VersionMismatch);
                 }
 
-                foreach (var languageId in links.Keys.Where(x => !content.Translations.Any(tr => tr.LanguageId == x)))
+                var written = new HashSet<string>(links.Keys, StringComparer.Ordinal);
+                written.UnionWith(markdown.Keys);
+
+                foreach (var languageId in written.Where(x => !content.Translations.Any(tr => tr.LanguageId == x)))
                 {
                     content.Translations.Add(new ContentTranslation
                     {
@@ -78,8 +88,12 @@ public sealed class ContentPostFeature : IFeature
 
                 foreach (var translation in content.Translations)
                 {
-                    translation.Json = links.TryGetValue(translation.LanguageId, out var stored)
-                        ? ContentJson.ToJson(stored)
+                    translation.Json = links.TryGetValue(translation.LanguageId, out var storedLinks)
+                        ? ContentJson.ToJson(storedLinks)
+                        : null;
+
+                    translation.Markdown = markdown.TryGetValue(translation.LanguageId, out var storedText)
+                        ? storedText
                         : null;
 
                     // The triggers own the dates and the versions, but they only fire on a row the
@@ -105,6 +119,31 @@ public sealed class ContentPostFeature : IFeature
                     .Select(x => x.Id)
                     .ToHashSetAsync(ctn);
             }
+        }
+
+        /// <summary>
+        /// The body of every locale that carries one. A blank text is not a body and drops out, so
+        /// an editor that clears the field stores null rather than a row of spaces.
+        /// </summary>
+        private static Dictionary<string, string> ToMarkdown(
+            Dictionary<string, string?> markdown,
+            HashSet<string> languages)
+        {
+            var result = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            foreach (var (languageId, text) in markdown)
+            {
+                if (string.IsNullOrWhiteSpace(text)) { continue; }
+
+                if (!languages.Contains(languageId))
+                {
+                    throw new IncidentException(IncidentCode.Validation);
+                }
+
+                result[languageId] = text;
+            }
+
+            return result;
         }
 
         /// <summary>

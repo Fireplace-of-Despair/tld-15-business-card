@@ -9,7 +9,10 @@ public sealed class SharedContent
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
-    public string? Html { get; set; } = null;
+
+    /// <summary> The body of the block, as markdown. The page renders it, the database never sees html. </summary>
+    public string? Markdown { get; set; } = null;
+
     public string? Json { get; set; } = null;
 
     public Dictionary<string, string> JsonToDictionary()

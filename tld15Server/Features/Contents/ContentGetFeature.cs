@@ -18,10 +18,15 @@ using tld15Server.Features.Shared.Business;
 namespace tld15Server.Features.Contents;
 
 /// <summary>
-/// Reads one content and the links of every locale it carries. The dates and the version belong to
-/// the content itself: a save moves the content and all of its translations together, so the root
-/// row is the one number that describes the whole of it.
+/// Reads one content whole: the body and the links of every locale it carries. The dates and the
+/// version belong to the content itself, because a save moves the content and all of its
+/// translations together, so the root row is the one number that describes the whole of it.
 /// </summary>
+/// <remarks>
+/// An editor page opens one side of a content and leaves the other alone, so both sides leave the
+/// database on every read: <see cref="ContentPostFeature"/> stores what it is given and nothing
+/// else, and a page that dropped the side it does not edit would erase it on the next save.
+/// </remarks>
 public sealed class ContentGetFeature : IFeature
 {
     public const string Id = "content.get";
@@ -40,6 +45,7 @@ public sealed class ContentGetFeature : IFeature
         public required string Id { get; set; }
         public required string Title { get; set; }
         public List<SharedContentLink> Links { get; set; } = [];
+        public Dictionary<string, string> Markdown { get; set; } = [];
         public Dictionary<string, string> Languages { get; set; } = [];
 
         public DateTimeOffset CreatedAt { get; set; }
@@ -81,7 +87,7 @@ public sealed class ContentGetFeature : IFeature
                         x.UpdatedAt,
                         x.VersionLocal,
                         Titles = x.Translations.Select(tr => new KeyValuePair<string, string>(tr.LanguageId, tr.Name)).ToList(),
-                        Translations = x.Translations.Select(tr => new { tr.LanguageId, tr.Json }).ToList()
+                        Translations = x.Translations.Select(tr => new { tr.LanguageId, tr.Json, tr.Markdown }).ToList()
                     })
                     .FirstOrDefaultAsync(ctn)
                     ?? throw new IncidentException(IncidentCode.NotFound);
@@ -97,7 +103,10 @@ public sealed class ContentGetFeature : IFeature
                         .OrderBy(x => x.LanguageId, StringComparer.Ordinal)
                         .SelectMany(tr => ContentJson
                             .ToDictionary(tr.Json)
-                            .Select(link => SharedContentLink.FromKey(tr.LanguageId, link.Key, link.Value)))]
+                            .Select(link => SharedContentLink.FromKey(tr.LanguageId, link.Key, link.Value)))],
+                    Markdown = content.Translations
+                        .Where(x => !string.IsNullOrEmpty(x.Markdown))
+                        .ToDictionary(x => x.LanguageId, x => x.Markdown!, StringComparer.Ordinal)
                 };
             }
         }

@@ -43,7 +43,7 @@ public sealed class ContentSearchFeature : IFeature
     {
         public async ValueTask<Result> Handle(Query query, CancellationToken ctn)
         {
-            var contentIds = Globals.Content.LinkEditable;
+            var contentIds = Globals.Content.Editable;
 
             await using (var contextBusiness = await contextBusinessFactory.CreateDbContextAsync(ctn))
             {

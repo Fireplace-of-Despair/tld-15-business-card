@@ -39,7 +39,7 @@ public sealed class HomeGetFeature : IFeature
 
     public sealed class Handler(IDbContextFactory<DataContextBusiness> dataContextBusiness) : IQueryHandler<Query, Result>
     {
-        private sealed record ContentRow(string ContentId, string LanguageId, string Name, string? Html, string? Json);
+        private sealed record ContentRow(string ContentId, string LanguageId, string Name, string? Markdown, string? Json);
 
         private sealed record ProjectTranslationRow(string LanguageId, string Title, string Subtitle, string PosterAlt);
 
@@ -71,7 +71,7 @@ public sealed class HomeGetFeature : IFeature
                     .Where(x => contentIds.Contains(x.Id))
                     .SelectMany(x => x.Translations
                         .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
-                        .Select(tr => new ContentRow(x.Id, tr.LanguageId, tr.Name, tr.Html, tr.Json)))
+                        .Select(tr => new ContentRow(x.Id, tr.LanguageId, tr.Name, tr.Markdown, tr.Json)))
                     .ToListAsync(ctn);
 
                 result.Lore = MapContent(Globals.Content.Lore, contentRows, language);
@@ -138,7 +138,7 @@ public sealed class HomeGetFeature : IFeature
             {
                 Id = contentId,
                 Title = row?.Name ?? string.Empty,
-                Html = row?.Html,
+                Markdown = row?.Markdown,
                 Json = row?.Json,
             };
         }

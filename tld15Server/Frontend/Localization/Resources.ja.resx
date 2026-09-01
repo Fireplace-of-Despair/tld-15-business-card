@@ -210,6 +210,12 @@
   <data name="Content.Link" xml:space="preserve">
     <value>リンク</value>
   </data>
+  <data name="Content.Markdown" xml:space="preserve">
+    <value>マークダウン</value>
+  </data>
+  <data name="Content.Preview" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
   <data name="Content.Links" xml:space="preserve">
     <value>リンク一覧</value>
   </data>
