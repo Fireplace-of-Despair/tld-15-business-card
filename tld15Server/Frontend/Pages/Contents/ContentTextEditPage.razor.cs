@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using StainlessCore;
 using tld15Server.Composition;
 using tld15Server.Features.Contents;
+using tld15Server.Services;
 
 namespace tld15Server.Frontend.Pages.Contents;
 
@@ -30,6 +31,12 @@ public partial class ContentTextEditPage
     /// <summary> The body of every locale, held apart from the stored state until the save. </summary>
     private Dictionary<string, string> _texts = [];
 
+    /// <summary> What the picture shows, per locale, held apart the same way. </summary>
+    private Dictionary<string, string> _posterAlts = [];
+
+    /// <summary> The address of the picture. It belongs to the content, so it stands outside the tabs. </summary>
+    private string _posterUrl = string.Empty;
+
     private string _language = string.Empty;
 
     /// <summary> The body of the locale the editor is on. </summary>
@@ -38,6 +45,18 @@ public partial class ContentTextEditPage
         get => _texts.TryGetValue(_language, out var text) ? text : string.Empty;
         set => _texts[_language] = value;
     }
+
+    /// <summary> The description of the picture in the locale the editor is on. </summary>
+    private string PosterAlt
+    {
+        get => _posterAlts.TryGetValue(_language, out var text) ? text : string.Empty;
+        set => _posterAlts[_language] = value;
+    }
+
+    private bool IsPosterValid => UrlPolicy.IsImageSource(UrlPolicy.Clean(_posterUrl));
+
+    /// <summary> A field that cannot be stored blocks the save rather than losing itself quietly. </summary>
+    private bool CanSave => IsPosterValid;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -72,6 +91,8 @@ public partial class ContentTextEditPage
 
         _content = result.Data!;
         _texts = new Dictionary<string, string>(_content.Markdown, StringComparer.Ordinal);
+        _posterAlts = new Dictionary<string, string>(_content.PosterAlt, StringComparer.Ordinal);
+        _posterUrl = _content.PosterUrl;
 
         // A save reads the content back, and the tab the editor was working on has to survive that.
         // Only a locale the content does not carry moves the selection.
@@ -93,7 +114,7 @@ public partial class ContentTextEditPage
 
     private async Task Save()
     {
-        if (_content == null) { return; }
+        if (_content == null || !CanSave) { return; }
 
         IncidentCode = null;
 
@@ -106,6 +127,8 @@ public partial class ContentTextEditPage
                     Id = _content.Id,
                     VersionLocal = _content.VersionLocal,
                     Markdown = _texts.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal),
+                    PosterUrl = _posterUrl,
+                    PosterAlt = _posterAlts.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal),
                     // The links of the content belong to the other editor. They travel back exactly
                     // as they were read: the command replaces the whole content, not one side of it.
                     Links = _content.Links,

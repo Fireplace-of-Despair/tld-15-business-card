@@ -148,9 +148,14 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   component that hands the result to a `MarkupString`. Styling lives in `app.css` under
   `.markdown-body` — scoped css cannot reach markup a component did not write itself.
 - Content editors are split by what a content carries: `ContentLinkEditPage` for the table of links
-  (`Globals.Content.LinkEditable`), `ContentTextEditPage` for the markdown body
+  (`Globals.Content.LinkEditable`), `ContentTextEditPage` for the markdown body and the poster
   (`Globals.Content.TextEditable`). `ContentPostFeature` replaces a content **whole**, so a page that
   edits one side sends the other side back exactly as `ContentGetFeature` handed it over.
+- A content carries a poster of its own (`business.content.poster_url`, description in
+  `content_translation.poster_alt`, migration `V2026_09_02_1500_Added_Content_Poster`) — an address
+  like every other poster, never an upload. Only the lore block on `Home` draws it: the picture
+  stands to the left of the prose, narrows with the window, is cropped to the height of the block,
+  and leaves altogether below the narrow breakpoint.
 - Projects and articles are the same table, split by `project_type_id`. `ProjectEditPage`
   (`/projects/edit/{id?}`) creates and edits one: the id, type, division, publication date and
   poster address sit above the locale tabs, the title/subtitle/poster text and the markdown body

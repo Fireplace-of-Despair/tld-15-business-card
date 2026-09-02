@@ -12,6 +12,10 @@ public sealed class Content : IVersionLocal, IUpdatable
 {
     [Key, Column("id")]
     public required string Id { get; set; }
+
+    [Column("poster_url")]
+    public string? PosterUrl { get; set; }
+
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -39,8 +43,9 @@ public sealed class ContentTranslation : IVersionLocal, IUpdatable
     [Column("name")]
     public string Name { get; set; } = string.Empty;
 
-    /// <summary> The body of the translation, as the markdown an editor typed. </summary>
-    /// <remarks> The rendered html is never stored: it is built on read and cached in memory. </remarks>
+    [Column("poster_alt")]
+    public string? PosterAlt { get; set; }
+
     [Column("markdown")]
     public string? Markdown { get; set; }
 

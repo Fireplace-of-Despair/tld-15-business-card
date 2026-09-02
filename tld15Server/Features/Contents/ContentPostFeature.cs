@@ -19,9 +19,9 @@ using tld15Server.Services;
 namespace tld15Server.Features.Contents;
 
 /// <summary>
-/// Stores a content whole — the body and the links of every locale — replacing what was there. The
-/// content and all of its translations are written on the same save, so their dates and versions
-/// stay in step and the version of the content alone says whether a caller holds a stale copy.
+/// Stores a content whole — the picture, the body and the links of every locale — replacing what was
+/// there. The content and all of its translations are written on the same save, so their dates and
+/// versions stay in step and the version of the content alone says whether a caller holds a stale copy.
 /// </summary>
 /// <remarks>
 /// The command is the new state of the content, not a patch of it: a locale the command leaves out
@@ -36,9 +36,10 @@ public sealed class ContentPostFeature : IFeature
     public sealed record Command : ICommand<Result>
     {
         public required string Id { get; set; }
+        public string PosterUrl { get; set; } = string.Empty;
         public List<SharedContentLink> Links { get; set; } = [];
         public Dictionary<string, string?> Markdown { get; set; } = [];
-
+        public Dictionary<string, string?> PosterAlt { get; set; } = [];
         public required long VersionLocal { get; set; }
     }
 
@@ -54,9 +55,17 @@ public sealed class ContentPostFeature : IFeature
     {
         public async ValueTask<Result> Handle(Command cmd, CancellationToken ctn)
         {
+            var posterUrl = UrlPolicy.Clean(cmd.PosterUrl);
+
+            if (!UrlPolicy.IsImageSource(posterUrl))
+            {
+                throw new IncidentException(IncidentCode.Validation);
+            }
+
             var languages = await LoadLanguages(ctn);
             var links = ToLinks(cmd.Links, languages);
             var markdown = ToMarkdown(cmd.Markdown, languages);
+            var posterAlt = ToPosterAlt(cmd.PosterAlt, languages);
 
             await using (var contextBusiness = await contextBusinessFactory.CreateDbContextAsync(ctn))
             {
@@ -73,6 +82,7 @@ public sealed class ContentPostFeature : IFeature
 
                 var written = new HashSet<string>(links.Keys, StringComparer.Ordinal);
                 written.UnionWith(markdown.Keys);
+                written.UnionWith(posterAlt.Keys);
 
                 foreach (var languageId in written.Where(x => !content.Translations.Any(tr => tr.LanguageId == x)))
                 {
@@ -97,12 +107,17 @@ public sealed class ContentPostFeature : IFeature
                         ? storedText
                         : null;
 
+                    translation.PosterAlt = posterAlt.TryGetValue(translation.LanguageId, out var storedAlt)
+                        ? storedAlt
+                        : string.Empty;
+
                     // The triggers own the dates and the versions, but they only fire on a row the
                     // save actually writes. Touching the version sends the update for a translation
                     // whose links did not change, so the whole content moves as one.
                     translation.VersionLocal++;
                 }
 
+                content.PosterUrl = posterUrl;
                 content.VersionLocal++;
 
                 await contextBusiness.SaveChangesAsync(ctn);
@@ -142,6 +157,32 @@ public sealed class ContentPostFeature : IFeature
                 }
 
                 result[languageId] = text;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// What the picture shows, for every locale that says it. A blank description is not one and
+        /// drops out, so a locale that carries no text for the picture stores an empty column rather
+        /// than a row of spaces a screen reader would read out.
+        /// </summary>
+        private static Dictionary<string, string> ToPosterAlt(
+            Dictionary<string, string?> posterAlt,
+            HashSet<string> languages)
+        {
+            var result = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            foreach (var (languageId, text) in posterAlt)
+            {
+                if (string.IsNullOrWhiteSpace(text)) { continue; }
+
+                if (!languages.Contains(languageId))
+                {
+                    throw new IncidentException(IncidentCode.Validation);
+                }
+
+                result[languageId] = text.Trim();
             }
 
             return result;

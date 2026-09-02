@@ -18,7 +18,7 @@ using tld15Server.Features.Shared.Business;
 namespace tld15Server.Features.Contents;
 
 /// <summary>
-/// Reads one content whole: the body and the links of every locale it carries. The dates and the
+/// Reads one content whole: the picture, the body and the links of every locale it carries. The dates and the
 /// version belong to the content itself, because a save moves the content and all of its
 /// translations together, so the root row is the one number that describes the whole of it.
 /// </summary>
@@ -44,8 +44,10 @@ public sealed class ContentGetFeature : IFeature
     {
         public required string Id { get; set; }
         public required string Title { get; set; }
+        public string PosterUrl { get; set; } = string.Empty;
         public List<SharedContentLink> Links { get; set; } = [];
         public Dictionary<string, string> Markdown { get; set; } = [];
+        public Dictionary<string, string> PosterAlt { get; set; } = [];
         public Dictionary<string, string> Languages { get; set; } = [];
 
         public DateTimeOffset CreatedAt { get; set; }
@@ -83,11 +85,12 @@ public sealed class ContentGetFeature : IFeature
                     .Select(x => new
                     {
                         x.Id,
+                        x.PosterUrl,
                         x.CreatedAt,
                         x.UpdatedAt,
                         x.VersionLocal,
                         Titles = x.Translations.Select(tr => new KeyValuePair<string, string>(tr.LanguageId, tr.Name)).ToList(),
-                        Translations = x.Translations.Select(tr => new { tr.LanguageId, tr.Json, tr.Markdown }).ToList()
+                        Translations = x.Translations.Select(tr => new { tr.LanguageId, tr.Json, tr.Markdown, tr.PosterAlt }).ToList()
                     })
                     .FirstOrDefaultAsync(ctn)
                     ?? throw new IncidentException(IncidentCode.NotFound);
@@ -96,6 +99,7 @@ public sealed class ContentGetFeature : IFeature
                 {
                     Id = content.Id,
                     Title = content.Titles.GetName(query.LanguageId),
+                    PosterUrl = content.PosterUrl,
                     CreatedAt = content.CreatedAt,
                     UpdatedAt = content.UpdatedAt,
                     VersionLocal = content.VersionLocal,
@@ -106,7 +110,10 @@ public sealed class ContentGetFeature : IFeature
                             .Select(link => SharedContentLink.FromStoredOf(tr.LanguageId, link.Key, link.Value)))],
                     Markdown = content.Translations
                         .Where(x => !string.IsNullOrEmpty(x.Markdown))
-                        .ToDictionary(x => x.LanguageId, x => x.Markdown!, StringComparer.Ordinal)
+                        .ToDictionary(x => x.LanguageId, x => x.Markdown!, StringComparer.Ordinal),
+                    PosterAlt = content.Translations
+                        .Where(x => !string.IsNullOrEmpty(x.PosterAlt))
+                        .ToDictionary(x => x.LanguageId, x => x.PosterAlt, StringComparer.Ordinal)
                 };
             }
         }

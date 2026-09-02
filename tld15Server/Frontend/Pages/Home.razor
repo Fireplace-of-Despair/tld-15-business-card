@@ -36,7 +36,17 @@
 {
     <div class="component-container-column-narrow">
         <h1 id="@Lore.Id" class="component-title">@Lore.Title</h1>
-        <MarkdownView Markdown="@Lore.Markdown" />
+
+        <div class="lore-body">
+            @if (!string.IsNullOrEmpty(Lore.PosterUrl))
+            {
+                <div class="lore-poster">
+                    <img src="@Lore.PosterUrl" alt="@Lore.PosterAlt" loading="lazy" />
+                </div>
+            }
+
+            <MarkdownView Markdown="@Lore.Markdown" />
+        </div>
     </div>
 }
 

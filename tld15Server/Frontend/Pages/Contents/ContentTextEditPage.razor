@@ -33,7 +33,38 @@
 }
 
 <div class="component-container-column">
+    <div class="component-container-row">
+        <div class="input-group poster-group">
+            <label for="content-poster">@Localizer["Common.Poster.Url"]</label>
+            <input id="content-poster"
+                   type="url"
+                   class="poster-url @(IsPosterValid ? string.Empty : "invalid")"
+                   @bind="_posterUrl"
+                   @bind:event="oninput" />
+            @if (!IsPosterValid)
+            {
+                <span class="field-error">@Localizer["Common.Validation.Poster"]</span>
+            }
+        </div>
+
+        @if (IsPosterValid && !string.IsNullOrWhiteSpace(_posterUrl))
+        {
+            <div class="poster-preview">
+                <img src="@_posterUrl" alt="@PosterAlt" loading="lazy" />
+            </div>
+        }
+    </div>
+</div>
+
+<div class="component-container-column">
     <LanguageTabs Languages="@_content.Languages" @bind-Selected="_language" HasContent="HasText" />
+
+    <div class="component-container-row">
+        <div class="input-group poster-group">
+            <label for="content-poster-alt">@Localizer["Common.Poster.Alt"]</label>
+            <input id="content-poster-alt" class="poster-url" type="text" @bind="PosterAlt" />
+        </div>
+    </div>
 
     <MarkdownEditor @bind-Value="Text" />
 </div>
@@ -43,7 +74,7 @@
 <div class="component-container-row">
     <AuthorizeView Policy="@Features.Contents.ContentPostFeature.Id">
         <Authorized>
-            <button @onclick="() => Save()">@Localizer["Common.Save"]</button>
+            <button disabled="@(!CanSave)" @onclick="() => Save()">@Localizer["Common.Save"]</button>
         </Authorized>
     </AuthorizeView>
 </div>

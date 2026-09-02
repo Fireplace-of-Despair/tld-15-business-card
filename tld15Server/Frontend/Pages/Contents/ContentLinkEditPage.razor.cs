@@ -166,9 +166,9 @@ public partial class ContentLinkEditPage
                     Id = _content.Id,
                     VersionLocal = _content.VersionLocal,
                     Links = _links,
-                    // The body of the content belongs to the other editor. It travels back exactly
-                    // as it was read: the command replaces the whole content, not one side of it.
-                    Markdown = _content.Markdown.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal)
+                    Markdown = _content.Markdown.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal),
+                    PosterUrl = _content.PosterUrl,
+                    PosterAlt = _content.PosterAlt.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal)
                 }, _cts.Token
             );
         });

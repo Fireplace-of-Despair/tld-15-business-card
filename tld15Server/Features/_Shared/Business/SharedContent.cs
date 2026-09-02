@@ -9,10 +9,9 @@ public sealed class SharedContent
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
-
-    /// <summary> The body of the block, as markdown. The page renders it, the database never sees html. </summary>
+    public string PosterUrl { get; set; } = string.Empty;
+    public string PosterAlt { get; set; } = string.Empty;
     public string? Markdown { get; set; } = null;
-
     public string? Json { get; set; } = null;
 
     public Dictionary<string, string> JsonToDictionary()
