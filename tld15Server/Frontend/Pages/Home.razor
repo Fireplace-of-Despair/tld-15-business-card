@@ -34,9 +34,7 @@
 
 @if (Lore != null && !string.IsNullOrEmpty(Lore.Markdown))
 {
-    @* The opening block is the heading of the page, so it is the h1 the rest of the sections hang
-       under. The class holds it to the size the other section titles carry. *@
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h1 id="@Lore.Id" class="component-title">@Lore.Title</h1>
         <MarkdownView Markdown="@Lore.Markdown" />
     </div>
@@ -44,7 +42,7 @@
 
 @if (Articles.Any())
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h2 id="@Globals.Anchor.Articles" class="component-title">@Localizer["Articles"]</h2>
 
         <div class="articles-container">
@@ -58,7 +56,7 @@
 
 @if (Projects.Any())
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h2 id="@Globals.Anchor.Projects" class="component-title">@Localizer["Projects"]</h2>
         <div class="articles-container">
             @foreach (var project in Projects)
@@ -71,7 +69,7 @@
 
 @if (Social != null && !string.IsNullOrEmpty(Social.Json))
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h2 id="@Social.Id" class="component-title">@Social.Title</h2>
         <div class="social-container">
             @foreach (var link in @Social.JsonToDictionary())
@@ -86,7 +84,7 @@
 
 @if (Contacts != null && !string.IsNullOrEmpty(Contacts.Json))
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h2 id="@Contacts.Id" class="component-title">@Contacts.Title</h2>
         <div class="social-container">
             @foreach (var link in @Contacts.JsonToDictionary())

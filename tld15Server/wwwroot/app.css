@@ -189,6 +189,18 @@ select.invalid {
     gap: 5px;
 }
 
+.component-container-column-narrow {
+    background-color: var(--color-container);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    max-width: 1500px;
+    box-sizing: border-box;
+    margin: 5px auto 0 auto;
+}
+
 .component-container-column-full {
     display: flex;
     flex-direction: column;
@@ -523,10 +535,21 @@ button {
         margin-bottom: 10px;
     }
 
-    .markdown-body h1 { font-size: 35px; }
-    .markdown-body h2 { font-size: 30px; }
-    .markdown-body h3 { font-size: 25px; }
-    .markdown-body h4 { font-size: 22px; }
+    .markdown-body h1 {
+        font-size: 35px;
+    }
+
+    .markdown-body h2 {
+        font-size: 30px;
+    }
+
+    .markdown-body h3 {
+        font-size: 25px;
+    }
+
+    .markdown-body h4 {
+        font-size: 22px;
+    }
 
     .markdown-body ul,
     .markdown-body ol {
@@ -659,10 +682,10 @@ button {
     color: var(--color-text);
 }
 
-.link-icon svg {
-    width: 100%;
-    height: 100%;
-}
+    .link-icon svg {
+        width: 100%;
+        height: 100%;
+    }
 
 .link-language {
     width: 80px;
@@ -782,12 +805,12 @@ button {
         visibility: visible;
     }
 
-    /* Under the element instead, for a badge that stands at the top edge of what carries it: above
+/* Under the element instead, for a badge that stands at the top edge of what carries it: above
        it the note would hang over the header with nothing behind it. */
-    .tooltip-below::after {
-        bottom: auto;
-        top: 125%;
-    }
+.tooltip-below::after {
+    bottom: auto;
+    top: 125%;
+}
 /* ------------------------------------------------------------ */
 
 /* Reading ---------------------------------------------------- */

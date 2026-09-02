@@ -26,19 +26,22 @@
     return;
 }
 
-<div class="component-container-column">
-    <h1 id="press" class="component-title">@Localizer["Press"]</h1>
-</div>
-
 @if (Items.Count == 0)
 {
-    <div class="component-container-column">
-        <div>@Localizer["Common.NothingWasFound"]</div>
+    <div class="component-container-column-narrow">
+        <h1 id="press" class="component-title">@Localizer["Press"]</h1>
+
+        <div class="articles-container">
+            <div>@Localizer["Common.NothingWasFound"]</div>
+        </div>
     </div>
+
     return;
 }
 
-<div class="component-container-column">
+<div class="component-container-column-narrow">
+    <h1 id="press" class="component-title">@Localizer["Press"]</h1>
+
     <div class="articles-container">
         @foreach (var item in Items)
         {

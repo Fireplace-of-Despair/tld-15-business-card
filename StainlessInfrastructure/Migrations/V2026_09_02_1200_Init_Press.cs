@@ -9,11 +9,6 @@ using StainlessInfrastructure.Composition;
 
 namespace StainlessInfrastructure.Migrations;
 
-/// <summary>
-/// The press: what somebody else wrote about this body of work. A mention is a card that leads off
-/// this site, so it carries an address of its own and no body of text — there is nothing here to
-/// read that is not better read where it was published.
-/// </summary>
 [ExcludeFromCodeCoverage]
 [Migration(2026_09_02_1200, "Init: Press")]
 public sealed class V2026_09_02_1200_Init_Press : Migration

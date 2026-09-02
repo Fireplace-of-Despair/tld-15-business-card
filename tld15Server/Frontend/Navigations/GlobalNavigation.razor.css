@@ -1,7 +1,7 @@
 ﻿.global-navigation {
     align-self: center;
-    padding-bottom: 5px;
     text-align: center;
+    margin-top: 10px;
 }
 
 /* The same fill as the local links, without the border: this row sits inside the header and a row
@@ -37,4 +37,5 @@
 /* The page a reader is already on. */
 .active {
     background: var(--color-background);
+    color: var(--color-text);
 }
