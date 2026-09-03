@@ -640,8 +640,8 @@ button {
     font-size: 15px;
     line-height: 1.5;
     resize: vertical;
-    white-space: pre;
-    overflow-wrap: normal;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 /* Editors ---------------------------------------------------- */
