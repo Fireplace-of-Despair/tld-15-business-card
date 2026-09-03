@@ -1,6 +1,4 @@
-﻿@using Microsoft.Extensions.Localization
-
-<div class="tab-strip" role="tablist">
+﻿<div class="tab-strip" role="tablist">
     <button type="button"
             role="tab"
             class="tab @(_tab == Tab.Source ? "tab-selected" : string.Empty)"
@@ -25,7 +23,8 @@
            the preview reads what was typed. *@
         <textarea class="markdown-source"
                   rows="@Rows"
-                  spellcheck="false"
+                  wrap="soft"
+                  spellcheck="true"
                   value="@Value"
                   @onchange="OnChangedAsync"></textarea>
     }

@@ -64,7 +64,7 @@ public sealed class HomeGetFeature : IFeature
                     .Where(x => contentIds.Contains(x.Id))
                     .SelectMany(x => x.Translations
                         .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
-                        .Select(tr => new ContentRow(x.Id, tr.LanguageId, tr.Name, x.PosterUrl, tr.PosterAlt, tr.Markdown, tr.Json)))
+                        .Select(tr => new ContentRow(x.Id, tr.LanguageId, tr.Name, x.PosterUrl ?? string.Empty, tr.PosterAlt ?? string.Empty, tr.Markdown, tr.Json)))
                     .ToListAsync(ctn);
 
                 result.Lore = MapContent(Globals.Content.Lore, contentRows, language);

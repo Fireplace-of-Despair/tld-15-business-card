@@ -13,13 +13,13 @@
 <nav>
     <NavAccordion Title="@Localizer["Menu.Content"]"
                   ActiveUrls='new[]
-                                      {
-                                          Pages.Contents.ContentSearchPage.Url, Pages.Contents.ContentLinkEditPage.Url,
+                    {
+                        Pages.Contents.ContentSearchPage.Url, Pages.Contents.ContentLinkEditPage.Url,
 
-                                          Pages.Contents.ContentTextEditPage.Url, Pages.Projects.ProjectSearchPage.Url,
-                                          Pages.Projects.ProjectEditPage.Url, Pages.Presses.PressSearchPage.Url,
-                                          Pages.Presses.PressEditPage.Url
-                                      }'>
+                        Pages.Contents.ContentTextEditPage.Url, Pages.Projects.ProjectSearchPage.Url,
+                        Pages.Projects.ProjectEditPage.Url, Pages.Presses.PressSearchPage.Url,
+                        Pages.Presses.PressEditPage.Url
+                    }'>
 
         <Restricted Feature="@Features.Contents.ContentSearchFeature.Id">
             <NavLink href="@Pages.Contents.ContentSearchPage.Url">
@@ -42,10 +42,10 @@
 
     <NavAccordion Title="@Localizer["Menu.System"]"
                   ActiveUrls='new[]
-                                      {
-                                          Pages.Sessions.SessionSearchPage.Url, Pages.Account.AccountSearchPage.Url,
-                                                    Pages.Account.AccountReadPage.Url, Pages.Profiles.ProfileReadPage.Url
-                                      }'>
+                                {
+                                    Pages.Sessions.SessionSearchPage.Url, Pages.Account.AccountSearchPage.Url,
+                                    Pages.Account.AccountReadPage.Url, Pages.Profiles.ProfileReadPage.Url
+                                }'>
 
         <Restricted Feature="@Features.Profiles.ProfileGetFeature.Id">
             <NavLink href="@Pages.Profiles.ProfileReadPage.Url">

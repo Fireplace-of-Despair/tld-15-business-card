@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using StainlessCore;
+using tld15Server.Common;
 using tld15Server.Composition;
 using tld15Server.Features.Contents;
 using tld15Server.Features.Shared.Business;
-using tld15Server.Frontend.Components.Common;
 
 namespace tld15Server.Frontend.Pages.Contents;
 
@@ -167,7 +167,7 @@ public partial class ContentLinkEditPage
                     VersionLocal = _content.VersionLocal,
                     Links = _links,
                     Markdown = _content.Markdown.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal),
-                    PosterUrl = _content.PosterUrl,
+                    PosterUrl = _content.PosterUrl ?? string.Empty,
                     PosterAlt = _content.PosterAlt.ToDictionary(x => x.Key, x => (string?)x.Value, StringComparer.Ordinal)
                 }, _cts.Token
             );

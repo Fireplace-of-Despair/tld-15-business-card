@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Components;
 using tld15Server.Frontend.Components.Icons;
 
-namespace tld15Server.Frontend.Components.Common;
+namespace tld15Server.Common;
 
 /// <summary>
 /// Maps the key of a link onto the icon that stands for it. An icon is a Razor component under

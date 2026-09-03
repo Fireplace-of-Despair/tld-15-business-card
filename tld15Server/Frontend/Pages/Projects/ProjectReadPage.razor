@@ -75,13 +75,7 @@
         @if (!string.IsNullOrWhiteSpace(Subtitle))
         {
             <p class="reading-subtitle">@Subtitle</p>
-        }
-
-        @if (_project.Links.Count > 0)
-        {
-            <nav class="reading-links" aria-label="@Localizer["Content.Links"]">
-                <LinkButtons Links="@_project.Links" />
-            </nav>
+            <hr />
         }
 
         <MarkdownView Markdown="@_translation.Markdown" />

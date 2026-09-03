@@ -92,7 +92,7 @@ public partial class ContentTextEditPage
         _content = result.Data!;
         _texts = new Dictionary<string, string>(_content.Markdown, StringComparer.Ordinal);
         _posterAlts = new Dictionary<string, string>(_content.PosterAlt, StringComparer.Ordinal);
-        _posterUrl = _content.PosterUrl;
+        _posterUrl = _content.PosterUrl ?? string.Empty;
 
         // A save reads the content back, and the tab the editor was working on has to survive that.
         // Only a locale the content does not carry moves the selection.

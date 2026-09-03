@@ -13,7 +13,7 @@ namespace tld15Server.Features.Shared.Business;
 /// </summary>
 public class SharedLink
 {
-    /// <summary> The icon of the link, as <see cref="Frontend.Components.Common.IconHelper"/> names it. </summary>
+    /// <summary> The icon of the link, as <see cref="Common.IconHelper"/> names it. </summary>
     public string Icon { get; set; } = string.Empty;
 
     /// <summary> The language of the link itself. Empty is allowed: a card then shows a placeholder badge. </summary>

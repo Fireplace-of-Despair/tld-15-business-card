@@ -21,19 +21,20 @@
 
 @if (IncidentCode != null)
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <FriendlyIncident Code="@IncidentCode" />
     </div>
     return;
 }
 
-<div class="component-container-column">
+<div class="component-container-column-narrow">
     <h1 id="archive" class="component-title">@Localizer["Archive"]</h1>
 </div>
 
+
 @if (Articles.Count == 0 && Projects.Count == 0)
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <div>@Localizer["Common.NothingWasFound"]</div>
     </div>
     return;
@@ -41,10 +42,10 @@
 
 @if (Articles.Count > 0)
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h2 id="@Globals.Anchor.Articles" class="component-title">@Localizer["Articles"]</h2>
 
-        <div class="articles-container">
+        <div class="cards-container">
             @foreach (var article in Articles)
             {
                 <SharedCard SharedCardContent="article" />
@@ -55,10 +56,10 @@
 
 @if (Projects.Count > 0)
 {
-    <div class="component-container-column">
+    <div class="component-container-column-narrow">
         <h2 id="@Globals.Anchor.Projects" class="component-title">@Localizer["Projects"]</h2>
 
-        <div class="articles-container">
+        <div class="cards-container">
             @foreach (var project in Projects)
             {
                 <SharedCard SharedCardContent="project" />

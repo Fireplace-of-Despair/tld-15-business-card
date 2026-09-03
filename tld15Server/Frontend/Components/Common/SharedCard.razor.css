@@ -68,18 +68,11 @@
 ::deep .article-title {
     text-align: center;
     text-decoration: underline;
-    color: var(--color-text);
-    text-decoration-color: var(--color-text);
     font-size: 25px;
     height: 60px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
-
-    ::deep .article-title:hover {
-        color: var(--color-highlight-hard);
-        text-decoration-color: var(--color-highlight-hard);
-    }
 
 ::deep .article-description {
     height: 110px;

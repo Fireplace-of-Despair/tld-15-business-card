@@ -38,6 +38,7 @@ public sealed class MarkdownService
         .UsePipeTables()        // | a | table |
         .UseEmphasisExtras()    // ~~strikethrough~~
         .UseTaskLists()         // - [x] done
+        .UseCitations()
         .UseAutoLinks()         // a bare address becomes a link
         .UseAutoIdentifiers()   // a heading takes an id, so a section can be linked to
         .DisableHtml()          // raw html is text, not markup

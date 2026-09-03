@@ -44,7 +44,7 @@ public sealed class ContentGetFeature : IFeature
     {
         public required string Id { get; set; }
         public required string Title { get; set; }
-        public string PosterUrl { get; set; } = string.Empty;
+        public string? PosterUrl { get; set; }
         public List<SharedContentLink> Links { get; set; } = [];
         public Dictionary<string, string> Markdown { get; set; } = [];
         public Dictionary<string, string> PosterAlt { get; set; } = [];
@@ -113,7 +113,7 @@ public sealed class ContentGetFeature : IFeature
                         .ToDictionary(x => x.LanguageId, x => x.Markdown!, StringComparer.Ordinal),
                     PosterAlt = content.Translations
                         .Where(x => !string.IsNullOrEmpty(x.PosterAlt))
-                        .ToDictionary(x => x.LanguageId, x => x.PosterAlt, StringComparer.Ordinal)
+                        .ToDictionary(x => x.LanguageId, x => x.PosterAlt!, StringComparer.Ordinal)
                 };
             }
         }

@@ -4,17 +4,15 @@
     margin-top: 10px;
 }
 
-/* The same fill as the local links, without the border: this row sits inside the header and a row
-   of boxes there would fight the brand above it. */
 .global-navigation-link {
     position: relative;
     z-index: 1;
     display: inline-block;
     padding: 5px 10px;
-    background: transparent;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 1000;
 }
 
     .global-navigation-link::after {
@@ -25,7 +23,7 @@
         left: 0;
         width: 100%;
         height: 0;
-        background: var(--color-control);
+        background: var(--color-highlight-soft);
         transition: all 0.3s ease;
     }
 
@@ -34,8 +32,17 @@
         height: 100%;
     }
 
-/* The page a reader is already on. */
+    .global-navigation-link:hover {
+        border-color: var(--color-highlight-soft);
+        color: var(--color-background);
+    }
+
+
 .active {
     background: var(--color-background);
+    color: var(--color-text);
+}
+
+.inactive {
     color: var(--color-text);
 }
