@@ -106,7 +106,7 @@ public sealed partial class ProjectPostFeature : IFeature
                 project.DivisionId = cmd.Project.DivisionId;
                 project.PosterUrl = posterUrl;
                 project.PublishedAt = cmd.Project.PublishedAt;
-                project.LinksJson = LinkJson.ToJson(links);
+                project.LinksJson = SharedLink.DictionaryToJson(links);
 
                 Write(contextBusiness, project, translations);
 
@@ -137,9 +137,10 @@ public sealed partial class ProjectPostFeature : IFeature
         }
 
         /// <summary>
-        /// The links of the project as one dictionary. A row without an icon or without an address is
-        /// not a link and drops out. Two rows landing on the same key are a mistake the caller has to
-        /// resolve, not one this handler resolves by keeping whichever row came last.
+        /// The links of the project as one dictionary, keyed by the address each one opens. A row
+        /// without an address is not a link and drops out. Two rows landing on the same address are a
+        /// mistake the caller has to resolve, not one this handler resolves by keeping whichever row
+        /// came last.
         /// </summary>
         private static Dictionary<string, string> ToLinks(List<SharedLink> links)
         {
@@ -147,18 +148,17 @@ public sealed partial class ProjectPostFeature : IFeature
 
             foreach (var link in links)
             {
-                var icon = link.Icon.Trim().ToLowerInvariant();
-                var language = link.Language.Trim().ToLowerInvariant();
                 var url = UrlPolicy.Clean(SharedLink.ToStoredUrl(link.Url));
+                var language = link.Language.Trim().ToLowerInvariant();
 
-                if (string.IsNullOrEmpty(icon) || string.IsNullOrEmpty(url)) { continue; }
+                if (string.IsNullOrEmpty(url)) { continue; }
 
                 if (!SharedLink.IsLanguageValid(language) || !UrlPolicy.IsFollowable(url))
                 {
                     throw new IncidentException(IncidentCode.Validation);
                 }
 
-                if (!result.TryAdd(SharedLink.ToKey(icon, language), url))
+                if (!result.TryAdd(url, language))
                 {
                     throw new IncidentException(IncidentCode.Validation);
                 }

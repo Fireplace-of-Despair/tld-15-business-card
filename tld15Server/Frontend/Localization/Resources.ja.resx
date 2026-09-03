@@ -198,9 +198,7 @@
   <data name="Content.Icon" xml:space="preserve">
     <value>アイコン</value>
   </data>
-  <data name="Content.Icon.Language" xml:space="preserve">
-    <value>アイコンの言語</value>
-  </data>
+
   <data name="Content.Id" xml:space="preserve">
     <value>ID</value>
   </data>
@@ -209,6 +207,9 @@
   </data>
   <data name="Content.Link" xml:space="preserve">
     <value>リンク</value>
+  </data>
+  <data name="Content.Link.Language" xml:space="preserve">
+    <value>リンクの言語</value>
   </data>
   <data name="Content.Markdown" xml:space="preserve">
     <value>マークダウン</value>
@@ -223,7 +224,7 @@
     <value>翻訳</value>
   </data>
   <data name="Content.Validation.Duplicate" xml:space="preserve">
-    <value>このアイコンとこの言語の組み合わせは他の行が既に使っています。</value>
+    <value>このアドレスは他の行が既に使っています。</value>
   </data>
   <data name="Content.Validation.Language" xml:space="preserve">
     <value>ラテン文字3文字まで。空欄は〇〇になります。</value>

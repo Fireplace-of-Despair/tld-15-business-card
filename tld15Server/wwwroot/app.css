@@ -667,16 +667,6 @@ button {
 /* ------------------------------------------------------------ */
 
 /* Editors ---------------------------------------------------- */
-/* The table of links and the fields around it, shared by the content editor and the project
-   editor. Both write the same markup, so the rules live here rather than beside one of them. */
-.link-icon-cell {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-}
-
-/* The icon is inline SVG painted with currentColor, so the cell decides the colour. */
 .link-icon {
     display: inline-flex;
     align-items: center;
@@ -704,6 +694,10 @@ button {
 .link-url {
     width: 100%;
 }
+
+    .link-url.invalid {
+        border: 1px solid var(--color-highlight-hard);
+    }
 
 .field-error {
     display: block;
@@ -854,7 +848,7 @@ button {
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-    margin: 25px 0 5px 0;
+    margin: 0px 0 10px 0px;
     padding: 0 20px;
 }
 
@@ -903,7 +897,3 @@ button {
     max-width: 1470px;
     margin-bottom: 10px;
 }
-
-/* External links --------------------------------------------- */
-/* The button itself is ExternalLinkIcon and carries its own rules. What stays here is only how far
-   apart a row of them stands, which belongs to the row rather than to the button. */

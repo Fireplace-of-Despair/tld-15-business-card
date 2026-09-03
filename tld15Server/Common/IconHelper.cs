@@ -2,24 +2,24 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Components;
 using tld15Server.Frontend.Components.Icons;
 
 namespace tld15Server.Common;
 
 /// <summary>
-/// Maps the key of a link onto the icon that stands for it. An icon is a Razor component under
+/// Maps the address of a link onto the icon that stands for it. An icon is a Razor component under
 /// <c>Frontend/Components/Icons</c>, so the page carries inline SVG and the icon takes its colour
 /// from the element around it through <c>currentColor</c>.
 /// </summary>
+/// <remarks>
+/// Nothing stored names an icon. The address is the only thing an editor types, and the site it
+/// leads to is read back out of it here, so a link cannot carry an icon that contradicts where it
+/// goes.
+/// </remarks>
 public static class IconHelper
 {
-    /// <summary>
-    /// Every icon a link can carry, in the order the editor lists them. The table is the single
-    /// source: <see cref="Names"/> reads the keys, <see cref="GetIcon"/> reads the fragments.
-    /// </summary>
+    /// <summary> Every icon a link can carry. The name is what <see cref="GetNameByUrl"/> answers. </summary>
     private static readonly (string Key, RenderFragment Icon)[] _icons =
     [
         ("amazon", Render<Amazon>()),
@@ -67,45 +67,6 @@ public static class IconHelper
     ];
 
     private static readonly RenderFragment _unknown = Render<Unknown>();
-
-    /// <summary> The keys an editor can pick from, in the order it shows them. </summary>
-    public static IReadOnlyList<string> Names { get; } = [.. _icons.Select(x => x.Key)];
-
-    public static string GetLanguage(string key)
-    {
-        var language = key.Split("_").LastOrDefault();
-
-        if (string.IsNullOrEmpty(language) || language.Length > 3)
-        {
-            return "〇〇";
-        }
-
-        return language.ToUpper();
-    }
-
-    /// <summary> Get the icon part of a link key: everything ahead of the language suffix. </summary>
-    public static string GetName(string key)
-    {
-        return key.Split("_")[0].ToLowerInvariant();
-    }
-
-    /// <summary>
-    /// Get the markup of the icon a link key stands for, or a placeholder icon for a key this
-    /// application does not know.
-    /// </summary>
-    public static RenderFragment GetIcon(string key)
-    {
-        var name = GetName(key);
-
-        // A short linear pass beats a dictionary at this size, and it keeps the table above the
-        // only place that names an icon.
-        foreach (var icon in _icons)
-        {
-            if (icon.Key == name) { return icon.Icon; }
-        }
-
-        return _unknown;
-    }
 
     /// <summary>
     /// The name of the icon an address stands for, or an empty string for an address this
@@ -158,7 +119,16 @@ public static class IconHelper
     /// </summary>
     public static RenderFragment GetIconByUrl(string? url)
     {
-        return GetIcon(GetNameByUrl(url));
+        var name = GetNameByUrl(url);
+
+        // A short linear pass beats a dictionary at this size, and it keeps the table above the
+        // only place that names an icon.
+        foreach (var icon in _icons)
+        {
+            if (icon.Key == name) { return icon.Icon; }
+        }
+
+        return _unknown;
     }
 
     /// <summary>

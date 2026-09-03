@@ -198,9 +198,7 @@
   <data name="Content.Icon" xml:space="preserve">
     <value>Icon</value>
   </data>
-  <data name="Content.Icon.Language" xml:space="preserve">
-    <value>Icon language</value>
-  </data>
+
   <data name="Content.Id" xml:space="preserve">
     <value>Id</value>
   </data>
@@ -209,6 +207,9 @@
   </data>
   <data name="Content.Link" xml:space="preserve">
     <value>Link</value>
+  </data>
+  <data name="Content.Link.Language" xml:space="preserve">
+    <value>Link language</value>
   </data>
   <data name="Content.Markdown" xml:space="preserve">
     <value>Markdown</value>
@@ -223,7 +224,7 @@
     <value>Translation</value>
   </data>
   <data name="Content.Validation.Duplicate" xml:space="preserve">
-    <value>Another row already carries this icon in this language.</value>
+    <value>Another row already carries this address.</value>
   </data>
   <data name="Content.Validation.Language" xml:space="preserve">
     <value>Up to three latin letters, or empty for 〇〇.</value>

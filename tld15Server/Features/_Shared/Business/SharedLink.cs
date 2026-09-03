@@ -2,57 +2,42 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace tld15Server.Features.Shared.Business;
 
 /// <summary>
-/// One row of a link dictionary: an icon, the language the link speaks, and the address it opens.
-/// The stored key holds the icon and the language in the <c>%key-name%_%language%</c> format the
-/// pages read back, so an owner of links only has to store a key to a url.
+/// One row of a table of links: the address it opens and the language it speaks. A stored set of
+/// links is keyed by the address itself, so an owner of links only has to store a url to a language.
 /// </summary>
+/// <remarks>
+/// Nothing here names an icon. The icon a link draws is read off the address by
+/// <see cref="Common.IconHelper"/>, so the site it leads to is never stored a second time beside it.
+/// </remarks>
 public class SharedLink
 {
-    /// <summary> The icon of the link, as <see cref="Common.IconHelper"/> names it. </summary>
-    public string Icon { get; set; } = string.Empty;
-
-    /// <summary> The language of the link itself. Empty is allowed: a card then shows a placeholder badge. </summary>
+    /// <summary> The language of the link itself. Empty is allowed: a card then shows no badge. </summary>
     public string Language { get; set; } = string.Empty;
 
-    /// <summary> The address the link opens. </summary>
+    /// <summary> The address the link opens, which is also the key it is stored under. </summary>
     public string Url { get; set; } = string.Empty;
 
-    /// <summary> Build the key this link is stored under. </summary>
-    public static string ToKey(string icon, string language)
-    {
-        return $"{icon}_{language}";
-    }
-
-    /// <summary>
-    /// Split a stored key. The icon ends at the first separator and the language takes the rest,
-    /// which is what <c>IconHelper</c> assumes when it picks the icon of a key.
-    /// </summary>
-    public static (string Icon, string Language) SplitKey(string key)
-    {
-        var separator = key.IndexOf('_', StringComparison.Ordinal);
-
-        return separator < 0
-            ? (key, string.Empty)
-            : (key[..separator], key[(separator + 1)..]);
-    }
+    /// <summary> What an editor shows in place of a language nobody typed. </summary>
+    public const string LanguageUnknown = "〇〇";
 
     /// <summary> Read a stored entry back into a row of an editor. </summary>
-    public static SharedLink FromStored(string key, string url)
+    public static SharedLink FromStored(string url, string language)
     {
-        var (icon, language) = SplitKey(key);
-
-        return new SharedLink { Icon = icon, Language = language, Url = url };
+        return new SharedLink { Url = url, Language = language };
     }
+
 
     /// <summary>
     /// Whether the language reads as a code this application stores: latin letters, at most three of
     /// them, following the reference table. Empty passes on purpose — a link without a language is a
-    /// link the card badges with a placeholder instead of a code.
+    /// link the card draws with no badge at all.
     /// </summary>
     public static bool IsLanguageValid(string language)
     {
@@ -89,6 +74,29 @@ public class SharedLink
         // A host with no dot in it is not a host a mail server delivers to.
         return value.IndexOf('.', at + 1) > at + 1;
     }
+
+    private static readonly JsonSerializerOptions _options = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
+
+    public static Dictionary<string, string> JsonToDictionary(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) { return []; }
+
+
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(json, _options) ?? [];
+    }
+
+    public static string? DictionaryToJson(Dictionary<string, string> links)
+    {
+        if (links.Count == 0)
+        {
+            return null;
+        }
+
+        return JsonSerializer.Serialize(links, _options);
+    }
 }
 
 /// <summary>
@@ -101,16 +109,13 @@ public sealed class SharedContentLink : SharedLink
     public string TranslationLanguageId { get; set; } = string.Empty;
 
     /// <summary> Read a stored entry of one translation back into a row of the editor. </summary>
-    public static SharedContentLink FromStoredOf(string translationLanguageId, string key, string url)
+    public static SharedContentLink FromStoredOf(string translationLanguageId, string url, string language)
     {
-        var (icon, language) = SplitKey(key);
-
         return new SharedContentLink
         {
             TranslationLanguageId = translationLanguageId,
-            Icon = icon,
-            Language = language,
             Url = url,
+            Language = language,
         };
     }
 }

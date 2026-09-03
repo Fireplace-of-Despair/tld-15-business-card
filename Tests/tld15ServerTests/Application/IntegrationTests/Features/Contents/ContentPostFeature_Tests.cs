@@ -102,7 +102,6 @@ public class ContentPostFeature_Tests
             Links = [new SharedContentLink
             {
                 TranslationLanguageId = _english,
-                Icon = "github",
                 Language = "en",
                 Url = "https://example.org",
             }],

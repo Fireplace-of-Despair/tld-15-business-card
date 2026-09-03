@@ -105,8 +105,8 @@ public sealed class ContentGetFeature : IFeature
                     VersionLocal = content.VersionLocal,
                     Links = [.. content.Translations
                         .OrderBy(x => x.LanguageId, StringComparer.Ordinal)
-                        .SelectMany(tr => LinkJson
-                            .ToDictionary(tr.Json)
+                        .SelectMany(tr => SharedContent
+                            .JsonToDictionary(tr.Json)
                             .Select(link => SharedContentLink.FromStoredOf(tr.LanguageId, link.Key, link.Value)))],
                     Markdown = content.Translations
                         .Where(x => !string.IsNullOrEmpty(x.Markdown))

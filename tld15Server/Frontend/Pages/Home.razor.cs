@@ -187,14 +187,16 @@ public partial class Home
     {
         var result = new List<string>();
 
-        foreach (var link in Social?.JsonToDictionary() ?? [])
+        // A link is stored as the address it opens against the language it speaks, so the address
+        // is the key of the row rather than its value.
+        foreach (var link in Social?.JsonToDictionary())
         {
-            var scheme = UrlPolicy.SchemeOf(link.Value);
+            var scheme = UrlPolicy.SchemeOf(link.Key);
 
             if (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase))
             {
-                result.Add(link.Value);
+                result.Add(link.Key);
             }
         }
 

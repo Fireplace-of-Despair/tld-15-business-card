@@ -2,14 +2,12 @@
 // Copyright (c) 2025 Fireplace of Despair
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using StainlessCore;
-using tld15Server.Common;
 using tld15Server.Composition;
 using tld15Server.Features.Projects;
 using tld15Server.Features.Shared.Business;
@@ -39,10 +37,10 @@ public sealed partial class ProjectEditPage
         /// <summary> The row is ready to be stored. </summary>
         None = 0,
 
-        /// <summary> The language of the icon is not a code this application stores. </summary>
+        /// <summary> The language of the link is not a code this application stores. </summary>
         Language = 1,
 
-        /// <summary> Another row already carries this icon in this language. </summary>
+        /// <summary> Another row already carries this address. </summary>
         Duplicate = 2,
     }
 
@@ -162,7 +160,7 @@ public sealed partial class ProjectEditPage
 
     /// <summary>
     /// The same rules the feature applies before it stores a row, so the table says no here instead
-    /// of the save saying no later. A project keeps one set of links, so a key has to be unique
+    /// of the save saying no later. A project keeps one set of links, so an address has to be unique
     /// across the whole table rather than inside a locale.
     /// </summary>
     private RowIssue Validate(SharedLink row)
@@ -172,7 +170,11 @@ public sealed partial class ProjectEditPage
             return RowIssue.Language;
         }
 
-        if (_project.Links.Exists(x => !ReferenceEquals(x, row) && StoredKey(x) == StoredKey(row)))
+        var url = StoredUrl(row);
+
+        // A row with nothing typed into it is not a link and the save drops it, so two blank rows
+        // are not a collision the editor has to complain about.
+        if (url.Length > 0 && _project.Links.Exists(x => !ReferenceEquals(x, row) && StoredUrl(x) == url))
         {
             return RowIssue.Duplicate;
         }
@@ -180,35 +182,16 @@ public sealed partial class ProjectEditPage
         return RowIssue.None;
     }
 
-    /// <summary> The key a row lands on, in the form the feature stores it. </summary>
-    private static string StoredKey(SharedLink row)
+    /// <summary> The key a row lands on, which is its address in the form the feature stores it. </summary>
+    private static string StoredUrl(SharedLink row)
     {
-        return SharedLink.ToKey(row.Icon.Trim().ToLowerInvariant(), row.Language.Trim().ToLowerInvariant());
+        return UrlPolicy.Clean(SharedLink.ToStoredUrl(row.Url));
     }
 
-    /// <summary>
-    /// The icons a row may take. An icon serves as many rows as there are languages, so nothing is
-    /// held back; a key this application no longer knows joins the list so opening never drops it.
-    /// </summary>
-    private static List<string> IconOptions(SharedLink row)
-    {
-        var options = new List<string>(IconHelper.Names);
-
-        if (!string.IsNullOrEmpty(row.Icon) && !options.Contains(row.Icon))
-        {
-            options.Insert(0, row.Icon);
-        }
-
-        return options;
-    }
-
-    /// <summary> Adds a row on an icon the work does not carry yet, so two additions never collide. </summary>
+    /// <summary> Adds an empty row. The icon follows from the address once one is typed into it. </summary>
     private void AddLink()
     {
-        var free = IconHelper.Names.FirstOrDefault(name => !_project.Links.Exists(x => x.Icon == name))
-            ?? IconHelper.Names[0];
-
-        _project.Links.Add(new SharedLink { Icon = free });
+        _project.Links.Add(new SharedLink());
     }
 
     private void DeleteLink(SharedLink link)

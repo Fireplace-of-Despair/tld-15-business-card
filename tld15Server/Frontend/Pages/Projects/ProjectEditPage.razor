@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Authorization
 @using tld15Server.Common
+@using tld15Server.Features.Shared.Business
 @using tld15Server.Frontend.Components.Common
 @using tld15Server.Frontend.Components.Icons
 
@@ -144,7 +145,7 @@
             <thead>
                 <tr>
                     <th>@Localizer["Content.Icon"]</th>
-                    <th>@Localizer["Content.Icon.Language"]</th>
+                    <th>@Localizer["Content.Link.Language"]</th>
                     <th>@Localizer["Content.Link"]</th>
                     <th></th>
                 </tr>
@@ -156,21 +157,15 @@
 
                     <tr @key="link">
                         <td>
-                            <div class="link-icon-cell">
-                                <span class="link-icon">@IconHelper.GetIcon(link.Icon)</span>
-                                <select @bind="link.Icon">
-                                    @foreach (var option in IconOptions(link))
-                                    {
-                                        <option value="@option">@option</option>
-                                    }
-                                </select>
-                            </div>
+                            @* Nothing picks the icon: it is read off the address as it is typed, so
+                               the cell shows what the button will draw. *@
+                            <span class="link-icon">@IconHelper.GetIconByUrl(link.Url)</span>
                         </td>
                         <td>
-                            <input class="link-language @(issue == RowIssue.None ? string.Empty : "invalid")"
+                            <input class="link-language @(issue == RowIssue.Language ? "invalid" : string.Empty)"
                                    type="text"
                                    maxlength="3"
-                                   placeholder="@IconHelper.GetLanguage(string.Empty)"
+                                   placeholder="@SharedLink.LanguageUnknown"
                                    @bind="link.Language"
                                    @bind:event="oninput" />
 
@@ -178,13 +173,17 @@
                             {
                                 <span class="field-error">@Localizer["Content.Validation.Language"]</span>
                             }
-                            else if (issue == RowIssue.Duplicate)
+                        </td>
+                        <td>
+                            <input class="link-url @(issue == RowIssue.Duplicate ? "invalid" : string.Empty)"
+                                   type="url"
+                                   @bind="link.Url"
+                                   @bind:event="oninput" />
+
+                            @if (issue == RowIssue.Duplicate)
                             {
                                 <span class="field-error">@Localizer["Content.Validation.Duplicate"]</span>
                             }
-                        </td>
-                        <td>
-                            <input class="link-url" type="url" @bind="link.Url" />
                         </td>
                         <td>
                             <button class="icon-button" type="button" @onclick="() => DeleteLink(link)">

@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using StainlessCore;
-using tld15Server.Common;
 using tld15Server.Composition;
 using tld15Server.Features.Contents;
 using tld15Server.Features.Shared.Business;
+using tld15Server.Services;
 
 namespace tld15Server.Frontend.Pages.Contents;
 
@@ -27,10 +27,10 @@ public partial class ContentLinkEditPage
         /// <summary> The row is ready to be stored. </summary>
         None = 0,
 
-        /// <summary> The language of the icon is not a code this application stores. </summary>
+        /// <summary> The language of the link is not a code this application stores. </summary>
         Language = 1,
 
-        /// <summary> Another row of the same translation already carries this icon in this language. </summary>
+        /// <summary> Another row of the same translation already carries this address. </summary>
         Duplicate = 2,
     }
 
@@ -83,7 +83,7 @@ public partial class ContentLinkEditPage
 
     /// <summary>
     /// The same rules the feature applies before it stores a row, so the table says no here instead
-    /// of the save saying no later. A key only has to be unique inside its own translation: the
+    /// of the save saying no later. An address only has to be unique inside its own translation: the
     /// locales keep separate dictionaries.
     /// </summary>
     private RowIssue Validate(SharedContentLink row)
@@ -93,9 +93,13 @@ public partial class ContentLinkEditPage
             return RowIssue.Language;
         }
 
-        if (_links.Exists(x => !ReferenceEquals(x, row)
+        var url = StoredUrl(row);
+
+        // A row with nothing typed into it is not a link and the save drops it, so two blank rows
+        // are not a collision the editor has to complain about.
+        if (url.Length > 0 && _links.Exists(x => !ReferenceEquals(x, row)
             && x.TranslationLanguageId == row.TranslationLanguageId
-            && StoredKey(x) == StoredKey(row)))
+            && StoredUrl(x) == url))
         {
             return RowIssue.Duplicate;
         }
@@ -103,33 +107,15 @@ public partial class ContentLinkEditPage
         return RowIssue.None;
     }
 
-    /// <summary> The key a row lands on, in the form the feature stores it. </summary>
-    private static string StoredKey(SharedContentLink row)
+    /// <summary> The key a row lands on, which is its address in the form the feature stores it. </summary>
+    private static string StoredUrl(SharedContentLink row)
     {
-        return SharedContentLink.ToKey(
-            row.Icon.Trim().ToLowerInvariant(),
-            row.Language.Trim().ToLowerInvariant());
+        return UrlPolicy.Clean(SharedContentLink.ToStoredUrl(row.Url));
     }
 
     /// <summary>
-    /// The icons a row may take. An icon serves as many rows as there are languages, so nothing is
-    /// held back; a key this application no longer knows joins the list so opening never drops it.
-    /// </summary>
-    private static List<string> IconOptions(SharedContentLink row)
-    {
-        var options = new List<string>(IconHelper.Names);
-
-        if (!string.IsNullOrEmpty(row.Icon) && !options.Contains(row.Icon))
-        {
-            options.Insert(0, row.Icon);
-        }
-
-        return options;
-    }
-
-    /// <summary>
-    /// Adds a row to the locale the editor is being read in, on an icon that locale does not carry
-    /// yet, so two additions in a row never collide.
+    /// Adds a row to the locale the editor is being read in. The icon follows from the address once
+    /// one is typed into it, so a fresh row carries nothing but the locale it lands in.
     /// </summary>
     private void AddLink()
     {
@@ -139,11 +125,7 @@ public partial class ContentLinkEditPage
             ? Language
             : _content.Languages.Keys.FirstOrDefault() ?? Language;
 
-        var free = IconHelper.Names.FirstOrDefault(name =>
-            !_links.Exists(x => x.TranslationLanguageId == translation && x.Icon == name))
-            ?? IconHelper.Names[0];
-
-        _links.Add(new SharedContentLink { TranslationLanguageId = translation, Icon = free });
+        _links.Add(new SharedContentLink { TranslationLanguageId = translation });
     }
 
     private void DeleteLink(SharedContentLink link)

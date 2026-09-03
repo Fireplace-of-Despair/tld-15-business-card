@@ -35,6 +35,6 @@ public class SharedCardPreview
     {
         if (string.IsNullOrEmpty(LinksJson)) { return []; }
 
-        return LinkJson.ToDictionary(LinksJson);
+        return SharedLink.JsonToDictionary(LinksJson);
     }
 }

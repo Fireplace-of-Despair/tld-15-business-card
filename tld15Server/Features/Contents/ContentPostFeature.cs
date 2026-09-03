@@ -100,7 +100,7 @@ public sealed class ContentPostFeature : IFeature
                 foreach (var translation in content.Translations)
                 {
                     translation.Json = links.TryGetValue(translation.LanguageId, out var storedLinks)
-                        ? LinkJson.ToJson(storedLinks)
+                        ? SharedContent.DictionaryToJson(storedLinks)
                         : null;
 
                     translation.Markdown = markdown.TryGetValue(translation.LanguageId, out var storedText)
@@ -189,10 +189,10 @@ public sealed class ContentPostFeature : IFeature
         }
 
         /// <summary>
-        /// Turns the rows of the editor into one dictionary per locale. A row without an icon or
-        /// without an address is not a link and drops out. Two rows that would land on the same key
-        /// of the same locale are a mistake the caller has to resolve, not one this handler resolves
-        /// by keeping whichever row came last.
+        /// Turns the rows of the editor into one dictionary per locale, each keyed by the address a
+        /// link opens. A row without an address is not a link and drops out. Two rows that would land
+        /// on the same address of the same locale are a mistake the caller has to resolve, not one
+        /// this handler resolves by keeping whichever row came last.
         /// </summary>
         private static Dictionary<string, Dictionary<string, string>> ToLinks(
             List<SharedContentLink> links,
@@ -202,15 +202,14 @@ public sealed class ContentPostFeature : IFeature
 
             foreach (var link in links)
             {
-                var icon = link.Icon.Trim().ToLowerInvariant();
+                var url = UrlPolicy.Clean(SharedContentLink.ToStoredUrl(link.Url));
                 var language = link.Language.Trim().ToLowerInvariant();
-                var url = SharedContentLink.ToStoredUrl(link.Url);
 
-                if (string.IsNullOrEmpty(icon) || string.IsNullOrEmpty(url)) { continue; }
+                if (string.IsNullOrEmpty(url)) { continue; }
 
                 if (!languages.Contains(link.TranslationLanguageId)
                     || !SharedContentLink.IsLanguageValid(language)
-                    || !UrlPolicy.IsFollowable(UrlPolicy.Clean(url)))
+                    || !UrlPolicy.IsFollowable(url))
                 {
                     throw new IncidentException(IncidentCode.Validation);
                 }
@@ -221,7 +220,7 @@ public sealed class ContentPostFeature : IFeature
                     result[link.TranslationLanguageId] = stored;
                 }
 
-                if (!stored.TryAdd(SharedContentLink.ToKey(icon, language), url))
+                if (!stored.TryAdd(url, language))
                 {
                     throw new IncidentException(IncidentCode.Validation);
                 }

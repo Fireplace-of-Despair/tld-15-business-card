@@ -1,7 +1,6 @@
 ﻿@using System.Globalization
 @using tld15Server.Common
 @using tld15Server.Composition
-@using tld15Server.Features.Shared.Business
 <div id="@SharedCardContent.Id" class="article-card">
     <div class="article-image-container">
 
@@ -53,11 +52,9 @@
 
             @foreach (var link in links)
             {
-                @* The stored key holds the icon and the language, but the icon now follows from the
-                   address itself, so only the language of the key is still worth reading. *@
-                var (_, language) = SharedLink.SplitKey(link.Key);
-
-                <ExternalLinkIcon Url="@link.Value" Language="@language" />
+                @* A link is stored as the address it opens against the language it speaks: the icon
+                   follows from the address, so nothing here has to name the site. *@
+                <ExternalLinkIcon Url="@link.Key" Language="@link.Value" />
             }
     }
     </div>

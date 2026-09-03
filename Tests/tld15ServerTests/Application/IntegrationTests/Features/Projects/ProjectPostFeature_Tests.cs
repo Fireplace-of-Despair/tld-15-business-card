@@ -89,7 +89,7 @@ public class ProjectPostFeature_Tests
         var id = NewId();
 
         var project = NewProject(id);
-        project.Links.Add(new SharedLink { Icon = "github", Language = "en", Url = "https://example.org" });
+        project.Links.Add(new SharedLink { Language = "en", Url = "https://example.org" });
 
         await StoreAsync(provider, project);
 
@@ -108,8 +108,9 @@ public class ProjectPostFeature_Tests
         Assert.Equal("A carried over article", translation.Title);
         Assert.Equal("# Body", translation.Markdown);
 
+        // The address is what the link is stored under; nothing beside it names the site.
         var link = Assert.Single(result.Item.Links);
-        Assert.Equal("github", link.Icon);
+        Assert.Equal("https://example.org", link.Url);
         Assert.Equal("en", link.Language);
 
         await CreateDeleteHandler(provider).Handle(
@@ -202,6 +203,22 @@ public class ProjectPostFeature_Tests
 
         var project = NewProject(NewId());
         project.DivisionId = "XXX";
+
+        var incident = await Assert.ThrowsAsync<IncidentException>(async () => await StoreAsync(provider, project));
+
+        Assert.Equal(IncidentCode.Validation, incident.Code);
+    }
+
+    [Fact]
+    public async Task Handle_Throws_WhenTwoRowsCarryTheSameAddress()
+    {
+        var provider = IntegrationTestSetup.GetServices();
+
+        // The address is the key a link is stored under, so the same one twice is a row the editor
+        // has to resolve rather than one the handler silently drops.
+        var project = NewProject(NewId());
+        project.Links.Add(new SharedLink { Language = "en", Url = "https://example.org" });
+        project.Links.Add(new SharedLink { Language = "ja", Url = "https://example.org" });
 
         var incident = await Assert.ThrowsAsync<IncidentException>(async () => await StoreAsync(provider, project));
 

@@ -174,6 +174,13 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   no spacing — the row around it (`.reading-links`, `.project-buttons-container`, `.social-container`)
   sets the gap. Every outward link on the site goes through it: `SharedCard`, `LinkButtons`, and the
   social and contacts blocks on `Home`. Nothing else writes an `<a>` around an icon.
+- A stored set of links is one json dictionary of **an address to the language it speaks**
+  (`Features/_Shared/Business/LinkJson`, rows as `SharedLink`), kept in `business.project.links_json`
+  and in `content_translation.json`. The address is the key because it is unique on its own and
+  because the icon follows from it: nothing stores the name of a site, and neither editor offers a
+  choice of icon — the cell draws `IconHelper.GetIconByUrl` of whatever address the row carries. Two
+  rows on the same address are a validation error rather than a silent overwrite, and a language is
+  a badge only, so a blank one is allowed.
 - `GlobalNavigation` (`Frontend/Navigations`) is the row under the brand in `MainLayout`: Home,
   Press and Archive, with the current page marked `active`. `MainLayout.IsAdmin` keeps it off the pages under
   `Globals.Route.Admin`, which carry their own navigation at the side.

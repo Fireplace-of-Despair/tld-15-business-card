@@ -112,8 +112,8 @@ public sealed class ProjectGetFeature : IFeature
                         DivisionId = project.DivisionId,
                         PosterUrl = project.PosterUrl,
                         PublishedAt = project.PublishedAt,
-                        Links = [.. LinkJson
-                            .ToDictionary(project.LinksJson)
+                        Links = [.. SharedLink
+                            .JsonToDictionary(project.LinksJson)
                             .Select(link => SharedLink.FromStored(link.Key, link.Value))],
                         Translations = [.. project.Translations
                             .OrderBy(x => x.LanguageId, StringComparer.Ordinal)
