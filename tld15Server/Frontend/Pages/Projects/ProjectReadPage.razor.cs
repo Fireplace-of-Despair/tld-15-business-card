@@ -38,32 +38,15 @@ public sealed partial class ProjectReadPage
     private string _divisionName = string.Empty;
     private DateTimeOffset _updatedAt;
     private long _versionLocal;
-
-    /// <summary> The one address of this work, whatever address the reader arrived on. </summary>
     private string _canonical = string.Empty;
 
-    /// <summary> The other locales this work is written in, which the share cards name. </summary>
     private readonly List<string> _otherLocales = [];
-
-    /// <summary> The picture a share card shows: the poster of the work, or the mark of the site. </summary>
     private string _shareCard = string.Empty;
-
-    /// <summary>
-    /// Which of the two it is. It decides what the page may say about the picture: an alt text
-    /// describes a poster, and a declared width and height describe the mark, whose file ships with
-    /// this application and whose size is therefore known.
-    /// </summary>
     private bool _shareCardIsPoster;
-
-    /// <summary>
-    /// The work as schema.org describes it, wrapped in the element that carries it. The element is
-    /// built here rather than in the markup because the renderer escapes the plus of the media type
-    /// into an entity, and a reader of raw html should not have to decode one to find the block.
-    /// </summary>
+    private string _twitterSite = string.Empty;
     private MarkupString _structuredData;
 
     private string Title => _translation?.Title ?? string.Empty;
-
     private string Subtitle => _translation?.Subtitle ?? string.Empty;
 
     /// <summary> A date as the cards write it, so one work reads the same everywhere on the site. </summary>
@@ -76,6 +59,11 @@ public sealed partial class ProjectReadPage
     private static string Stamp(DateTimeOffset value)
     {
         return value.UtcDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
+
+    private static string StampIso(DateTimeOffset value)
+    {
+        return value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -164,6 +152,8 @@ public sealed partial class ProjectReadPage
 
         _canonical = $"{origin}{Url}/{loaded.Item.Id}";
 
+        _twitterSite = Configuration[Globals.Settings.TwitterSite] ?? string.Empty;
+
         _shareCardIsPoster = !string.IsNullOrWhiteSpace(loaded.Item.PosterUrl);
 
         _shareCard = _shareCardIsPoster
@@ -201,8 +191,8 @@ public sealed partial class ProjectReadPage
             ["@context"] = "https://schema.org",
             ["@type"] = loaded.Item.ProjectTypeId == Globals.ProjectType.Article ? "Article" : "CreativeWork",
             ["headline"] = Title,
-            ["datePublished"] = Stamp(loaded.Item.PublishedAt),
-            ["dateModified"] = Stamp(loaded.UpdatedAt),
+            ["datePublished"] = StampIso(loaded.Item.PublishedAt),
+            ["dateModified"] = StampIso(loaded.UpdatedAt),
             ["inLanguage"] = _translation!.LanguageId,
             ["version"] = loaded.VersionLocal,
             ["mainEntityOfPage"] = new Dictionary<string, object>(StringComparer.Ordinal)

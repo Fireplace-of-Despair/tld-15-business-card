@@ -12,11 +12,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="language" content="@localizer["System.Language"]" />
     <meta name="author" content="@localizer["System.Author"]" />
-    <meta name="designer" content="@localizer["System.Author"]" />
-    <meta name="publisher" content="@localizer["Brand.Company"]" />
-    <meta name="copyright" content="@localizer["Brand.Company"]">
     <meta name="robots" content="index,follow">
 
     <!-- Mobile meta tags -->
@@ -28,15 +24,7 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["tld15Server.styles.css"]" />
 
-    <!-- The feed, so a browser and a reader both find it from the page instead of guessing at an
-         address. IconHelper draws the feed icon for this path too, so a stored link to it needs no
-         icon of its own.
-
-         The renderer writes the plus of the media type as &#x2B;, and it does so whether the value
-         is interpolated or spelled out - an attribute value goes through the encoder either way.
-         That is legal html and every conformant parser decodes it, which is what finds a feed, so
-         the constant stays. The xml writer of the feed itself has no such habit and writes the
-         plus. -->
+    <!-- The feed -->
     <link rel="alternate"
           type="@Globals.Page.Rss.MediaType"
           title="@localizer["Brand"]"
@@ -47,7 +35,10 @@
     <link rel="icon" type="image/x-icon" href="@Assets["favicon.ico"]" />
     <link rel="apple-touch-icon" href="@Assets["images/logo_touch.png"]" />
 
-    <ImportMap />
+    @if (Interactive)
+    {
+        <ImportMap />
+    }
     <HeadOutlet />
     <ResourcePreloader />
 </head>
@@ -70,11 +61,6 @@
     [Inject] private IHttpContextAccessor httpContextAccessor { get; set; } = default!;
 
     /// <summary> Whether this response carries anything that has to become interactive. </summary>
-    /// <remarks>
-    /// Read from the request rather than from an AuthorizeView, because the cascading authentication
-    /// state is opened by Routes and therefore does not reach the element this component writes
-    /// around it. This component only ever renders statically, so the request is always there.
-    /// </remarks>
     private bool Interactive
         => httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 }

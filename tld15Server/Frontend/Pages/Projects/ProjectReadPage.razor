@@ -38,6 +38,8 @@
     }
 
     <meta property="@Globals.Page.OpenGraph.Image" content="@_shareCard" />
+    <meta property="@Globals.Page.OpenGraph.ImageWidth" content="@Globals.Image.ShareCardWidth" />
+    <meta property="@Globals.Page.OpenGraph.ImageHeight" content="@Globals.Image.ShareCardHeight" />
 
     @if (_shareCardIsPoster)
     {
@@ -45,16 +47,19 @@
     }
     else
     {
-        <meta property="@Globals.Page.OpenGraph.ImageWidth" content="@Globals.Image.ShareCardWidth" />
-        <meta property="@Globals.Page.OpenGraph.ImageHeight" content="@Globals.Image.ShareCardHeight" />
         <meta property="@Globals.Page.OpenGraph.ImageType" content="@Globals.Image.ShareCardType" />
     }
 
-    <meta property="@Globals.Page.OpenGraph.ArticlePublished" content="@Stamp(_project.PublishedAt)" />
-    <meta property="@Globals.Page.OpenGraph.ArticleModified" content="@Stamp(_updatedAt)" />
+    <meta property="@Globals.Page.OpenGraph.ArticlePublished" content="@StampIso(_project.PublishedAt)" />
+    <meta property="@Globals.Page.OpenGraph.ArticleModified" content="@StampIso(_updatedAt)" />
     <meta property="@Globals.Page.OpenGraph.ArticleAuthor" content="@Localizer["System.Author"]" />
 
     <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
+    @if (!string.IsNullOrEmpty(_twitterSite))
+    {
+        <meta name="@Globals.Page.Twitter.Site" content="@_twitterSite" />
+    }
+    <meta name="@Globals.Page.Twitter.Creator" content="@Localizer["Brand.TwitterCreator"]" />
 </HeadContent>
 
 <div class="reading-container">

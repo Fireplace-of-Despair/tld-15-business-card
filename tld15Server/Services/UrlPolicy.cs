@@ -69,6 +69,47 @@ public static class UrlPolicy
         return scheme.Length == 0 || Contains(_image, scheme);
     }
 
+    /// <summary>
+    /// The scheme and host of an address, with nothing after them, or an empty string when the
+    /// address carries no host of its own.
+    /// </summary>
+    public static string OriginOf(string? url)
+    {
+        var cleaned = Clean(url);
+
+        if (cleaned.Length == 0 || !IsImageSource(cleaned)) { return string.Empty; }
+
+        return Uri.TryCreate(cleaned, UriKind.Absolute, out var parsed) && parsed.IsAbsoluteUri
+            ? $"{parsed.Scheme}://{parsed.Authority}"
+            : string.Empty;
+    }
+
+    /// <summary>
+    /// The host worth opening a connection to before the page needs one, read off the first of the
+    /// given addresses that names a host of its own. An empty answer means there is nothing to hint
+    /// at: the pictures are on this site, or there are none.
+    /// </summary>
+    /// <param name="origin"> Where this site answers, so its own host is not hinted at twice. </param>
+    /// <param name="candidates"> The pictures the page will draw, in the order it draws them. </param>
+    public static string PreconnectFor(string origin, params string?[] candidates)
+    {
+        var self = OriginOf(origin);
+
+        foreach (var candidate in candidates)
+        {
+            var host = OriginOf(candidate);
+
+            if (host.Length == 0) { continue; }
+
+            // A connection to this site is already open by the time the head is read.
+            if (string.Equals(host, self, StringComparison.OrdinalIgnoreCase)) { return string.Empty; }
+
+            return host;
+        }
+
+        return string.Empty;
+    }
+
     private static bool Contains(string[] schemes, string scheme)
     {
         return Array.Exists(schemes, x => string.Equals(x, scheme, StringComparison.OrdinalIgnoreCase));

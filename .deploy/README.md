@@ -426,7 +426,9 @@ production values. Replace each `CHANGE_ME` and each `example.com`.
 | `Security:ForwardedHeaders:KnownNetworks` | `[]` | `[ "172.28.0.0/16" ]` |
 | `Security:RateLimit:GlobalPermits` | `1000` | `300`, or a value that fits your users |
 | `Security:RateLimit:ApiPermits` | `100` | `30`, or a value that fits your clients |
+| `Application:Host` | `http://localhost:5105` | `https://example.com` - see the note below |
 | `Application:SourceUrl` | this repository | your fork, when you run modified code |
+| `Application:TwitterSite` | `@chiefnoir` | the handle your site posts under, or drop the key |
 | `Serilog:MinimumLevel` | `Debug` | `Information` |
 | `Serilog:WriteTo` | console only | console and a file at `/app/logs/tld15-.log` |
 | `AllowedHosts` | `*` | `example.com` |
@@ -434,9 +436,26 @@ production values. Replace each `CHANGE_ME` and each `example.com`.
 Keep the other keys. `SaltSize`, `CookieExpiration`, `CookieMaxAge` and the three `Login*` keys all
 hold a correct value.
 
-Two keys of the example file look like settings and change nothing today. No code reads
-`Application:Host`. No code reads `Automation:TimeoutMinutes`. The site address comes from the `Host`
-header that Caddy passes through. `AllowedHosts` is the key that checks that header.
+One key of the example file looks like a setting and changes nothing today: no code reads
+`Automation:TimeoutMinutes`.
+
+`Application:Host` is not one of them. It is the only place this deployment knows its own address,
+and four things are built out of it, each of which needs an absolute url that no request header can
+supply:
+
+- `/sitemap.xml`, which is not served at all while the key is unset;
+- the `Sitemap:` line of `/robots.txt`, which is left out rather than written relative;
+- `/rss`, which answers **404** without it, because every address in a feed is absolute;
+- the canonical link and the OpenGraph urls of every public page, which fall back to the address of
+  the request - so a site reachable under two names is indexed twice.
+
+Set it to the address readers type, with the scheme and without a trailing slash. `AllowedHosts` is a
+different job: it checks the `Host` header Caddy passes through, and it does not tell the site what
+it is called.
+
+`Application:TwitterSite` is the handle the share cards are attributed to. It has to be a handle and
+not an address - a card handed a url drops the field. Leave the key out and the site writes no
+`twitter:site` at all, which is better than writing one nobody reads.
 
 > **Nothing is uploaded to this site.** A poster and a picture inside a text are both addresses that
 > an editor types, and no page takes a file. The largest correct body is a save from the editor: one

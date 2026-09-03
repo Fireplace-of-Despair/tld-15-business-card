@@ -77,6 +77,7 @@ public static class Globals
         public const string Sitemap = "/sitemap.xml";
         public const string Robots = "/robots.txt";
         public const string Rss = "/rss";
+        public const string NotFound = "/404";
     }
 
     public static class ProjectType
@@ -161,8 +162,16 @@ public static class Globals
     }
 
     /// <summary> Locales supported by the system </summary>
-    /// <remarks> ISO_639-3 </remarks>
-    public static Dictionary<string, string> Locales => new()
+    /// <remarks>
+    /// ISO_639-3. Held rather than built on each read: every page reads the current locale through
+    /// <see cref="ToStoredLanguage"/> several times while it renders, and a property that returns a
+    /// new dictionary allocates one on every single one of those reads. Handed out read-only so the
+    /// one instance cannot be written to from outside, and kept as an insertion-ordered dictionary
+    /// because <see cref="LanguageFallback"/> is the first row of it.
+    /// </remarks>
+    public static IReadOnlyDictionary<string, string> Locales => _locales;
+
+    private static readonly Dictionary<string, string> _locales = new(StringComparer.Ordinal)
     {
         {"en", "English"},
         {"ja", "日本語"}
@@ -183,7 +192,7 @@ public static class Globals
     /// language_TERRITORY, and a consumer handed a bare "en" falls back to its own default - the
     /// preview then comes back in a language the reader never asked for.
     /// </remarks>
-    private static Dictionary<string, string> LocalesOpenGraph => new(StringComparer.Ordinal)
+    private static readonly Dictionary<string, string> _localesOpenGraph = new(StringComparer.Ordinal)
     {
         {"en", "en_US"},
         {"ja", "ja_JP"}
@@ -192,11 +201,9 @@ public static class Globals
     /// <summary> One locale as OpenGraph writes it, falling back the way the rest of the site does. </summary>
     public static string ToOpenGraphLocale(string? language)
     {
-        var locales = LocalesOpenGraph;
-
-        return locales.TryGetValue(language ?? string.Empty, out var value)
+        return _localesOpenGraph.TryGetValue(language ?? string.Empty, out var value)
             ? value
-            : locales[LanguageFallback];
+            : _localesOpenGraph[LanguageFallback];
     }
 
     public static class Page
@@ -238,6 +245,8 @@ public static class Globals
         {
             public static string Card => "twitter:card";
             public static string CardLarge => "summary_large_image";
+            public static string Site => "twitter:site";
+            public static string Creator => "twitter:creator";
         }
 
         public static class Meta
@@ -275,6 +284,7 @@ public static class Globals
     {
         public static string ApplicationHost => "Application:Host";
         public const string SourceUrl = "Application:SourceUrl";
+        public const string TwitterSite = "Application:TwitterSite";
         public const string ConnectionString = "PostgreSQL";
         public const string AutomationTimeoutMinutes = "Automation:TimeoutMinutes";
         public static string DateFormat => "yyyy/MM/dd";

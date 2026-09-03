@@ -34,6 +34,7 @@ public sealed class RssGetFeature : IFeature
         string Id,
         string Title,
         string Subtitle,
+        string PosterUrl,
         DateTimeOffset PublishedAt);
 
     public sealed record Query : IQuery<Result>
@@ -48,6 +49,7 @@ public sealed class RssGetFeature : IFeature
 
         private sealed record Row(
             string Id,
+            string PosterUrl,
             DateTimeOffset PublishedAt,
             List<TranslationRow> Translations);
 
@@ -64,6 +66,7 @@ public sealed class RssGetFeature : IFeature
                     .Take(MaxItems)
                     .Select(x => new Row(
                         x.Id,
+                        x.PosterUrl,
                         x.PublishedAt,
                         x.Translations
                             .Select(tr => new TranslationRow(tr.LanguageId, tr.Title, tr.Subtitle))
@@ -89,6 +92,7 @@ public sealed class RssGetFeature : IFeature
                         row.Id,
                         translation.Title,
                         translation.Subtitle,
+                        row.PosterUrl,
                         row.PublishedAt));
                 }
 

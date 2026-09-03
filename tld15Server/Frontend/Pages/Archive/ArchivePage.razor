@@ -11,6 +11,11 @@
     <meta name="@Globals.Page.Description" content="@_description" />
     <link rel="canonical" href="@_canonical" />
 
+    @if (!string.IsNullOrEmpty(_preconnect))
+    {
+        <link rel="preconnect" href="@_preconnect" />
+    }
+
     <meta property="@Globals.Page.OpenGraph.Type" content="@Globals.Page.OpenGraph.Kind.Website" />
     <meta property="@Globals.Page.OpenGraph.SiteName" content="@Localizer["Brand"]" />
     <meta property="@Globals.Page.OpenGraph.Title" content="@Localizer["Brand"] | @Localizer["Archive"]" />
@@ -24,6 +29,11 @@
     <meta property="@Globals.Page.OpenGraph.ImageType" content="@Globals.Image.ShareCardType" />
 
     <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
+    @if (!string.IsNullOrEmpty(_twitterSite))
+    {
+        <meta name="@Globals.Page.Twitter.Site" content="@_twitterSite" />
+    }
+    <meta name="@Globals.Page.Twitter.Creator" content="@Localizer["Brand.TwitterCreator"]" />
 </HeadContent>
 
 @if (IncidentCode != null)

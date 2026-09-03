@@ -37,27 +37,16 @@ public partial class Home
     public SharedContent? Contacts { get; set; }
     public List<SharedCardPreview> Articles { get; set; } = [];
     public List<SharedCardPreview> Projects { get; set; } = [];
-
-    /// <summary> The one address of the front page, whatever address the reader arrived on. </summary>
     private string _canonical = string.Empty;
-
-    /// <summary> The picture a share card shows. The front page carries no work to draw a poster of. </summary>
     private string _shareCard = string.Empty;
-
-    /// <summary> The mark itself, which is what a crawler reads as the logo of the publisher. </summary>
+    private bool _shareCardIsPoster;
+    private string _preconnect = string.Empty;
     private string _logo = string.Empty;
-
-    /// <summary>
-    /// What the page says about itself. It is the opening of the lore rather than a line written
-    /// beside it: a description kept by hand goes stale the first time the text is edited.
-    /// </summary>
     private string _description = string.Empty;
-
-    /// <summary> The site as schema.org describes it, wrapped in the element that carries it. </summary>
     private MarkupString _structuredData;
-
-    /// <summary> The blocks this page renders, for the row of links that jumps between them. </summary>
     private List<LocalNavigation.Section> _sections = [];
+
+    private string _twitterSite = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -137,8 +126,21 @@ public partial class Home
         _canonical = $"{origin}/";
         // Two pictures rather than one: a card is cropped wide by whoever shows it, and a logo is
         // read square. One file cannot be both without being wrong in one of the two places.
-        _shareCard = $"{origin}{Globals.Image.ShareCard}";
         _logo = $"{origin}{Globals.Image.Logo}";
+
+        _shareCardIsPoster = !string.IsNullOrWhiteSpace(Lore?.PosterUrl);
+
+        _shareCard = _shareCardIsPoster
+            ? Absolute(origin, Lore!.PosterUrl)
+            : $"{origin}{Globals.Image.ShareCard}";
+
+        _preconnect = UrlPolicy.PreconnectFor(
+            origin,
+            Lore?.PosterUrl,
+            Articles.Count > 0 ? Articles[0].PosterUrl : null,
+            Projects.Count > 0 ? Projects[0].PosterUrl : null);
+
+        _twitterSite = Configuration[Globals.Settings.TwitterSite] ?? string.Empty;
 
         _description = Markdown.ToSummary(Lore?.Markdown, DescriptionLength);
 
@@ -146,6 +148,16 @@ public partial class Home
         {
             _description = Localizer["Brand.Slogan"].Value;
         }
+    }
+
+    /// <summary> An address a share card and a crawler can both resolve, whatever the editor typed. </summary>
+    private static string Absolute(string origin, string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) { return string.Empty; }
+
+        return Uri.IsWellFormedUriString(url, UriKind.Absolute)
+            ? url
+            : $"{origin}/{url.TrimStart('/')}";
     }
 
     /// <summary>
@@ -187,7 +199,9 @@ public partial class Home
 
     /// <summary>
     /// The profiles of the social block, addresses only. A mail address is somewhere to write to,
-    /// not another place the same body is published, so it does not belong in this list.
+    /// not another place the same body is published, so it does not belong in this list. Neither
+    /// does the feed of this site: sameAs names the same entity somewhere else, and a feed is this
+    /// site again in another format rather than a profile a reader could open.
     /// </summary>
     private List<string> Profiles()
     {
@@ -199,13 +213,24 @@ public partial class Home
         {
             var scheme = UrlPolicy.SchemeOf(link.Key);
 
-            if (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase))
             {
-                result.Add(link.Key);
+                continue;
             }
+
+            if (IsFeed(link.Key)) { continue; }
+
+            result.Add(link.Key);
         }
 
         return result;
+    }
+
+    /// <summary> Whether an address is the feed of a site rather than a profile on one. </summary>
+    private static bool IsFeed(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out var parsed)
+            && string.Equals(parsed.AbsolutePath.TrimEnd('/'), Globals.Route.Rss, StringComparison.OrdinalIgnoreCase);
     }
 }

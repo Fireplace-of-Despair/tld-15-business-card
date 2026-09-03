@@ -42,11 +42,13 @@ public static class RssService
     /// <param name="Path"> The address of the work on this site, with or without its leading slash. </param>
     /// <param name="Title"> The headline. </param>
     /// <param name="Description"> The line under it. </param>
+    /// <param name="PosterUrl"> The picture of the work, or nothing when it carries none. </param>
     /// <param name="PublishedAt"> The date the editor gave the work. </param>
     public sealed record Entry(
         string Path,
         string Title,
         string Description,
+        string PosterUrl,
         DateTimeOffset PublishedAt);
 
     private static readonly XNamespace _atom = "http://www.w3.org/2005/Atom";
@@ -77,6 +79,7 @@ public static class RssService
                 // own address, and that address is what tells a reader it has seen this one before.
                 new XElement("guid", new XAttribute("isPermaLink", "true"), address),
                 new XElement("description", entry.Description),
+                Enclosure(root, entry.PosterUrl),
                 new XElement("pubDate", Stamp(entry.PublishedAt)));
         });
 
@@ -110,6 +113,60 @@ public static class RssService
         }
 
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// The poster of a work as the element a reader draws it from, or nothing when the work carries
+    /// no poster. A reader that finds no enclosure draws the item as a line of text.
+    /// </summary>
+    /// <remarks>
+    /// The length is written as zero. RSS asks for the size of the file in bytes, and this site does
+    /// not have one to give: a poster is an address on somebody else's host, never an upload, so the
+    /// only way to learn its size would be to fetch every poster on every read of the feed. Zero is
+    /// what a feed writes when the size is unknown, and every reader treats it as "come and see".
+    /// </remarks>
+    private static XElement? Enclosure(string root, string posterUrl)
+    {
+        var url = UrlPolicy.Clean(posterUrl);
+
+        if (url.Length == 0 || !UrlPolicy.IsImageSource(url)) { return null; }
+
+        var address = UrlPolicy.SchemeOf(url).Length == 0
+            ? $"{root}/{url.TrimStart('/')}"
+            : url;
+
+        return new XElement("enclosure",
+            new XAttribute("url", address),
+            new XAttribute("length", 0),
+            new XAttribute("type", MediaType(address)));
+    }
+
+    /// <summary> The media type of a picture, read off the end of its address. </summary>
+    /// <remarks>
+    /// Read from the address because that is all this site holds. An address that names no format
+    /// this site recognises is called a png: the attribute is required, a reader uses it only to
+    /// decide how to draw the file, and every one of them sniffs the file it actually received.
+    /// </remarks>
+    private static string MediaType(string address)
+    {
+        var path = address.AsSpan();
+        var cut = path.IndexOfAny('?', '#');
+
+        if (cut >= 0) { path = path[..cut]; }
+
+        var dot = path.LastIndexOf('.');
+
+        var extension = dot < 0 ? string.Empty : path[(dot + 1)..].ToString().ToLowerInvariant();
+
+        return extension switch
+        {
+            "jpg" or "jpeg" => "image/jpeg",
+            "gif" => "image/gif",
+            "webp" => "image/webp",
+            "avif" => "image/avif",
+            "svg" => "image/svg+xml",
+            _ => "image/png",
+        };
     }
 
     /// <summary>

@@ -159,6 +159,9 @@
   <data name="Brand.Company" xml:space="preserve">
     <value>Fireplace of Despair</value>
   </data>
+  <data name="Brand.TwitterCreator" xml:space="preserve">
+    <value>@chiefnoir</value>
+  </data>
   <data name="Common.CreatedAt" xml:space="preserve">
     <value>作成日時</value>
   </data>

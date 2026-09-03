@@ -197,10 +197,9 @@ public sealed class Program
             Path: $"{Frontend.Pages.Projects.ProjectReadPage.Url}/{entry.Id}",
             Title: entry.Title,
             Description: entry.Subtitle,
+            PosterUrl: entry.PosterUrl,
             PublishedAt: entry.PublishedAt));
 
-        // An hour is the poll a reader is asked to keep to. The locale comes from a cookie, so a
-        // shared cache has to be told that this address answers with more than one document.
         context.Response.Headers.CacheControl = "public, max-age=3600";
         context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.Cookie);
 

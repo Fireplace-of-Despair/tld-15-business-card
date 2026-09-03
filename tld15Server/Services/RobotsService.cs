@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+﻿// SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2025 Fireplace of Despair
 
 using System.Text;
@@ -32,6 +32,11 @@ public static class RobotsService
         builder.AppendLine("# The door, and the act of closing it. Neither is a page anybody should arrive at from a");
         builder.AppendLine("# search.");
         builder.AppendLine($"Disallow: {Globals.Route.Identity}/");
+        builder.AppendLine();
+        builder.AppendLine("# The page a request for something missing is re-executed into. Reached that way it carries");
+        builder.AppendLine("# the 404 of the original request, but typed directly it answers 200 like any other route,");
+        builder.AppendLine("# and a crawler that found it would file the apology away as a page of this site.");
+        builder.AppendLine($"Disallow: {Globals.Route.NotFound}");
 
         if (!string.IsNullOrWhiteSpace(origin))
         {

@@ -1,8 +1,10 @@
 ﻿:root {
+    color-scheme: dark;
+
     --color-background: #0A0E11;
     --color-container: #151D21;
     --color-text: #dfdfdf;
-    --color-text-rgb: 255,238,238;
+    --color-text-rgb: 223,223,223;
     --color-highlight-soft: #A65B5A;
     --color-highlight-soft-rgb: 166, 91, 90;
     --color-highlight-hard: #AB2C2B;
@@ -15,7 +17,6 @@ html {
     font-family: 'Georgia', serif;
     font-weight: normal;
     font-style: normal;
-    font-display: swap;
 }
 
 body {
@@ -23,7 +24,7 @@ body {
     color: var(--color-text);
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
     font-size: 20px;
 }
@@ -48,8 +49,6 @@ hr {
     border-top: 2px solid var(--color-highlight-soft);
 }
 
-/* The title of a block on the front page. The opening block carries the h1 of the page and the rest
-   carry h2, and this holds all of them to one size: the outline is for a crawler, not for the eye. */
 .component-title {
     font-family: "Park Lane NF";
     font-size: 35px;
@@ -60,7 +59,7 @@ hr {
 
 @font-face {
     font-family: "Park Lane NF";
-    src: url(../fonts/park_lane_nf.woff2) format("woff2"), url(../fonts/park_lane_nf.woff) format("woff");
+    src: url(../fonts/park_lane_nf.woff2) format("woff2");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -250,6 +249,11 @@ a {
     &:active {
         color: var(--color-highlight-soft);
     }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
+    }
 }
 
 
@@ -405,10 +409,10 @@ tr:hover {
         transform: scale(0.9);
     }
 
-    &:focus {
+    &:focus-visible {
         background: transparent;
-        outline: none;
-        transform: scale(0.9);
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
     }
 
     &:active {

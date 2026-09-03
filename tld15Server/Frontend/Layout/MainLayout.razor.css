@@ -41,7 +41,7 @@ footer {
 .page {
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 100px);
+    min-height: calc(100dvh - 100px);
 
     main {
         flex: 1;

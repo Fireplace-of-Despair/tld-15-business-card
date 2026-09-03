@@ -9,6 +9,7 @@ using StainlessCore;
 using tld15Server.Composition;
 using tld15Server.Features.Archive;
 using tld15Server.Features.Shared.Business;
+using tld15Server.Services;
 
 namespace tld15Server.Frontend.Pages.Archive;
 
@@ -28,9 +29,9 @@ public sealed partial class ArchivePage
 
     private string _canonical = string.Empty;
     private string _description = string.Empty;
-
-    /// <summary> The picture a share card shows. A wall of cards has no one work to draw. </summary>
     private string _shareCard = string.Empty;
+    private string _preconnect = string.Empty;
+    private string _twitterSite = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,6 +41,7 @@ public sealed partial class ArchivePage
         _canonical = $"{origin}{Url}";
         _shareCard = $"{origin}{Globals.Image.ShareCard}";
         _description = Localizer["Archive.Description"].Value;
+        _twitterSite = Configuration[Globals.Settings.TwitterSite] ?? string.Empty;
 
         var result = await Execute.Run(async () =>
         {
@@ -58,6 +60,12 @@ public sealed partial class ArchivePage
 
         Articles = result.Data!.Articles;
         Projects = result.Data.Projects;
+
+        // After the rows, not before them: the host is read off the first poster the wall will draw.
+        _preconnect = UrlPolicy.PreconnectFor(
+            origin,
+            Articles.Count > 0 ? Articles[0].PosterUrl : null,
+            Projects.Count > 0 ? Projects[0].PosterUrl : null);
 
         IsLoading = false;
     }
