@@ -31,7 +31,7 @@ public sealed partial class PressPage
     private string _description = string.Empty;
     private string _shareCard = string.Empty;
     private string _preconnect = string.Empty;
-    private string _twitterSite = string.Empty;
+    private string _twitterAccount = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,7 +41,7 @@ public sealed partial class PressPage
         _canonical = $"{origin}{Url}";
         _shareCard = $"{origin}{Globals.Image.ShareCard}";
         _description = Localizer["Press.Description"].Value;
-        _twitterSite = Configuration[Globals.Settings.TwitterSite] ?? string.Empty;
+        _twitterAccount = Globals.ToTwitterHandle(Configuration[Globals.Settings.TwitterAccount]);
 
         var result = await Execute.Run(async () =>
         {

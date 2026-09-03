@@ -198,6 +198,20 @@ public static class Globals
         {"ja", "ja_JP"}
     };
 
+    /// <summary>
+    /// A handle as a share card reads one, or an empty string when the setting holds nothing. The
+    /// leading at sign is added when it was written without one: a card asks for "@name" and drops
+    /// a field that carries a bare name.
+    /// </summary>
+    public static string ToTwitterHandle(string? account)
+    {
+        var trimmed = account?.Trim() ?? string.Empty;
+
+        if (trimmed.Length == 0) { return string.Empty; }
+
+        return trimmed.StartsWith('@') ? trimmed : $"@{trimmed}";
+    }
+
     /// <summary> One locale as OpenGraph writes it, falling back the way the rest of the site does. </summary>
     public static string ToOpenGraphLocale(string? language)
     {
@@ -284,7 +298,7 @@ public static class Globals
     {
         public static string ApplicationHost => "Application:Host";
         public const string SourceUrl = "Application:SourceUrl";
-        public const string TwitterSite = "Application:TwitterSite";
+        public const string TwitterAccount = "Application:TwitterAccount";
         public const string ConnectionString = "PostgreSQL";
         public const string AutomationTimeoutMinutes = "Automation:TimeoutMinutes";
         public static string DateFormat => "yyyy/MM/dd";

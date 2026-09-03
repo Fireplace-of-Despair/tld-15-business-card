@@ -46,7 +46,7 @@ public partial class Home
     private MarkupString _structuredData;
     private List<LocalNavigation.Section> _sections = [];
 
-    private string _twitterSite = string.Empty;
+    private string _twitterAccount = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -140,7 +140,7 @@ public partial class Home
             Articles.Count > 0 ? Articles[0].PosterUrl : null,
             Projects.Count > 0 ? Projects[0].PosterUrl : null);
 
-        _twitterSite = Configuration[Globals.Settings.TwitterSite] ?? string.Empty;
+        _twitterAccount = Globals.ToTwitterHandle(Configuration[Globals.Settings.TwitterAccount]);
 
         _description = Markdown.ToSummary(Lore?.Markdown, DescriptionLength);
 

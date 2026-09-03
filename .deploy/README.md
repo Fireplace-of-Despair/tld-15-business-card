@@ -428,7 +428,7 @@ production values. Replace each `CHANGE_ME` and each `example.com`.
 | `Security:RateLimit:ApiPermits` | `100` | `30`, or a value that fits your clients |
 | `Application:Host` | `http://localhost:5105` | `https://example.com` - see the note below |
 | `Application:SourceUrl` | this repository | your fork, when you run modified code |
-| `Application:TwitterSite` | `@chiefnoir` | the handle your site posts under, or drop the key |
+| `Application:TwitterAccount` | `stainless_chief` | the account your site posts under, or drop the key |
 | `Serilog:MinimumLevel` | `Debug` | `Information` |
 | `Serilog:WriteTo` | console only | console and a file at `/app/logs/tld15-.log` |
 | `AllowedHosts` | `*` | `example.com` |
@@ -437,11 +437,11 @@ Keep the other keys. `SaltSize`, `CookieExpiration`, `CookieMaxAge` and the thre
 hold a correct value.
 
 One key of the example file looks like a setting and changes nothing today: no code reads
-`Automation:TimeoutMinutes`.
+`Automation:TimeoutMinutes`. It is the only one.
 
-`Application:Host` is not one of them. It is the only place this deployment knows its own address,
-and four things are built out of it, each of which needs an absolute url that no request header can
-supply:
+`Application:Host` in particular is read, and by a great deal. It is the only place this deployment
+knows its own address, and four things are built out of it, each needing an absolute url that no
+request header can supply:
 
 - `/sitemap.xml`, which is not served at all while the key is unset;
 - the `Sitemap:` line of `/robots.txt`, which is left out rather than written relative;
@@ -453,9 +453,12 @@ Set it to the address readers type, with the scheme and without a trailing slash
 different job: it checks the `Host` header Caddy passes through, and it does not tell the site what
 it is called.
 
-`Application:TwitterSite` is the handle the share cards are attributed to. It has to be a handle and
-not an address - a card handed a url drops the field. Leave the key out and the site writes no
-`twitter:site` at all, which is better than writing one nobody reads.
+`Application:TwitterAccount` is the account on X the share cards are attributed to, and it fills
+both `twitter:site` and `twitter:creator`: one person publishes this site, so a second key would
+only be a second place for the same handle to go stale in. Write the account name, with or without
+the leading at sign - the site adds one where it is missing, because a card asks for `@name` and
+drops a field that carries an address or a bare name. Leave the key out and the site writes neither
+field, which is better than writing one nobody can follow.
 
 > **Nothing is uploaded to this site.** A poster and a picture inside a text are both addresses that
 > an editor types, and no page takes a file. The largest correct body is a save from the editor: one

@@ -43,7 +43,7 @@ public sealed partial class ProjectReadPage
     private readonly List<string> _otherLocales = [];
     private string _shareCard = string.Empty;
     private bool _shareCardIsPoster;
-    private string _twitterSite = string.Empty;
+    private string _twitterAccount = string.Empty;
     private MarkupString _structuredData;
 
     private string Title => _translation?.Title ?? string.Empty;
@@ -152,7 +152,7 @@ public sealed partial class ProjectReadPage
 
         _canonical = $"{origin}{Url}/{loaded.Item.Id}";
 
-        _twitterSite = Configuration[Globals.Settings.TwitterSite] ?? string.Empty;
+        _twitterAccount = Globals.ToTwitterHandle(Configuration[Globals.Settings.TwitterAccount]);
 
         _shareCardIsPoster = !string.IsNullOrWhiteSpace(loaded.Item.PosterUrl);
 

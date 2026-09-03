@@ -41,11 +41,14 @@
     }
 
     <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
-    @if (!string.IsNullOrEmpty(_twitterSite))
+    @* One account, read into both fields. This is one person publishing one site, so the site and
+       the creator of a card are the same handle, and a second setting would only be a second place
+       for it to go stale in. *@
+    @if (!string.IsNullOrEmpty(_twitterAccount))
     {
-        <meta name="@Globals.Page.Twitter.Site" content="@_twitterSite" />
+        <meta name="@Globals.Page.Twitter.Site" content="@_twitterAccount" />
+        <meta name="@Globals.Page.Twitter.Creator" content="@_twitterAccount" />
     }
-    <meta name="@Globals.Page.Twitter.Creator" content="@Localizer["Brand.TwitterCreator"]" />
 </HeadContent>
 
 @if (IncidentCode != null)
