@@ -1,5 +1,7 @@
 ﻿@attribute [Route($"{ProjectReadPage.Url}/{ProjectReadPage.UrlParamId}")]
 @inherits BasePage
+@using tld15Server.Features.Shared.Business
+@using tld15Server.Frontend.Components
 @using tld15Server.Frontend.Components.Common
 
 @* No render mode on purpose. The page is read, not operated: rendering it statically puts the whole
@@ -84,8 +86,11 @@
         {
             <section class="reading-section" aria-labelledby="links">
                 <h2 id="links" class="reading-heading">@Localizer["Content.Links"]</h2>
-                <nav class="reading-links">
-                    <LinkButtons Links="@_project.Links" />
+                <nav class="external-links-container">
+                    @foreach (var link in _project.Links)
+                    {
+                        <ExternalLinkIcon Url="@link.Url" Language="@link.Language" />
+                    }
                 </nav>
             </section>
         }

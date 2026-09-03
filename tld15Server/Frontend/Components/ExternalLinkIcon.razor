@@ -1,0 +1,14 @@
+﻿@* The icon of one outward link, badged with the language it speaks. The icon is read from the
+   address itself, so a caller only has to hand over where the link goes. *@
+
+<a class="external-button"
+   href="@Url"
+   rel="noopener noreferrer"
+   target="_blank"
+   aria-label="@_name">
+    @if (_language.Length > 0)
+    {
+        <span class="external-button-language">@_language</span>
+    }
+    <span class="external-button-icon">@_icon</span>
+</a>

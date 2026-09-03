@@ -167,6 +167,13 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
 - `SharedCardPreview` fills every card. An entry with an `ExternalUrl` leads off the site (the card
   then opens a new tab and hands it nothing); one without leads to `ProjectReadPage`. An entry with
   no `DivisionId` draws no badge, and one with no `ProjectTypeId` draws no link buttons.
+- `ExternalLinkIcon` (`Frontend/Components`) is the one outward link button, and it owns its own
+  css. It takes an address and, optionally, a language: `IconHelper.GetIconByUrl` reads the icon off
+  the host (`_hosts`, plus `mailto:` and a `/rss` path), and an unrecognised address draws the
+  placeholder icon. A missing, blank or invalid language draws no badge at all. The button carries
+  no spacing — the row around it (`.reading-links`, `.project-buttons-container`, `.social-container`)
+  sets the gap. Every outward link on the site goes through it: `SharedCard`, `LinkButtons`, and the
+  social and contacts blocks on `Home`. Nothing else writes an `<a>` around an icon.
 - `GlobalNavigation` (`Frontend/Navigations`) is the row under the brand in `MainLayout`: Home,
   Press and Archive, with the current page marked `active`. `MainLayout.IsAdmin` keeps it off the pages under
   `Globals.Route.Admin`, which carry their own navigation at the side.

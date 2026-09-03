@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2025 Fireplace of Despair
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
@@ -35,6 +36,34 @@ public static class IconHelper
         ("steam", Render<Steam>()),
         ("telegram", Render<Telegram>()),
         ("youtube", Render<Youtube>()),
+    ];
+
+    /// <summary>
+    /// The hosts an icon is recognised by, for a caller that holds an address and nothing else. A
+    /// row matches the host itself and any subdomain of it, so <c>fireplace-of-despair.itch.io</c>
+    /// lands on the same icon as <c>itch.io</c>.
+    /// </summary>
+    private static readonly (string Host, string Key)[] _hosts =
+    [
+        ("amazon.com", "amazon"),
+        ("facebook.com", "facebook"),
+        ("github.com", "github"),
+        ("instagram.com", "instagram"),
+        ("itch.io", "itch"),
+        ("linkedin.com", "linkedin"),
+        ("pixiv.net", "pixiv"),
+        ("royalroad.com", "royalroad"),
+        ("steamcommunity.com", "steam"),
+        ("steampowered.com", "steam"),
+        ("t.me", "telegram"),
+        ("telegram.me", "telegram"),
+        ("telegram.org", "telegram"),
+        ("youtube.com", "youtube"),
+        ("youtu.be", "youtube"),
+
+        // What this site hands out itself: the files a work offers for download live here and
+        // nowhere else, so the host is enough to know what the button is.
+        ("storage.fireplace-of-despair.org", "pirate"),
     ];
 
     private static readonly RenderFragment _unknown = Render<Unknown>();
@@ -76,6 +105,60 @@ public static class IconHelper
         }
 
         return _unknown;
+    }
+
+    /// <summary>
+    /// The name of the icon an address stands for, or an empty string for an address this
+    /// application recognises nothing in.
+    /// </summary>
+    /// <remarks>
+    /// A relative address names no host and so names no icon: everything this reads is in the
+    /// scheme, the host and the path of an absolute address.
+    /// </remarks>
+    public static string GetNameByUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) { return string.Empty; }
+
+        if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out var address)) { return string.Empty; }
+
+        // A mail address goes nowhere a host would explain, and the scheme already says what it is.
+        if (string.Equals(address.Scheme, Uri.UriSchemeMailto, StringComparison.OrdinalIgnoreCase))
+        {
+            return "email";
+        }
+
+        // A feed is told apart by what it serves rather than by where it is served from: it sits on
+        // the site's own host, beside everything else that host carries.
+        var path = address.AbsolutePath.TrimEnd('/');
+
+        if (path.EndsWith("/rss", StringComparison.OrdinalIgnoreCase)
+            || path.EndsWith("/feed", StringComparison.OrdinalIgnoreCase))
+        {
+            return "rss";
+        }
+
+        var host = address.Host.ToLowerInvariant();
+
+        if (host.StartsWith("www.", StringComparison.Ordinal)) { host = host[4..]; }
+
+        foreach (var (candidate, key) in _hosts)
+        {
+            if (host == candidate || host.EndsWith($".{candidate}", StringComparison.Ordinal))
+            {
+                return key;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Get the markup of the icon an address stands for, or a placeholder icon for an address this
+    /// application does not recognise.
+    /// </summary>
+    public static RenderFragment GetIconByUrl(string? url)
+    {
+        return GetIcon(GetNameByUrl(url));
     }
 
     /// <summary>
