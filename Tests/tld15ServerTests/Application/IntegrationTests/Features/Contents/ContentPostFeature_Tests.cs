@@ -99,12 +99,7 @@ public class ContentPostFeature_Tests
         {
             Id = stored.Id,
             VersionLocal = stored.VersionLocal,
-            Links = [new SharedContentLink
-            {
-                TranslationLanguageId = _english,
-                Language = "en",
-                Url = "https://example.org",
-            }],
+            Links = [new SharedLink { Language = "en", Url = "https://example.org" }],
         }, CancellationToken.None);
 
         var withLink = await ReadAsync(provider);
@@ -123,6 +118,30 @@ public class ContentPostFeature_Tests
         Assert.Equal("# Body", result.Markdown[_english]);
         var link = Assert.Single(result.Links);
         Assert.Equal("https://example.org", link.Url);
+    }
+
+    [Fact]
+    public async Task Handle_Throws_WhenTwoRowsCarryTheSameAddress()
+    {
+        var provider = IntegrationTestSetup.GetServices();
+
+        var stored = await ReadAsync(provider);
+
+        // The address is the key a link is stored under, so the same one twice is a row the editor
+        // has to resolve rather than one the save quietly overwrites.
+        var incident = await Assert.ThrowsAsync<IncidentException>(async () =>
+            await CreatePostHandler(provider).Handle(new ContentPostFeature.Command
+            {
+                Id = stored.Id,
+                VersionLocal = stored.VersionLocal,
+                Links =
+                [
+                    new SharedLink { Language = "en", Url = "https://example.org" },
+                    new SharedLink { Language = "ja", Url = "https://example.org" },
+                ],
+            }, CancellationToken.None));
+
+        Assert.Equal(IncidentCode.Validation, incident.Code);
     }
 
     [Fact]

@@ -16,6 +16,9 @@ public sealed class Content : IVersionLocal, IUpdatable
     [Column("poster_url")]
     public string? PosterUrl { get; set; }
 
+    [Column("links_json")]
+    public string? LinksJson { get; set; }
+
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -48,12 +51,6 @@ public sealed class ContentTranslation : IVersionLocal, IUpdatable
 
     [Column("markdown")]
     public string? Markdown { get; set; }
-
-    /// <summary>
-    /// Dictionary in format %key-name%_%language% to %url%
-    /// </summary>
-    [Column("json")]
-    public string? Json { get; set; }
 
     [Column("created_at")]
     public DateTimeOffset CreatedAt { get; set; }

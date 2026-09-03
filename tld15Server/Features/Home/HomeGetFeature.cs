@@ -44,7 +44,7 @@ public sealed class HomeGetFeature : IFeature
             string PosterUrl,
             string PosterAlt,
             string? Markdown,
-            string? Json);
+            string? LinksJson);
 
         public async ValueTask<Result> Handle(Query query, CancellationToken ctn)
         {
@@ -57,14 +57,12 @@ public sealed class HomeGetFeature : IFeature
             {
                 var contentIds = new[] { Globals.Content.Lore, Globals.Content.Social, Globals.Content.Contacts };
 
-                // Two locales leave the database instead of the whole translation set: the requested one and
-                // the fallback the page renders when the requested one holds no row yet.
                 var contentRows = await contextBusiness
                     .Contents
                     .Where(x => contentIds.Contains(x.Id))
                     .SelectMany(x => x.Translations
                         .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
-                        .Select(tr => new ContentRow(x.Id, tr.LanguageId, tr.Name, x.PosterUrl ?? string.Empty, tr.PosterAlt ?? string.Empty, tr.Markdown, tr.Json)))
+                        .Select(tr => new ContentRow(x.Id, tr.LanguageId, tr.Name, x.PosterUrl ?? string.Empty, tr.PosterAlt ?? string.Empty, tr.Markdown, x.LinksJson)))
                     .ToListAsync(ctn);
 
                 result.Lore = MapContent(Globals.Content.Lore, contentRows, language);
@@ -104,7 +102,7 @@ public sealed class HomeGetFeature : IFeature
                 PosterUrl = row?.PosterUrl ?? string.Empty,
                 PosterAlt = row?.PosterAlt ?? string.Empty,
                 Markdown = row?.Markdown,
-                Json = row?.Json,
+                LinksJson = row?.LinksJson,
             };
         }
     }

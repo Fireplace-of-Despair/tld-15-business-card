@@ -18,9 +18,9 @@ using tld15Server.Features.Shared.Business;
 namespace tld15Server.Features.Contents;
 
 /// <summary>
-/// Reads one content whole: the picture, the body and the links of every locale it carries. The dates and the
-/// version belong to the content itself, because a save moves the content and all of its
-/// translations together, so the root row is the one number that describes the whole of it.
+/// Reads one content whole: the picture and the links it carries, and the body of every locale. The
+/// dates and the version belong to the content itself, because a save moves the content and all of
+/// its translations together, so the root row is the one number that describes the whole of it.
 /// </summary>
 /// <remarks>
 /// An editor page opens one side of a content and leaves the other alone, so both sides leave the
@@ -45,7 +45,7 @@ public sealed class ContentGetFeature : IFeature
         public required string Id { get; set; }
         public required string Title { get; set; }
         public string? PosterUrl { get; set; }
-        public List<SharedContentLink> Links { get; set; } = [];
+        public List<SharedLink> Links { get; set; } = [];
         public Dictionary<string, string> Markdown { get; set; } = [];
         public Dictionary<string, string> PosterAlt { get; set; } = [];
         public Dictionary<string, string> Languages { get; set; } = [];
@@ -86,11 +86,12 @@ public sealed class ContentGetFeature : IFeature
                     {
                         x.Id,
                         x.PosterUrl,
+                        x.LinksJson,
                         x.CreatedAt,
                         x.UpdatedAt,
                         x.VersionLocal,
                         Titles = x.Translations.Select(tr => new KeyValuePair<string, string>(tr.LanguageId, tr.Name)).ToList(),
-                        Translations = x.Translations.Select(tr => new { tr.LanguageId, tr.Json, tr.Markdown, tr.PosterAlt }).ToList()
+                        Translations = x.Translations.Select(tr => new { tr.LanguageId, tr.Markdown, tr.PosterAlt }).ToList()
                     })
                     .FirstOrDefaultAsync(ctn)
                     ?? throw new IncidentException(IncidentCode.NotFound);
@@ -103,11 +104,9 @@ public sealed class ContentGetFeature : IFeature
                     CreatedAt = content.CreatedAt,
                     UpdatedAt = content.UpdatedAt,
                     VersionLocal = content.VersionLocal,
-                    Links = [.. content.Translations
-                        .OrderBy(x => x.LanguageId, StringComparer.Ordinal)
-                        .SelectMany(tr => SharedContent
-                            .JsonToDictionary(tr.Json)
-                            .Select(link => SharedContentLink.FromStoredOf(tr.LanguageId, link.Key, link.Value)))],
+                    Links = [.. SharedLink
+                        .JsonToDictionary(content.LinksJson)
+                        .Select(link => SharedLink.FromStored(link.Key, link.Value))],
                     Markdown = content.Translations
                         .Where(x => !string.IsNullOrEmpty(x.Markdown))
                         .ToDictionary(x => x.LanguageId, x => x.Markdown!, StringComparer.Ordinal),

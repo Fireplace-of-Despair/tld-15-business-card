@@ -76,6 +76,7 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
             .InSchema(Globals.Schema.Business)
             .WithColumn("id").AsString(Globals.ColumnLength.ContentId).PrimaryKey()
             .WithColumn("poster_url").AsString(1024).Nullable()
+            .WithColumn("links_json").AsString().Nullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefaultValue(SystemMethods.CurrentUTCDateTime)
             .WithColumn("version_local").AsInt64().NotNullable().WithDefaultValue(0);
@@ -92,7 +93,6 @@ public sealed class V2026_08_31_1336_Init_Business : Migration
                 .OnDelete(Rule.Cascade)
             .WithColumn("name").AsString().NotNullable()
             .WithColumn("markdown").AsString().Nullable()
-            .WithColumn("json").AsString().Nullable()
             .WithColumn("poster_alt").AsString().Nullable()
             .WithColumn("created_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)
             .WithColumn("updated_at").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentUTCDateTime)

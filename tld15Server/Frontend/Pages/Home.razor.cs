@@ -110,12 +110,12 @@ public partial class Home
             _sections.Add(new LocalNavigation.Section(Globals.Anchor.Projects, Localizer["Projects"].Value));
         }
 
-        if (Social != null && !string.IsNullOrEmpty(Social.Json))
+        if (Social != null && !string.IsNullOrEmpty(Social.LinksJson))
         {
             _sections.Add(new LocalNavigation.Section(Social.Id, Social.Title));
         }
 
-        if (Contacts != null && !string.IsNullOrEmpty(Contacts.Json))
+        if (Contacts != null && !string.IsNullOrEmpty(Contacts.LinksJson))
         {
             _sections.Add(new LocalNavigation.Section(Contacts.Id, Contacts.Title));
         }
@@ -189,7 +189,7 @@ public partial class Home
 
         // A link is stored as the address it opens against the language it speaks, so the address
         // is the key of the row rather than its value.
-        foreach (var link in Social?.JsonToDictionary())
+        foreach (var link in Social?.LinksToDictionary() ?? [])
         {
             var scheme = UrlPolicy.SchemeOf(link.Key);
 

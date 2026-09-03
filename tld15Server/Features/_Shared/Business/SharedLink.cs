@@ -98,24 +98,3 @@ public class SharedLink
         return JsonSerializer.Serialize(links, _options);
     }
 }
-
-/// <summary>
-/// A link that lives inside one translation of a content. The locales of a content keep separate
-/// dictionaries, so the row has to name the one it lands in.
-/// </summary>
-public sealed class SharedContentLink : SharedLink
-{
-    /// <summary> The translation that carries the link: the locale of the content_translation row. </summary>
-    public string TranslationLanguageId { get; set; } = string.Empty;
-
-    /// <summary> Read a stored entry of one translation back into a row of the editor. </summary>
-    public static SharedContentLink FromStoredOf(string translationLanguageId, string url, string language)
-    {
-        return new SharedContentLink
-        {
-            TranslationLanguageId = translationLanguageId,
-            Url = url,
-            Language = language,
-        };
-    }
-}

@@ -54,7 +54,6 @@
                 <tr>
                     <th>@Localizer["Content.Icon"]</th>
                     <th>@Localizer["Content.Link.Language"]</th>
-                    <th>@Localizer["Content.Translation.Language"]</th>
                     <th>@Localizer["Content.Link"]</th>
                     <th></th>
                 </tr>
@@ -82,14 +81,6 @@
                             {
                                 <span class="field-error">@Localizer["Content.Validation.Language"]</span>
                             }
-                        </td>
-                        <td>
-                            <select @bind="link.TranslationLanguageId">
-                                @foreach (var language in _content.Languages)
-                                {
-                                    <option value="@language.Key">@language.Value</option>
-                                }
-                            </select>
                         </td>
                         <td>
                             <input class="link-url @(issue == RowIssue.Duplicate ? "invalid" : string.Empty)"

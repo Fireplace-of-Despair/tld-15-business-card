@@ -79,12 +79,12 @@
     </div>
 }
 
-@if (Social != null && !string.IsNullOrEmpty(Social.Json))
+@if (Social != null && !string.IsNullOrEmpty(Social.LinksJson))
 {
     <div class="component-container-column-narrow">
         <h2 id="@Social.Id" class="component-title">@Social.Title</h2>
         <div class="external-links-container">
-            @foreach (var link in @Social.JsonToDictionary())
+            @foreach (var link in @Social.LinksToDictionary())
             {
                 <ExternalLinkIcon Url="@link.Key" Language="@link.Value" />
             }
@@ -92,12 +92,12 @@
     </div>
 }
 
-@if (Contacts != null && !string.IsNullOrEmpty(Contacts.Json))
+@if (Contacts != null && !string.IsNullOrEmpty(Contacts.LinksJson))
 {
     <div class="component-container-column-narrow">
         <h2 id="@Contacts.Id" class="component-title">@Contacts.Title</h2>
         <div class="external-links-container">
-            @foreach (var link in @Contacts.JsonToDictionary())
+            @foreach (var link in @Contacts.LinksToDictionary())
             {
                 <ExternalLinkIcon Url="@link.Key" Language="@link.Value" />
             }

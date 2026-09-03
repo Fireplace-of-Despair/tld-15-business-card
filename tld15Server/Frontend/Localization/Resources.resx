@@ -220,9 +220,6 @@
   <data name="Content.Links" xml:space="preserve">
     <value>Links</value>
   </data>
-  <data name="Content.Translation.Language" xml:space="preserve">
-    <value>Translation</value>
-  </data>
   <data name="Content.Validation.Duplicate" xml:space="preserve">
     <value>Another row already carries this address.</value>
   </data>

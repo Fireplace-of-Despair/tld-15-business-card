@@ -220,9 +220,6 @@
   <data name="Content.Links" xml:space="preserve">
     <value>リンク一覧</value>
   </data>
-  <data name="Content.Translation.Language" xml:space="preserve">
-    <value>翻訳</value>
-  </data>
   <data name="Content.Validation.Duplicate" xml:space="preserve">
     <value>このアドレスは他の行が既に使っています。</value>
   </data>

@@ -30,7 +30,7 @@ public partial class ContentLinkEditPage
         /// <summary> The language of the link is not a code this application stores. </summary>
         Language = 1,
 
-        /// <summary> Another row of the same translation already carries this address. </summary>
+        /// <summary> Another row already carries this address. </summary>
         Duplicate = 2,
     }
 
@@ -39,7 +39,7 @@ public partial class ContentLinkEditPage
     private ContentGetFeature.Result? _content;
 
     /// <summary> The rows of the table, held apart from the stored state until the save. </summary>
-    private List<SharedContentLink> _links = [];
+    private List<SharedLink> _links = [];
 
     /// <summary> A row that cannot be stored blocks the save rather than losing itself quietly. </summary>
     private bool CanSave => !_links.Exists(x => Validate(x) != RowIssue.None);
@@ -83,12 +83,12 @@ public partial class ContentLinkEditPage
 
     /// <summary>
     /// The same rules the feature applies before it stores a row, so the table says no here instead
-    /// of the save saying no later. An address only has to be unique inside its own translation: the
-    /// locales keep separate dictionaries.
+    /// of the save saying no later. A content keeps one set of links, so an address has to be unique
+    /// across the whole table.
     /// </summary>
-    private RowIssue Validate(SharedContentLink row)
+    private RowIssue Validate(SharedLink row)
     {
-        if (!SharedContentLink.IsLanguageValid(row.Language.Trim()))
+        if (!SharedLink.IsLanguageValid(row.Language.Trim()))
         {
             return RowIssue.Language;
         }
@@ -97,9 +97,7 @@ public partial class ContentLinkEditPage
 
         // A row with nothing typed into it is not a link and the save drops it, so two blank rows
         // are not a collision the editor has to complain about.
-        if (url.Length > 0 && _links.Exists(x => !ReferenceEquals(x, row)
-            && x.TranslationLanguageId == row.TranslationLanguageId
-            && StoredUrl(x) == url))
+        if (url.Length > 0 && _links.Exists(x => !ReferenceEquals(x, row) && StoredUrl(x) == url))
         {
             return RowIssue.Duplicate;
         }
@@ -108,27 +106,21 @@ public partial class ContentLinkEditPage
     }
 
     /// <summary> The key a row lands on, which is its address in the form the feature stores it. </summary>
-    private static string StoredUrl(SharedContentLink row)
+    private static string StoredUrl(SharedLink row)
     {
-        return UrlPolicy.Clean(SharedContentLink.ToStoredUrl(row.Url));
+        return UrlPolicy.Clean(SharedLink.ToStoredUrl(row.Url));
     }
 
     /// <summary>
-    /// Adds a row to the locale the editor is being read in. The icon follows from the address once
-    /// one is typed into it, so a fresh row carries nothing but the locale it lands in.
+    /// Adds an empty row to the table. The icon follows from the address once one is typed into it,
+    /// so a fresh row carries nothing at all.
     /// </summary>
     private void AddLink()
     {
-        if (_content == null) { return; }
-
-        var translation = _content.Languages.ContainsKey(Language)
-            ? Language
-            : _content.Languages.Keys.FirstOrDefault() ?? Language;
-
-        _links.Add(new SharedContentLink { TranslationLanguageId = translation });
+        _links.Add(new SharedLink());
     }
 
-    private void DeleteLink(SharedContentLink link)
+    private void DeleteLink(SharedLink link)
     {
         _links.Remove(link);
     }
