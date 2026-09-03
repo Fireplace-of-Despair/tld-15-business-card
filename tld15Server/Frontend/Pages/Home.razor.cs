@@ -41,7 +41,10 @@ public partial class Home
     /// <summary> The one address of the front page, whatever address the reader arrived on. </summary>
     private string _canonical = string.Empty;
 
-    /// <summary> The address of the mark, for a share card that has no work to show a poster of. </summary>
+    /// <summary> The picture a share card shows. The front page carries no work to draw a poster of. </summary>
+    private string _shareCard = string.Empty;
+
+    /// <summary> The mark itself, which is what a crawler reads as the logo of the publisher. </summary>
     private string _logo = string.Empty;
 
     /// <summary>
@@ -132,7 +135,10 @@ public partial class Home
         var origin = (string.IsNullOrWhiteSpace(configured) ? Navigation.BaseUri : configured).TrimEnd('/');
 
         _canonical = $"{origin}/";
-        _logo = $"{origin}/images/logo.png";
+        // Two pictures rather than one: a card is cropped wide by whoever shows it, and a logo is
+        // read square. One file cannot be both without being wrong in one of the two places.
+        _shareCard = $"{origin}{Globals.Image.ShareCard}";
+        _logo = $"{origin}{Globals.Image.Logo}";
 
         _description = Markdown.ToSummary(Lore?.Markdown, DescriptionLength);
 

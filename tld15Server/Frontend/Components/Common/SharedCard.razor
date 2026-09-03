@@ -9,7 +9,7 @@
             @if (string.IsNullOrEmpty(SharedCardContent.PosterUrl))
             {
                 <img class="article-image" loading="lazy"
-                     src="/images/placeholder/project.png"
+                     src="@Assets["images/placeholder/project.png"]"
                      alt="@SharedCardContent.PosterAlt">
             }
             else

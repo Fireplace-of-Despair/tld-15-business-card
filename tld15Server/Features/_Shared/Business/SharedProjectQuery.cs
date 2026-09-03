@@ -4,8 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using StainlessCore.Common.Helpers;
 using StainlessCore.Exceptions;
+using StainlessInfrastructure;
 using StainlessInfrastructure.Models.Business;
 using tld15Server.Composition;
 
@@ -27,8 +31,7 @@ internal static class SharedProjectQuery
         string PosterUrl,
         string? LinksJson,
         DateTimeOffset PublishedAt,
-        List<TranslationRow> Translations,
-        List<KeyValuePair<string, string>> DivisionNames);
+        List<TranslationRow> Translations);
 
     /// <summary> The two lists a wall of cards is drawn from, newest first. </summary>
     internal sealed record Cards
@@ -43,6 +46,15 @@ internal static class SharedProjectQuery
     /// the payload of the page. Two locales leave the database — the requested one and the fallback
     /// a card falls back to when the requested one holds no row.
     /// </summary>
+    /// <remarks>
+    /// One collection leaves the database here, and the names of the divisions are read separately
+    /// by <see cref="DivisionNames"/>. Two collections in one projection are joined into a single
+    /// result set, so every work would come back once per division name it matched — the rows
+    /// multiply instead of adding up, and EF Core says so out loud at compile time. The second read
+    /// also costs less on its own terms: a division carries the same name for every work filed
+    /// under it, and this way that name crosses the wire once for the page rather than once per
+    /// card.
+    /// </remarks>
     internal static IQueryable<Row> SelectCards(this IQueryable<Project> projects, string language, string fallback)
     {
         var types = new[] { Globals.ProjectType.Project, Globals.ProjectType.Article };
@@ -60,18 +72,39 @@ internal static class SharedProjectQuery
                 x.Translations
                     .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
                     .Select(tr => new TranslationRow(tr.LanguageId, tr.Title, tr.Subtitle, tr.PosterAlt))
-                    .ToList(),
-                x.Division.Translations
-                    .Where(tr => tr.LanguageId == language || tr.LanguageId == fallback)
-                    .Select(tr => new KeyValuePair<string, string>(tr.LanguageId, tr.Name))
                     .ToList()));
+    }
+
+    /// <summary>
+    /// The divisions, as an id against the name it carries in this locale. The reference tables hold
+    /// a handful of rows, so a wall of any size reads them in one short query.
+    /// </summary>
+    internal static async Task<Dictionary<string, string>> DivisionNames(
+          IDbContextFactory<DataContextReference> factory
+        , string language
+        , CancellationToken ctn)
+    {
+        await using (var context = await factory.CreateDbContextAsync(ctn))
+        {
+            var divisions = await context
+                .Divisions
+                .Select(x => new
+                {
+                    x.Id,
+                    Names = x.Translations.Select(tr => new KeyValuePair<string, string>(tr.LanguageId, tr.Name))
+                })
+                .AsNoTracking()
+                .ToListAsync(ctn);
+
+            return divisions.ToDictionary(x => x.Id, x => x.Names.GetName(language), StringComparer.Ordinal);
+        }
     }
 
     /// <summary>
     /// Splits the rows by what they are. The database already ordered them, so a single pass keeps
     /// both lists newest first.
     /// </summary>
-    internal static Cards Split(List<Row> rows, string language)
+    internal static Cards Split(List<Row> rows, Dictionary<string, string> divisions, string language)
     {
         var cards = new Cards();
 
@@ -79,13 +112,13 @@ internal static class SharedProjectQuery
         {
             if (row.ProjectTypeId == Globals.ProjectType.Article)
             {
-                cards.Articles.Add(ToPreview(row, language));
+                cards.Articles.Add(ToPreview(row, divisions, language));
                 continue;
             }
 
             if (row.ProjectTypeId == Globals.ProjectType.Project)
             {
-                cards.Projects.Add(ToPreview(row, language));
+                cards.Projects.Add(ToPreview(row, divisions, language));
                 continue;
             }
 
@@ -95,7 +128,7 @@ internal static class SharedProjectQuery
         return cards;
     }
 
-    private static SharedCardPreview ToPreview(Row row, string language)
+    private static SharedCardPreview ToPreview(Row row, Dictionary<string, string> divisions, string language)
     {
         var translation = row.Translations.Find(x => x.LanguageId == language)
             ?? row.Translations.FirstOrDefault();
@@ -105,7 +138,7 @@ internal static class SharedProjectQuery
             Id = row.Id,
             ProjectTypeId = row.ProjectTypeId,
             DivisionId = row.DivisionId,
-            DivisionName = row.DivisionNames.GetName(language),
+            DivisionName = divisions.GetValueOrDefault(row.DivisionId, row.DivisionId),
             Title = translation?.Title ?? string.Empty,
             Subtitle = translation?.Subtitle ?? string.Empty,
             PosterAlt = translation?.PosterAlt ?? string.Empty,

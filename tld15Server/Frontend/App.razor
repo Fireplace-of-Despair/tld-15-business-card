@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Localization
 @using tld15Server.Frontend.Components
 
@@ -27,6 +28,8 @@
     <meta name="format-detection" content="telephone=yes" />
     <meta name="HandheldFriendly" content="true" />
 
+    <link rel="preload" href="@Assets["fonts/park_lane_nf.woff2"]" as="font" type="font/woff2" crossorigin />
+
     <!-- Styles -->
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["tld15Server.styles.css"]" />
@@ -34,7 +37,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="@Assets["favicon.png"]" />
     <link rel="icon" type="image/x-icon" href="@Assets["favicon.ico"]" />
-    <link rel="apple-touch-icon" href="@Assets["images/logo.png"]" />
+    <link rel="apple-touch-icon" href="@Assets["images/logo_touch.png"]" />
 
     <ImportMap />
     <HeadOutlet />
@@ -43,12 +46,34 @@
 
 <body>
     <Routes />
-    <ReconnectModal />
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
+
+    @* Nothing a visitor reads is operated. Every interactive component of this site sits behind the
+       sign-in: the pages that carry a render mode all live under Globals.Route.Admin, and the two
+       components MainLayout renders interactively are both inside an AuthorizeView. The circuit
+       script and the dialog that reconnects a circuit are therefore written for a signed-in reader
+       and for nobody else, and a public page ships as html alone.
+
+       The forms a visitor can reach - the sign-in and the choice of language - are static forms that
+       post. They needed no script before this and they need none now. *@
+    @if (Interactive)
+    {
+        <ReconnectModal />
+        <script src="@Assets["_framework/blazor.web.js"]"></script>
+    }
 </body>
 
 </html>
 
 @code {
     [Inject] private IStringLocalizer<Localization.Resources> localizer { get; set; } = default!;
+    [Inject] private IHttpContextAccessor httpContextAccessor { get; set; } = default!;
+
+    /// <summary> Whether this response carries anything that has to become interactive. </summary>
+    /// <remarks>
+    /// Read from the request rather than from an AuthorizeView, because the cascading authentication
+    /// state is opened by Routes and therefore does not reach the element this component writes
+    /// around it. This component only ever renders statically, so the request is always there.
+    /// </remarks>
+    private bool Interactive
+        => httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 }

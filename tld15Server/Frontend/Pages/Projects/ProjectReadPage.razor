@@ -35,9 +35,13 @@
     {
         <meta property="og:locale:alternate" content="@locale" />
     }
+    @* The share card of a work is its poster. A work published without one still has to share as
+       something, so the mark of the site stands in: a card with no picture at all reads as a broken
+       link rather than as a work nobody photographed. The alt text belongs to the poster, so a
+       stand-in carries none. *@
+    <meta property="og:image" content="@_shareCard" />
     @if (!string.IsNullOrWhiteSpace(_project.PosterUrl))
     {
-        <meta property="og:image" content="@Absolute(_project.PosterUrl)" />
         <meta property="og:image:alt" content="@_translation.PosterAlt" />
     }
 

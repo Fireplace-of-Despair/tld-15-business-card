@@ -45,6 +45,9 @@ public sealed partial class ProjectReadPage
     /// <summary> The other locales this work is written in, which the share cards name. </summary>
     private readonly List<string> _otherLocales = [];
 
+    /// <summary> The picture a share card shows: the poster of the work, or the mark of the site. </summary>
+    private string _shareCard = string.Empty;
+
     /// <summary>
     /// The work as schema.org describes it, wrapped in the element that carries it. The element is
     /// built here rather than in the markup because the renderer escapes the plus of the media type
@@ -154,6 +157,10 @@ public sealed partial class ProjectReadPage
 
         _canonical = $"{origin}{Url}/{loaded.Item.Id}";
 
+        _shareCard = string.IsNullOrWhiteSpace(loaded.Item.PosterUrl)
+            ? $"{origin}{Globals.Image.ShareCard}"
+            : Absolute(loaded.Item.PosterUrl);
+
         _otherLocales.Clear();
         _otherLocales.AddRange(loaded.Item.Translations
             .Select(x => x.LanguageId)
@@ -200,6 +207,9 @@ public sealed partial class ProjectReadPage
 
         if (!string.IsNullOrWhiteSpace(Subtitle)) { data["description"] = Subtitle; }
 
+        // Only a real poster. A share card has to show something or it renders as a broken frame,
+        // but schema.org "image" is read as a picture *of* this work, and the mark of the site is
+        // not one. An absent field is honest; a stand-in in this field is not.
         if (!string.IsNullOrWhiteSpace(poster)) { data["image"] = poster; }
 
         // The default encoder escapes the characters that would end the element early, so nothing an

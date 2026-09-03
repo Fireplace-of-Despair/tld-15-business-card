@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -186,7 +186,7 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
 - `GlobalNavigation` (`Frontend/Navigations`) is the row under the brand in `MainLayout`: Home,
   Press and Archive, with the current page marked `active`. `MainLayout.IsAdmin` keeps it off the pages under
   `Globals.Route.Admin`, which carry their own navigation at the side.
-- Works of `Globals.Archive.DivisionId` (ACD) are kept **off** the front page and shown on
+- Works of `Globals.Divisions.ACD` (ACD) are kept **off** the front page and shown on
   `ArchivePage` (`/archive`) instead — the same wall of cards, leading to the same
   `ProjectReadPage`. `SharedProjectQuery` holds the columns, the order and the mapping both walls
   share; a page only chooses which works to ask for.

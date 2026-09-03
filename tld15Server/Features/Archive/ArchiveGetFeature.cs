@@ -35,7 +35,10 @@ public sealed class ArchiveGetFeature : IFeature
         public List<SharedCardPreview> Projects { get; set; } = [];
     }
 
-    public sealed class Handler(IDbContextFactory<DataContextBusiness> contextBusinessFactory) : IQueryHandler<Query, Result>
+    public sealed class Handler(
+          IDbContextFactory<DataContextBusiness> contextBusinessFactory
+        , IDbContextFactory<DataContextReference> contextReferenceFactory
+        ) : IQueryHandler<Query, Result>
     {
         public async ValueTask<Result> Handle(Query query, CancellationToken ctn)
         {
@@ -45,11 +48,16 @@ public sealed class ArchiveGetFeature : IFeature
             {
                 var rows = await contextBusiness
                     .Projects
-                    .Where(x => x.DivisionId == Globals.Archive.DivisionId)
+                    .Where(x => x.DivisionId == Globals.Divisions.ACD)
                     .SelectCards(language, Globals.LanguageFallback)
                     .ToListAsync(ctn);
 
-                var cards = SharedProjectQuery.Split(rows, language);
+                // The names of the divisions are a second, short read rather than a second
+                // collection in the projection above: joined into one result set they would
+                // multiply the rows of the wall instead of adding to them.
+                var divisions = await SharedProjectQuery.DivisionNames(contextReferenceFactory, language, ctn);
+
+                var cards = SharedProjectQuery.Split(rows, divisions, language);
 
                 return new Result
                 {

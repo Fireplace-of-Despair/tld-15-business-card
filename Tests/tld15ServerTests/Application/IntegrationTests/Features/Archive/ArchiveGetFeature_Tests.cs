@@ -25,6 +25,10 @@ public class ArchiveGetFeature_Tests
     /// <summary> A division the front page shows. </summary>
     private const string _current = "TLD";
 
+    /// <summary> The names those two divisions carry, as the reference tables import them. </summary>
+    private const string _archiveName = "Ashen Chronicles Division";
+    private const string _currentName = "Tamed Logic Division";
+
     private static ProjectPostFeature.Handler CreatePostHandler(IServiceProvider provider)
     {
         return new ProjectPostFeature.Handler
@@ -36,14 +40,22 @@ public class ArchiveGetFeature_Tests
 
     private static Task<ArchiveGetFeature.Result> ReadArchiveAsync(IServiceProvider provider)
     {
-        return new ArchiveGetFeature.Handler(provider.GetRequiredService<IDbContextFactory<DataContextBusiness>>())
+        return new ArchiveGetFeature.Handler
+        (
+            provider.GetRequiredService<IDbContextFactory<DataContextBusiness>>(),
+            provider.GetRequiredService<IDbContextFactory<DataContextReference>>()
+        )
             .Handle(new ArchiveGetFeature.Query { Language = _english }, CancellationToken.None)
             .AsTask();
     }
 
     private static Task<HomeGetFeature.Result> ReadHomeAsync(IServiceProvider provider)
     {
-        return new HomeGetFeature.Handler(provider.GetRequiredService<IDbContextFactory<DataContextBusiness>>())
+        return new HomeGetFeature.Handler
+        (
+            provider.GetRequiredService<IDbContextFactory<DataContextBusiness>>(),
+            provider.GetRequiredService<IDbContextFactory<DataContextReference>>()
+        )
             .Handle(new HomeGetFeature.Query { Language = _english }, CancellationToken.None)
             .AsTask();
     }
@@ -81,15 +93,15 @@ public class ArchiveGetFeature_Tests
     {
         var provider = IntegrationTestSetup.GetServices();
 
-        var archived = await StoreAsync(provider, Globals.Archive.DivisionId, Globals.ProjectType.Project);
+        var archived = await StoreAsync(provider, Globals.Divisions.ACD, Globals.ProjectType.Project);
         var current = await StoreAsync(provider, _current, Globals.ProjectType.Project);
 
         var result = await ReadArchiveAsync(provider);
 
         Assert.Contains(result.Projects, x => x.Id == archived);
         Assert.DoesNotContain(result.Projects, x => x.Id == current);
-        Assert.All(result.Projects, x => Assert.Equal(Globals.Archive.DivisionId, x.DivisionId));
-        Assert.All(result.Articles, x => Assert.Equal(Globals.Archive.DivisionId, x.DivisionId));
+        Assert.All(result.Projects, x => Assert.Equal(Globals.Divisions.ACD, x.DivisionId));
+        Assert.All(result.Articles, x => Assert.Equal(Globals.Divisions.ACD, x.DivisionId));
 
         await DeleteAsync(provider, archived, current);
     }
@@ -99,8 +111,8 @@ public class ArchiveGetFeature_Tests
     {
         var provider = IntegrationTestSetup.GetServices();
 
-        var article = await StoreAsync(provider, Globals.Archive.DivisionId, Globals.ProjectType.Article);
-        var project = await StoreAsync(provider, Globals.Archive.DivisionId, Globals.ProjectType.Project);
+        var article = await StoreAsync(provider, Globals.Divisions.ACD, Globals.ProjectType.Article);
+        var project = await StoreAsync(provider, Globals.Divisions.ACD, Globals.ProjectType.Project);
 
         var result = await ReadArchiveAsync(provider);
 
@@ -111,19 +123,39 @@ public class ArchiveGetFeature_Tests
     }
 
     [Fact]
+    public async Task Handle_NamesTheDivisionOfACard_OnBothWalls()
+    {
+        var provider = IntegrationTestSetup.GetServices();
+
+        var archived = await StoreAsync(provider, Globals.Divisions.ACD, Globals.ProjectType.Project);
+        var current = await StoreAsync(provider, _current, Globals.ProjectType.Project);
+
+        var fromArchive = (await ReadArchiveAsync(provider)).Projects.Single(x => x.Id == archived);
+        var fromHome = (await ReadHomeAsync(provider)).Projects.Single(x => x.Id == current);
+
+        // The name of a division comes from the reference tables, which a wall reads separately from
+        // the works it shows. A card that echoes its own division id back is a card whose name that
+        // read never found.
+        Assert.Equal(_archiveName, fromArchive.DivisionName);
+        Assert.Equal(_currentName, fromHome.DivisionName);
+
+        await DeleteAsync(provider, archived, current);
+    }
+
+    [Fact]
     public async Task HomeGetFeature_LeavesTheArchivedWorksOut()
     {
         var provider = IntegrationTestSetup.GetServices();
 
-        var archived = await StoreAsync(provider, Globals.Archive.DivisionId, Globals.ProjectType.Project);
+        var archived = await StoreAsync(provider, Globals.Divisions.ACD, Globals.ProjectType.Project);
         var current = await StoreAsync(provider, _current, Globals.ProjectType.Project);
 
         var result = await ReadHomeAsync(provider);
 
         Assert.Contains(result.Projects, x => x.Id == current);
         Assert.DoesNotContain(result.Projects, x => x.Id == archived);
-        Assert.All(result.Projects, x => Assert.NotEqual(Globals.Archive.DivisionId, x.DivisionId));
-        Assert.All(result.Articles, x => Assert.NotEqual(Globals.Archive.DivisionId, x.DivisionId));
+        Assert.All(result.Projects, x => Assert.NotEqual(Globals.Divisions.ACD, x.DivisionId));
+        Assert.All(result.Articles, x => Assert.NotEqual(Globals.Divisions.ACD, x.DivisionId));
 
         await DeleteAsync(provider, archived, current);
     }

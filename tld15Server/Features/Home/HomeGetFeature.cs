@@ -35,7 +35,10 @@ public sealed class HomeGetFeature : IFeature
         public required string Language { get; set; }
     }
 
-    public sealed class Handler(IDbContextFactory<DataContextBusiness> dataContextBusiness) : IQueryHandler<Query, Result>
+    public sealed class Handler(
+          IDbContextFactory<DataContextBusiness> dataContextBusiness
+        , IDbContextFactory<DataContextReference> dataContextReference
+        ) : IQueryHandler<Query, Result>
     {
         private sealed record ContentRow(
             string ContentId,
@@ -73,11 +76,16 @@ public sealed class HomeGetFeature : IFeature
                 // their own, and the wall here is what the site is doing now rather than what it did.
                 var rows = await contextBusiness
                     .Projects
-                    .Where(x => x.DivisionId != Globals.Archive.DivisionId)
+                    .Where(x => x.DivisionId != Globals.Divisions.ACD)
                     .SelectCards(language, fallback)
                     .ToListAsync(ctn);
 
-                var cards = SharedProjectQuery.Split(rows, language);
+                // The names of the divisions are a second, short read rather than a second
+                // collection in the projection above: joined into one result set they would
+                // multiply the rows of the wall instead of adding to them.
+                var divisions = await SharedProjectQuery.DivisionNames(dataContextReference, language, ctn);
+
+                var cards = SharedProjectQuery.Split(rows, divisions, language);
 
                 result.Articles = cards.Articles;
                 result.Projects = cards.Projects;

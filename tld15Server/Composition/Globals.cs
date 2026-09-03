@@ -57,13 +57,14 @@ public static class Globals
         public static string Projects => "projects";
     }
 
-    public static class Archive
+    /// <summary> The pictures the site owns, as paths under the web root. </summary>
+    public static class Image
     {
-        /// <summary>
-        /// The division whose works are kept in the archive. They are the same rows as any other
-        /// work and open on the same page; only the list they appear in is a different one.
-        /// </summary>
-        public static string DivisionId => Divisions.ACD;
+        /// <summary> 1200x630, the picture a share card shows when there is no work to show. </summary>
+        public const string ShareCard = "/images/logo_card.png";
+
+        /// <summary> 180x180, the mark itself: the touch icon, and the logo a crawler reads. </summary>
+        public const string Logo = "/images/logo_touch.png";
     }
 
     public static class Route

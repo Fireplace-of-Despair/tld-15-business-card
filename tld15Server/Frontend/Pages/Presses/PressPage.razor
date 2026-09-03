@@ -16,6 +16,9 @@
     <meta property="og:description" content="@_description" />
     <meta property="og:url" content="@_canonical" />
     <meta property="og:locale" content="@Language" />
+    @* A wall of cards carries no work of its own to show, so the card of this page is the mark of
+       the site. Without one a shared link renders as a grey box with a line of text in it. *@
+    <meta property="og:image" content="@_shareCard" />
 </HeadContent>
 
 @if (IncidentCode != null)

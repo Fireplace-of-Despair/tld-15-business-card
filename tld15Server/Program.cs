@@ -178,8 +178,8 @@ public sealed class Program
 
             // A wall of cards moved when the newest card on it moved, and the two walls carry
             // different works: the archive division on one, everything else on the other.
-            var archived = works.FindAll(x => x.DivisionId == Globals.Archive.DivisionId);
-            var current = works.FindAll(x => x.DivisionId != Globals.Archive.DivisionId);
+            var archived = works.FindAll(x => x.DivisionId == Globals.Divisions.ACD);
+            var current = works.FindAll(x => x.DivisionId != Globals.Divisions.ACD);
 
             var entries = new List<SitemapService.Entry>(works.Count + 2)
             {

@@ -29,12 +29,16 @@ public sealed partial class PressPage
     private string _canonical = string.Empty;
     private string _description = string.Empty;
 
+    /// <summary> The picture a share card shows. A wall of cards has no one work to draw. </summary>
+    private string _shareCard = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         var configured = Configuration[Globals.Settings.ApplicationHost];
         var origin = (string.IsNullOrWhiteSpace(configured) ? Navigation.BaseUri : configured).TrimEnd('/');
 
         _canonical = $"{origin}{Url}";
+        _shareCard = $"{origin}{Globals.Image.ShareCard}";
         _description = Localizer["Press.Description"].Value;
 
         var result = await Execute.Run(async () =>
