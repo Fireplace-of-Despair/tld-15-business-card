@@ -1,7 +1,7 @@
-﻿# Stainless Tasks reverse proxy.
+﻿# tld-15 business card reverse proxy.
 #
 # Copy this file to /config/caddy/Caddyfile. Then replace two values:
-#   1. tasks.example.com  -> your domain
+#   1. example.com  -> your domain
 #   2. admin@example.com  -> your address for the certificate authority
 #
 # Caddy gets the certificate. Caddy renews the certificate. Caddy also redirects http:// to https://.
@@ -48,9 +48,9 @@
 		# read_body is a limit on the full upload. It is not a stall detector. At this limit Caddy
 		# cuts the body. It then sends the incomplete request to the server.
 		#
-		# 5 minutes carries the 8 MB of a large snapshot at 68 KB each second. A phone on a weak link
-		# keeps that rate. A short limit such as 10s needs 800 KB each second. It stops a correct sync
-		# before the sync completes.
+		# This site accepts no upload at all. A poster is an address that the editor types, never a
+		# file, so the largest correct body is a form from the editor: a markdown text and the fields
+		# around it. 30 seconds carries a body of that size from any connection a person writes on.
 		#
 		# Keep this limit low. Until the body arrives in full, Caddy writes no line into the access
 		# log, so fail2ban cannot see a caller that sends one byte at a time. The rate limiter of the
@@ -61,7 +61,7 @@
 		# connection for its circuit.
 		timeouts {
 			read_header 5s
-			read_body 5m
+			read_body 30s
 		}
 	}
 }
@@ -216,9 +216,6 @@
 		# middle of a pattern does not cross a path separator, so keep each rule in the *name* form.
 		path *appsettings*
 
-		# The local database of a client, its key file and its backups. See Globals.Storage.
-		path *tld18.db* *tld18.kdf* *backup-tld18-* */backups/*
-
 		# The deployment. The Caddyfile names the proxy of the site, and the compose file names the
 		# bind mounts.
 		path *caddyfile* *docker-compose* *dockerfile* *.dockerignore*
@@ -229,8 +226,13 @@
 	}
 
 	# The same rule by file name ending. This application serves no PHP page and no archive.
+	#
+	# The last group is the working file of a picture. wwwroot holds what a page loads and nothing
+	# beside it, so a request for one means a deployment copied the folder of an artist into the
+	# image. These belong here and not in @scanner_path: a path rule with a star on each side reads
+	# the name at any position, and "*.ai*" would then also abort /projects/x.ai.
 	@scanner_suffix {
-		path_regexp (?i)\.(php|phtml|php[3-8]|asp|aspx|jsp|jspx|cgi|pl|py|rb|sql|db|bak|old|orig|save|swp|zip|tar|gz|tgz|rar|7z|env|ini|conf|log|sh|bash|pem|key|crt|p12|pfx)$
+		path_regexp (?i)\.(php|phtml|php[3-8]|asp|aspx|jsp|jspx|cgi|pl|py|rb|sql|db|bak|old|orig|save|swp|zip|tar|gz|tgz|rar|7z|env|ini|conf|log|sh|bash|pem|key|crt|p12|pfx|psd|xcf|ai|sketch|fig)$
 	}
 
 	# A path rule reads the path alone. The scan also carried a payload in the query string, such as
@@ -260,20 +262,35 @@
 		header_regexp User-Agent "(?i)^(python-requests|python-urllib|python-httpx|aiohttp|urllib|requests|scrapy|libwww-perl|lwp-request|java|okhttp|axios|node-fetch|got|guzzlehttp|winhttp|wininet|zabbix|ruby|go-http-client|http_request|httpclient|apache-httpclient|mechanize|colly|httrack)"
 	}
 
-	# An AI harvester and a marketing crawler. A private task tracker gets no value from them.
+	# An AI harvester and a marketing crawler. This site publishes work to be read, so it wants a
+	# search engine and it wants a link preview. It gets nothing back from a training scraper.
 	#
-	# Three names are wide on purpose. "chatgpt" covers ChatGPT-User and every later ChatGPT name.
-	# "openai" covers a name that does not start with OAI. "applebot" covers Applebot and
-	# Applebot-Extended. "twitterbot" stops the link preview of X, which this site does not need.
+	# Two names are wide on purpose. "chatgpt" covers ChatGPT-User and every later ChatGPT name.
+	# "openai" covers a name that does not start with OAI.
+	#
+	# Never add a name below without checking what it also catches. The match is not anchored, so a
+	# token matches anywhere in the header. Two names belong to a link preview and must stay out:
+	#
+	#   twitterbot  Twitterbot/1.0 draws the card on X. Telegram sends
+	#               "TelegramBot (like TwitterBot)", so this one token silences both.
+	#   applebot    Applebot feeds Siri, Spotlight and the suggestions of Safari.
+	#
+	# The scraper of Facebook is "facebookexternalhit" and matches nothing here. "facebookbot" and
+	# "meta-externalagent" below are the crawlers of Meta, not its preview, so they stay. Discord,
+	# Slack, WhatsApp and LinkedIn send names this list never held.
+	#
+	# No search engine is named below either. Googlebot, bingbot, DuckDuckBot and YandexBot pass.
 	@bad_crawler_agent {
-		header_regexp User-Agent "(?i)(gptbot|chatgpt|openai|oai-searchbot|claudebot|claude|claude-web|anthropic|perplexitybot|perplexity-user|ccbot|bytespider|bytedance|amazonbot|applebot|twitterbot|meta-externalagent|facebookbot|diffbot|imagesiftbot|omgili|timpibot|webzio|dataforseobot|petalbot|semrushbot|ahrefsbot|mj12bot|dotbot|blexbot|serpstatbot|seekportbot|barkrowler|zoominfobot)"
+		header_regexp User-Agent "(?i)(gptbot|chatgpt|openai|oai-searchbot|claudebot|claude|claude-web|anthropic|perplexitybot|perplexity-user|ccbot|bytespider|bytedance|amazonbot|meta-externalagent|facebookbot|diffbot|imagesiftbot|omgili|timpibot|webzio|dataforseobot|petalbot|semrushbot|ahrefsbot|mj12bot|dotbot|blexbot|serpstatbot|seekportbot|barkrowler|zoominfobot)"
 	}
 
 	# No User-Agent header, or an empty User-Agent header. A flood tool often sends one of these.
 	#
-	# These two rules need a client that gives its own name. The desktop client and the iOS client
-	# send "tld18ClientDesktop/<version>" and "tld18ClientMobile/<version>" from Globals.Sync.UserAgent.
-	# A new site that answers a caller without a User-Agent header must not import these two rules.
+	# These two rules cost something on this site, so weigh them before you keep them. A browser and
+	# every link preview send a name. A script against /api/protected often sends none: curl sends
+	# its own name, but a hand-written client and a plain HttpClient send nothing at all, and this
+	# rule then drops the call before the API key is ever read. Drop the import of abort_bots, or
+	# copy its lines without these two rules, when a caller of that kind has to reach the API.
 	@no_agent {
 		not header User-Agent *
 	}
@@ -388,7 +405,7 @@
 # ---------------------------------------------------------------------------
 # 3. The site
 # ---------------------------------------------------------------------------
-tasks.example.com {
+example.com {
 	import site_base access.log
 	import filter_matchers
 
@@ -401,17 +418,33 @@ tasks.example.com {
 	# AddInteractiveServerRenderMode on each page of a component. A plain "header" line runs before
 	# the answer of the server arrives, so a page then carries two Content-Security-Policy headers. A
 	# browser applies both of them together, and the strictest value of the two wins.
-	header >Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+	#
+	# img-src carries https: on purpose. A poster on this site is an address and never an upload:
+	# the editor stores where a picture lives, UrlPolicy decides whether a browser may load it, and
+	# nothing is ever written to disk. A poster therefore usually sits on a host that is not this
+	# one, and so does a picture inside a stored text. Without https: the policy blocks every one of
+	# them, and the page shows a broken frame where the work should be.
+	#
+	# https: and not http:. The site is served over TLS, so a picture on plain http is mixed content
+	# that a browser refuses before the policy is even read. Naming http: here would allow nothing
+	# and would only make the policy look weaker than it is.
+	#
+	# The relaxation is narrow. It covers a picture, which executes nothing, and it does not touch
+	# script-src, connect-src or frame-ancestors. What it does cost is privacy: the host of the
+	# poster learns the address of the reader. Referrer-Policy above keeps the referrer down to the
+	# origin, and the choice to store a poster as an address rather than an upload already carries
+	# that cost.
+	header >Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
 
 	# --- Request limits ----------------------------------------------------
-	# The largest correct body is an encrypted snapshot from a client. 40 MB holds a large task list
-	# with a margin. The limit also stops a body that only fills the disk.
+	# Nothing is uploaded to this site. A poster and a picture inside a text are both addresses that
+	# an editor types, and no page of the site takes a file. The largest correct body is therefore a
+	# form from the editor, which carries one markdown text and the fields around it.
 	#
-	# read_body above works together with this value. A body of 40 MB needs 340 KB each second to
-	# arrive inside 2 minutes. A snapshot of five thousand issues stays near 8 MB, which needs
-	# 68 KB each second. Raise read_body when your own snapshot comes close to this limit.
+	# 2 MB holds a text longer than anybody writes by hand, and it still stops a body whose only
+	# purpose is to fill the disk. Raise it only when a real save is refused.
 	request_body {
-		max_size 40MB
+		max_size 2MB
 	}
 
 	# --- Handling ----------------------------------------------------------
@@ -436,12 +469,12 @@ tasks.example.com {
 		# AllowedHosts in appsettings.json, finds no match, and answers 400. Caddy marks the only
 		# upstream unhealthy, and the site answers 502 to every visitor. This value must hold the
 		# same domain as the site block above.
-		reverse_proxy tld18-server:8080 {
+		reverse_proxy tld15-server:8080 {
 			health_uri /
 			health_interval 30s
 			health_timeout 5s
 			health_headers {
-				Host tasks.example.com
+				Host example.com
 			}
 		}
 	}

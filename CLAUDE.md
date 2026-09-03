@@ -232,8 +232,13 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
 
 ## Deployment
 
-`.github/workflows/rollout.yml` fires on push to `main`: it builds the image, rsyncs the tarball to
-the server over SSH, then reloads Docker Compose. `.deploy/` holds the four server-side files
+`.github/workflows/rollout.yml` fires on push to `main`: it builds the image **from the repository
+root** as `tld15-server:latest` — the name `.deploy/docker-compose.yml` starts, and lowercase
+because Docker refuses a capital letter in a repository name — rsyncs the gzipped tarball to the
+server over SSH, loads it, reloads Docker Compose, then waits for the container's own `HEALTHCHECK`
+to report healthy before pruning the image it replaced. Nothing in the roll-out stops the host, and
+a failed verification leaves the replaced image in place to fall back to. `.deploy/` holds the four
+server-side files
 (`docker-compose.yml`, `Caddyfile.example`, `address-lists.sh`, `appsettings.example.json`) and
 `.deploy/README.md` walks a bare VM to a running HTTPS site. Secrets (`Security:Pepper`, connection
 string) live only in the server's `appsettings.json` — `.dockerignore` keeps every `appsettings.json`

@@ -1,4 +1,4 @@
-﻿# Deploy Stainless Tasks
+﻿# Deploy the tld-15 business card
 
 This folder holds the four files that a server needs. The steps below take a new virtual server to a
 running site behind HTTPS. The steps assume no earlier setup. Do them in order. Plan about 40 minutes.
@@ -95,7 +95,7 @@ Add an `A` record for the IPv4 address of the server. Add an `AAAA` record when 
 address. Wait until the record answers.
 
 ```bash
-dig +short tasks.example.com
+dig +short example.com
 ```
 
 The certificate authority reads this record. A wrong record stops the certificate.
@@ -103,7 +103,7 @@ The certificate authority reads this record. A wrong record stops the certificat
 ### 2. Sign in and update
 
 ```bash
-ssh root@tasks.example.com
+ssh root@example.com
 ```
 
 ```bash
@@ -123,7 +123,7 @@ usermod -aG sudo tld
 Copy your public key to the new user. Run this command on your own computer, not on the server.
 
 ```bash
-ssh-copy-id tld@tasks.example.com
+ssh-copy-id tld@example.com
 ```
 
 ### 4. Restrict SSH
@@ -417,7 +417,7 @@ sudo chmod 750 /config/tld15
 ### 12. Edit appsettings.json
 
 `appsettings.example.json` starts from `tld15Server/appsettings.Development.json`. It already holds the
-production values. Replace each `CHANGE_ME` and each `tasks.example.com`.
+production values. Replace each `CHANGE_ME` and each `example.com`.
 
 | Key | Development value | Set it to |
 |---|---|---|
@@ -429,7 +429,7 @@ production values. Replace each `CHANGE_ME` and each `tasks.example.com`.
 | `Application:SourceUrl` | this repository | your fork, when you run modified code |
 | `Serilog:MinimumLevel` | `Debug` | `Information` |
 | `Serilog:WriteTo` | console only | console and a file at `/app/logs/tld15-.log` |
-| `AllowedHosts` | `*` | `tasks.example.com` |
+| `AllowedHosts` | `*` | `example.com` |
 
 Keep the other keys. `SaltSize`, `CookieExpiration`, `CookieMaxAge` and the three `Login*` keys all
 hold a correct value.
@@ -438,11 +438,11 @@ Two keys of the example file look like settings and change nothing today. No cod
 `Application:Host`. No code reads `Automation:TimeoutMinutes`. The site address comes from the `Host`
 header that Caddy passes through. `AllowedHosts` is the key that checks that header.
 
-> **A large push meets three limits.** `request_body` in the Caddyfile allows 40 MB. Kestrel allows
-> 30 MB of its own, and the server sets no other value. The lower size limit therefore comes from
-> Kestrel. `read_body` in the Caddyfile adds a time limit of 2 minutes for the full body. A snapshot
-> of five thousand issues stays near 8 MB and needs 68 KB each second, so all three limits have a
-> margin.
+> **Nothing is uploaded to this site.** A poster and a picture inside a text are both addresses that
+> an editor types, and no page takes a file. The largest correct body is a save from the editor: one
+> markdown text and the fields around it. `request_body` in the Caddyfile allows 2 MB, which is the
+> lower of the two size limits, because Kestrel allows 30 MB of its own. `read_body` adds a time
+> limit of 30 seconds for the full body. A text written by hand clears all three with room to spare.
 
 > **Set the pepper one time, before the first sign-in.** The server mixes the pepper into each password
 > hash and into each API-key hash. A later change stops every account and every API key. Only a new
@@ -454,9 +454,9 @@ header that Caddy passes through. `AllowedHosts` is the key that checks that hea
 > needs the same value here.
 
 > **`Security:RateLimit` counts each caller address over a fixed window.** `GlobalPermits` covers every
-> request. `ApiPermits` adds a second, lower limit on `/api/protected`, which the two clients use to
-> sync. A caller over a limit receives HTTP 429 and a `Retry-After` header. A permit value of `0` turns
-> that limiter off.
+> request. `ApiPermits` adds a second, lower limit on `/api/protected`, which a caller reaches with an
+> `X-API-KEY` header. A caller over a limit receives HTTP 429 and a `Retry-After` header. A permit
+> value of `0` turns that limiter off.
 >
 > The limiter partitions on the same address that `KnownNetworks` produces. A wrong `KnownNetworks`
 > therefore puts every user into one partition, and one busy client then rejects all the others. Set
@@ -467,7 +467,7 @@ header that Caddy passes through. `AllowedHosts` is the key that checks that hea
 
 ### 13. Edit the Caddyfile
 
-Replace `tasks.example.com` with your domain. Replace `admin@example.com` with your address. Read the
+Replace `example.com` with your domain. Replace `admin@example.com` with your address. Read the
 comments in the file before you change a rule.
 
 The file drops a request in six cases:
@@ -479,10 +479,11 @@ The file drops a request in six cases:
 5. The `User-Agent` names a scanner, a script library, or an AI harvester.
 6. The `User-Agent` header is absent or empty.
 
-> **Case 6 needs a current client.** The desktop client and the iOS client send
-> `tld15ClientDesktop/<version>` and `tld15ClientMobile/<version>`.
-> As an alternative, delete the `@no_agent` line and the
-> `@empty_agent` line from the `route` block.
+> **Case 6 costs you the machine callers.** This site ships no client of its own. A browser and every
+> link preview send a name, so a visitor is never touched by this rule, but a script against
+> `/api/protected` often sends none: `curl` sends its own name, while a hand-written client and a
+> plain `HttpClient` send nothing at all. Delete the `@no_agent` line and the `@empty_agent` line
+> from the `route` block when a caller of that kind has to reach the API.
 
 ### 14. The address filters
 
@@ -681,7 +682,7 @@ No registry holds the image today. The repository holds it as a file. Download t
 server, and load it.
 
 ```bash
-scp tld15-server-1.0.0.tar.gz tld@tasks.example.com:/tmp/
+scp tld15-server-1.0.0.tar.gz tld@example.com:/tmp/
 ```
 
 ```bash
@@ -719,7 +720,7 @@ sudo ss -lntp | grep -E ':80 |:443 '
 Now read port 80 from the internet. Run this command on your own computer, not on the server.
 
 ```bash
-curl -sv --max-time 10 http://tasks.example.com/.well-known/acme-challenge/test
+curl -sv --max-time 10 http://example.com/.well-known/acme-challenge/test
 ```
 
 An answer of `404` is the correct result. It proves that a packet from the internet reaches Caddy.
@@ -729,7 +730,7 @@ An answer of `404` is the correct result. It proves that a packet from the inter
 > certificate. Read these four points in order:
 >
 > 1. The `A` record of the domain. It must hold the address of this server. Read it with
->    `dig +short tasks.example.com`.
+>    `dig +short example.com`.
 > 2. The firewall of your hosting provider. Step 6 holds this point.
 > 3. The two published ports of the command above.
 > 4. The bans of fail2ban. `sudo iptables -n -L DOCKER-USER` shows a `DROP` rule for each one. A
@@ -753,7 +754,7 @@ An answer of `404` is the correct result. It proves that a packet from the inter
 
 ### 17. The first sign-in
 
-Open `https://tasks.example.com`. The first sign-in makes the administrator account. Open the account
+Open `https://example.com`. The first sign-in makes the administrator account. Open the account
 page, and make an API key. Copy the key immediately. The server shows it one time only.
 
 Now start fail2ban. The access log exists from this point.
@@ -770,7 +771,7 @@ The self-hosted flow needs no registry. It also needs no build on the server.
 
 ```bash
 # 1. On your own computer. Download the new image file from the repository, then copy it to the server.
-scp tld15-server-1.1.0.tar.gz tld@tasks.example.com:/tmp/
+scp tld15-server-1.1.0.tar.gz tld@example.com:/tmp/
 ```
 
 ```bash

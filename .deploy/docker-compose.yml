@@ -1,7 +1,7 @@
-﻿# Stainless Tasks deployment.
+﻿# tld-15 business card deployment.
 #
 # This file sits at /config/docker-compose.yml on the server. One folder next to it holds each part.
-# /config/caddy holds the reverse proxy. /config/tld18 holds the server. Start the stack from
+# /config/caddy holds the reverse proxy. /config/tld15 holds the server. Start the stack from
 # /config:
 #   cd /config && docker compose up -d
 #
@@ -12,9 +12,9 @@
 # reachable from the internet. See README.md for the full steps.
 
 services:
-  tld18-server:
-    image: tld18-server:latest
-    container_name: tld18-server
+  tld15-server:
+    image: tld15-server:latest
+    container_name: tld15-server
     # The image comes from a file that you load with "docker load". Never let Compose look for it in
     # a registry, because no registry holds it yet.
     pull_policy: never
@@ -28,10 +28,10 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       # The settings file stays outside the image. It holds the pepper and the database password.
-      - /config/tld18/appsettings.json:/app/appsettings.json:ro
-      - /config/tld18/logs:/app/logs
+      - /config/tld15/appsettings.json:/app/appsettings.json:ro
+      - /config/tld15/logs:/app/logs
     networks:
-      - tld18
+      - tld15
 
     # --- Container hardening ---
     # The image already runs as user 1654. These lines take away what is left after a break-in: the
@@ -62,7 +62,7 @@ services:
     container_name: caddy
     restart: unless-stopped
     depends_on:
-      - tld18-server
+      - tld15-server
     ports:
       - "80:80"
       - "443:443"
@@ -82,7 +82,7 @@ services:
       - caddy-data:/data
       - caddy-config:/config
     networks:
-      - tld18
+      - tld15
 
     # --- Container hardening ---
     # Caddy keeps no read_only line. It writes the certificate and the account key into /data, and its
@@ -108,7 +108,7 @@ volumes:
   caddy-config:
 
 networks:
-  tld18:
+  tld15:
     driver: bridge
     ipam:
       config:

@@ -29,7 +29,7 @@ README.md
 !.git/packed-refs
 !.git/refs/heads/**
 
-# Never bake a local configuration file into the image. tld18Server/appsettings.json holds the
+# Never bake a local configuration file into the image. tld15Server/appsettings.json holds the
 # pepper and the database address. The deployment binds the file onto /app/appsettings.json at run
 # time, so the image needs no copy. The development file holds a placeholder pepper and a local
 # database address, and a container never reads it.
@@ -39,8 +39,6 @@ README.md
 # The image builds the server only. These paths keep the build context small.
 Tests
 TestResults
-tld18ClientDesktop
-tld18ClientMobile
 .claude
 .deploy
 .docs

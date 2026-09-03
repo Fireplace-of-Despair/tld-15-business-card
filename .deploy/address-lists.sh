@@ -1,5 +1,5 @@
 #!/bin/sh
-# Stainless Tasks address lists. This script writes the two files that the Caddyfile imports.
+# tld-15 business card address lists. This script writes the two files that the Caddyfile imports.
 #
 #   region.caddy  the address ranges of the countries that you name
 #   cloud.caddy   the address ranges of a cloud provider, today Amazon Web Services
@@ -30,7 +30,7 @@ set -eu
 
 MODE="${MODE:-deny}"
 LIST_DIR="${LIST_DIR:-/config/caddy/lists}"
-CACHE="${CACHE:-/var/cache/tld18-lists}"
+CACHE="${CACHE:-/var/cache/tld15-lists}"
 MAX_AGE_HOURS="${MAX_AGE_HOURS:-24}"
 RELOAD="${RELOAD:-0}"
 COMPOSE_DIR="${COMPOSE_DIR:-/config}"
