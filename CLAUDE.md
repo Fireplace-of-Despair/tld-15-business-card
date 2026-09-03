@@ -1,12 +1,16 @@
 ﻿# CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code (claude.ai/code) in this repository.
 
 ## What this is
 
-TLD-15 — a personal portfolio / business-card website (projects, articles, contacts, RSS). Blazor
-Server (`InteractiveServer` render mode) on **.NET 11 preview**, PostgreSQL, Serilog, AGPL-3.0-only.
-The `Stainless*` projects are a reusable application skeleton shared with a sibling projects; `tld15Server` is the site itself.
+TLD-15 is the website of Fireplace of Despair: the lore, the projects, the articles, the press and the
+contacts. It is Blazor Server on .NET 11 preview, with PostgreSQL, Serilog and the AGPL-3.0-only
+license. The `Stainless*` projects are a shared skeleton, and a sibling repository uses them.
+`tld15Server` is the site.
+
+Three files hold the rest. [README.md](README.md) explains the site. [CONTRIBUTING.md](CONTRIBUTING.md)
+holds the full rules for code. [.deploy/README.md](.deploy/README.md) holds the deployment.
 
 ## Commands
 
@@ -18,53 +22,50 @@ dotnet build tld15.slnx
 dotnet run --project tld15Server
 ```
 
-The dev profile serves `http://localhost:5105` (`tld15Server/Properties/launchSettings.json`).
+The dev profile serves `http://localhost:5105`.
 
 ```bash
 dotnet test tld15.slnx
 ```
 
-`global.json` selects the **Microsoft.Testing.Platform** runner (xUnit v3), so filters are MTP
-options passed after `--`, not `--filter`:
+`global.json` selects the Microsoft.Testing.Platform runner. Filters are platform options after `--`,
+and not `--filter`.
 
 ```bash
 dotnet test Tests/tld15ServerTests/tld15ServerTests.csproj -- --filter-method "*IdentityPostFeature_Tests*"
 ```
 
-Also available: `--filter-class`, `--filter-namespace`, `--filter-trait "Application=Integration Tests"`,
-`--filter-not-*`, `--list-tests`. The test project is an executable, so
-`dotnet run --project Tests/tld15ServerTests -- --help` lists every option.
+`--filter-class`, `--filter-namespace`, `--filter-trait` and `--filter-not-*` work the same way. The
+test project is an executable, so `dotnet run --project Tests/tld15ServerTests -- --help` lists every
+option.
 
 ```bash
 docker build -f tld15Server/Dockerfile -t tld15-server:latest .
 ```
 
-Build the image **from the repository root** — every `COPY` in the Dockerfile is root-relative.
+Build the image from the repository root. Every `COPY` line reads from there.
 
 ### Gotchas
 
-- A running dev server locks `bin/Debug/net11.0/*.dll`, and the build then fails with MSB3027.
-  Stop the app first, or build `-c Release` into a separate output.
-- Integration tests need a live PostgreSQL. `appsettings.Tests.json` points at `localhost:5432`,
-  database `tld15-local-test`, user `postgres`. The assembly fixture
-  (`Tests/tld15ServerTests/AssemblyInfo.cs`) runs the migrations before any test.
+- A running dev server locks `bin/Debug/net11.0/*.dll`, and the build then fails with MSB3027. Stop the
+  application first, or build `-c Release` into a separate output.
+- Integration tests need a live PostgreSQL. `appsettings.Tests.json` points at `localhost:5432` and the
+  database `tld15-local-test`. The assembly fixture applies the migrations before any test.
 
 ## Architecture
 
-Four projects plus tests (`tld15.slnx`):
-
 | Project | Role |
 |---|---|
-| `StainlessCore` | Shared kernel: `Execute`, incidents, feature/endpoint contracts, hashing, API keys, login throttle. Documented library — `CS1591` is *not* suppressed here. |
-| `StainlessInfrastructure` | EF Core `DbContext` per schema, FluentMigrator migrations, reference-data import. |
-| `StainlessGenerators` | Roslyn incremental generator (`netstandard2.0`), referenced as an analyzer. |
-| `tld15Server` | Blazor Server UI, minimal-API endpoints, features, composition. |
+| `StainlessCore` | Shared kernel: `Execute`, incidents, feature and endpoint contracts, hashing, API keys, login throttle. `CS1591` stays on, so every public member needs a comment. |
+| `StainlessInfrastructure` | EF Core contexts, FluentMigrator migrations, reference-data import. |
+| `StainlessGenerators` | The Roslyn generator. It targets `netstandard2.0` and loads as an analyzer. |
+| `tld15Server` | The site: Blazor Server UI, Minimal-API endpoints, features, composition. |
 | `Tests/tld15ServerTests` | xUnit v3. `tld15Server` grants it `InternalsVisibleTo`. |
 
-### Vertical slices: features
+### Features
 
-Every unit of work is one file under `tld15Server/Features/<Area>/<Name>Feature.cs` implementing
-`IFeature` and containing everything it needs:
+Every unit of work is one file under `tld15Server/Features/<Area>/<Name>Feature.cs`. The file implements
+`IFeature` and holds everything that the action needs.
 
 ```csharp
 public class HomeGetFeature : IFeature
@@ -73,187 +74,198 @@ public class HomeGetFeature : IFeature
     public static string FeatureId => Id;
 
     public sealed class Result { ... }
-    public sealed record Query : IQuery<Result> { ... }   // Mediator; ICommand for writes
+    public sealed record Query : IQuery<Result> { ... }   // Mediator; ICommand for a write
     public sealed class Handler(IDbContextFactory<DataContextBusiness> factory)
         : IQueryHandler<Query, Result> { ... }
 }
 ```
 
-`Id` is also the **authorization policy name and claim value**. `StainlessGenerators` finds every
-`IFeature` at compile time and emits `StainlessGenerated.Registry.FeatureIds`; startup turns each
-into a policy requiring a `Feature` claim. Adding a feature class is the whole registration step —
-never add a reflection scan or a manual list.
+`Id` is also the authorization policy name and the claim value. `StainlessGenerators` finds every
+`IFeature` at compile time and writes `StainlessGenerated.Registry.FeatureIds`. Startup turns each id
+into a policy that asks for a `Feature` claim. Adding the class is the whole registration step. Never
+add a reflection scan or a list by hand.
+
+A `Post` feature replaces its entity whole. A page that edits one side of an entity sends the other side
+back exactly as the `Get` feature handed it over.
 
 ### Endpoints
 
-`tld15Server/Endpoints/{Public,Protected,External}/…` implement `IEndpointPublic`,
-`IEndpointProtected`, or `IEndpointExternal` — static-abstract `Metadata` (carrying the feature id)
-and `ConfigureRouting`. The same generator emits `Registry.MapPublic/MapProtected/MapExternal`, wired
-in `ServiceInjection.AddEndpoints` onto `/api/public`, `/api/protected`, `/api/external`.
-Protected routes sit behind `ApiKeyFilter` (`X-API-KEY`, hashed) plus a rate-limit policy; the
-`ExceptionHandlingFilter` registers *first* so it wraps the key check.
+`tld15Server/Endpoints/{Public,Protected,External}/…` implement `IEndpointPublic`, `IEndpointProtected`
+or `IEndpointExternal`. Each one exposes a static `Metadata` that carries the feature id, and a static
+`ConfigureRouting`. The generator writes `Registry.MapPublic`, `MapProtected` and `MapExternal`, and
+`ServiceInjection.AddEndpoints` maps them onto `/api/public`, `/api/protected` and `/api/external`.
 
-### Error handling
+A protected route sits behind `ApiKeyFilter`, which reads `X-API-KEY` and compares a hash. A rate-limit
+policy applies. `ExceptionHandlingFilter` registers first, so it wraps the key check.
 
-Features throw `IncidentException(IncidentCode)`. Blazor pages wrap the call in `Execute.Run(...)`
-and read `Result.Data` / `Result.IncidentCode` instead of catching; API endpoints get the same
-translation from `ExceptionHandlingFilter`. `IncidentCode` values are deliberately obfuscated
-(1_401, 2_000, …) and mapped to HTTP codes by `IncidentCodeExtension.ToHTTPCode`.
+### Errors
 
-### Middleware order (`tld15Server/Program.cs`)
+A feature throws `IncidentException(IncidentCode)`. A Blazor page wraps the call in `Execute.Run(...)`
+and reads `Result.Data` or `Result.IncidentCode`. It does not catch. `ExceptionHandlingFilter` does the
+same translation for the API. `IncidentCode` values stay obfuscated on purpose, and
+`IncidentCodeExtension.ToHTTPCode` maps them to HTTP codes.
 
-The order is load-bearing and each step carries a comment explaining why. `UseForwardedHeaders` must
-run first (rate-limit partitions, session metadata checks and cookie policy all read the caller
-address), `UseRateLimiter` next, and `UseAuthentication`/`UseAuthorization` are called explicitly so
-they land *behind* forwarded headers rather than at the framework default position. Do not reorder.
+### Middleware order
+
+The order in `tld15Server/Program.cs` is load-bearing, and each step carries a comment that says why.
+`UseForwardedHeaders` runs first, because the rate-limit partitions, the session metadata checks and the
+cookie policy all read the caller address. `UseRateLimiter` runs next. `UseAuthentication` and
+`UseAuthorization` are called by hand, so they land behind the forwarded headers. Do not reorder.
 
 ### Data access
 
-One `DbContext` per PostgreSQL schema — `identity`, `reference`, `business`, `archive`, `settings`
-(`StainlessInfrastructure/Composition/Globals.Schema`). All are registered as `AddDbContextFactory`,
-and handlers create a context per unit of work rather than injecting one.
+One `DbContext` maps to one PostgreSQL schema: `identity`, `reference`, `business`, `archive` and
+`settings`. All of them register as `AddDbContextFactory`. A handler creates a context per unit of work,
+and injects no context.
 
-**EF Core does not own the schema.** Tables, triggers, constraints and seed data come from
-FluentMigrator classes in `StainlessInfrastructure/Migrations`, named
-`V<yyyy>_<MM>_<dd>_<HHmm>_<Name>.cs` with a matching `[Migration(2026_08_31_1336, "Init: Business")]`.
-`MigrationRunner.Up` runs at application start and in the test fixture; the version table lives in
-`system.version`. Helpers in `MigrationHelper` attach the `version_local` / `version_global` bump
-triggers and load reference rows from `StainlessInfrastructure/.import/*.json` (copied to output).
+**EF Core does not own the schema.** Tables, triggers, constraints and seed data come from FluentMigrator
+classes in `StainlessInfrastructure/Migrations`. A file is named `V<yyyy>_<MM>_<dd>_<HHmm>_<Name>.cs`,
+with a matching `[Migration(2026_08_31_1336, "Init: Business")]`. `MigrationRunner.Up` runs at
+application start and in the test fixture. The version table lives in `system.version`. `MigrationHelper`
+attaches the `version_local` and `version_global` triggers, and loads reference rows from
+`StainlessInfrastructure/.import/*.json`.
 
-### Sessions, auth and cache
+`business.project.published_at` is the editor's date, and the cards order and show it. `created_at`
+belongs to the version trigger, and it says when the row appeared.
 
-Cookie authentication (`tld15-main`), but session state lives in `CacheManager` (in-memory), keyed by
-a `Session` claim. `CookieEvent.ValidatePrincipal` re-checks every request against that cache — a
-missing session, a changed feature set, or changed request metadata signs the user out. API-key
-hashes are loaded into the same cache at startup (`Program.AddAllApiKeysToTheCache`). A restart
-therefore drops all sessions by design. `CacheManager` carries a `TODO` about needing a refactor.
+### Sessions, authentication and cache
 
-### Frontend
+Cookie authentication uses the cookie `tld15-main`, but the session state lives in `CacheManager` in
+memory, keyed by a `Session` claim. `CookieEvent.ValidatePrincipal` checks every request against that
+cache. A missing session, a changed feature set, or changed request metadata signs the user out.
+API-key hashes load into the same cache at startup. A restart therefore drops every session, by design.
+`CacheManager` carries a `TODO` about a refactor.
 
-- Pages inherit `BasePage` (`Mediator`, localizer, cancellation token `_cts`, `IncidentCode`,
-  `IsLoading`, `HasFeatureAsync`, browser-local time) and live in `Frontend/Pages/<Area>/`, split as
-  `X.razor` + `X.razor.cs` + `X.razor.css`.
-- Each page declares `public const string Url` in its code-behind and routes with
-  `@attribute [Route(X.Url)]`. Navigation, redirects and 404 re-execution all reference those
-  constants — never hard-code a path string.
-- Localization is `en` + `ja` via `Frontend/Localization/Resources.resx` and `Resources.ja.resx`
-  (keep both in sync) plus `LocalizationMiddleware`, which sets the culture from the
-  `tld15-language` cookie. `InvariantGlobalization` is off and satellite languages are pinned to
-  `en;ja` — the Docker runtime uses the `-extra` tag so ICU and tzdata are present.
-- Styling is a global `wwwroot/app.css` with CSS custom properties (dark palette, `Park Lane NF`
-  display font) plus per-component scoped CSS. `Frontend/Components/Icons/*.razor` are inline SVGs.
-- Stored prose is **markdown**, never html. `content_translation.markdown` holds the source;
-  `Services/MarkdownService` renders it (Markdig, `DisableHtml`, link schemes limited to
-  http/https/mailto, rendered html cached by source) and `Components/Common/MarkdownView` is the only
-  component that hands the result to a `MarkupString`. Styling lives in `app.css` under
-  `.markdown-body` — scoped css cannot reach markup a component did not write itself.
-- Content editors are split by what a content carries: `ContentLinkEditPage` for the table of links
-  (`Globals.Content.LinkEditable`), `ContentTextEditPage` for the markdown body and the poster
-  (`Globals.Content.TextEditable`). `ContentPostFeature` replaces a content **whole**, so a page that
-  edits one side sends the other side back exactly as `ContentGetFeature` handed it over.
-- A content carries a poster of its own (`business.content.poster_url`, description in
-  `content_translation.poster_alt`, migration `V2026_09_02_1500_Added_Content_Poster`) — an address
-  like every other poster, never an upload. Only the lore block on `Home` draws it: the picture
-  stands to the left of the prose, narrows with the window, is cropped to the height of the block,
-  and leaves altogether below the narrow breakpoint.
-- Projects and articles are the same table, split by `project_type_id`. `ProjectEditPage`
-  (`/projects/edit/{id?}`) creates and edits one: the id, type, division, publication date and
-  poster address sit above the locale tabs, the title/subtitle/poster text and the markdown body
-  inside them. `ProjectPostFeature` replaces a project whole, dropping any locale left blank.
-- The press is its own table (`business.press` + `press_translation`, migration
-  `V2026_09_02_1200_Init_Press`), not a content: a mention carries an outward address, a poster, a
-  `published_at` of its own and no body. `PressPage` (`/press`) draws it with the same `SharedCard`,
-  and the editor lives at `Globals.Route.Admin` + `/press/…`.
-- `SharedCardPreview` fills every card. An entry with an `ExternalUrl` leads off the site (the card
-  then opens a new tab and hands it nothing); one without leads to `ProjectReadPage`. An entry with
-  no `DivisionId` draws no badge, and one with no `ProjectTypeId` draws no link buttons.
-- `ExternalLinkIcon` (`Frontend/Components`) is the one outward link button, and it owns its own
-  css. It takes an address and, optionally, a language: `IconHelper.GetIconByUrl` reads the icon off
-  the host (`_hosts`, plus `mailto:` and a `/rss` path), and an unrecognised address draws the
-  placeholder icon. A missing, blank or invalid language draws no badge at all. The button carries
-  no spacing — the row around it (`.reading-links`, `.project-buttons-container`, `.social-container`)
-  sets the gap. Every outward link on the site goes through it: `SharedCard`, `LinkButtons`, and the
-  social and contacts blocks on `Home`. Nothing else writes an `<a>` around an icon.
-- A stored set of links is one json dictionary of **an address to the language it speaks**
-  (`Features/_Shared/Business/SharedLink`), kept in `business.project.links_json` and in
-  `business.content.links_json`. Both hang off the **root row**, never off a translation: a profile
-  is the same address whichever language a reader arrives in, and the language a link speaks is a
-  badge the row carries rather than the locale it lives in. The address is the key because it is
-  unique on its own and because the icon follows from it: nothing stores the name of a site, and
-  neither editor offers a choice of icon — the cell draws `IconHelper.GetIconByUrl` of whatever
-  address the row carries. Two rows on the same address are a validation error rather than a silent
-  overwrite, and a language is a badge only, so a blank one is allowed.
-- `GlobalNavigation` (`Frontend/Navigations`) is the row under the brand in `MainLayout`: Home,
-  Press and Archive, with the current page marked `active`. `MainLayout.IsAdmin` keeps it off the pages under
-  `Globals.Route.Admin`, which carry their own navigation at the side.
-- Works of `Globals.Divisions.ACD` (ACD) are kept **off** the front page and shown on
-  `ArchivePage` (`/archive`) instead — the same wall of cards, leading to the same
-  `ProjectReadPage`. `SharedProjectQuery` holds the columns, the order and the mapping both walls
-  share; a page only chooses which works to ask for.
-- `LocalNavigation` (`Frontend/Navigations`) is the row of anchors at the top of `Home`, one per
-  block the page actually renders. The ids it jumps to are `Globals.Content.*` for the blocks that
-  stand for a content and `Globals.Anchor.*` for the rest. Do not put `scroll-behavior: smooth` on
-  the document: a browser drops a smooth jump of a few thousand pixels and the anchors stop working.
-- `/sitemap.xml` is built **once, at start** (`Program.BuildTheSitemap` into the `SitemapService`
-  singleton) out of `Application:Host`, the front page and one address per work that carries a
-  translation. A work published later appears on the next start. Without `Application:Host` the
-  route answers 404 rather than serving relative addresses.
-- `/robots.txt` is **composed, not a file** (`RobotsService`, mapped beside the sitemap). The
-  `Sitemap:` directive it carries has to be an absolute address and only `Application:Host` knows
-  one, so a file in `wwwroot` would hold a second copy of the host and go stale. Without the setting
-  the directive is left out rather than written relative. `Globals.Route` holds `Admin`, `Identity`,
-  `Sitemap` and `Robots` so the routes and the text of the file cannot drift apart.
-- `/rss` is RSS 2.0, read **per request** (`RssGetFeature` for the works, `RssService` for the xml,
-  `Program.WriteTheFeed` for the composition). Unlike the sitemap it is not held from start-up: a
-  reader polls a feed once, so an announcement a deploy late never arrives. The document is written
-  with `XDocument` for the same reason the sitemap is — the format is a handful of elements and a
-  syndication library would be a dependency and a reflection surface bought for forty lines of xml.
-  It carries the newest `RssGetFeature.MaxItems` works, skips any that carry no translation, and
-  picks a title the way `ProjectReadPage` does. `App.razor` links it for autodiscovery; the renderer
-  writes the plus of the media type as `&#x2B;`, which is legal html every parser decodes.
-- Every page that manages the site lives under `Globals.Route.Admin` (`/admin/…`), which is the one
-  line `robots.txt` has to carry. `InitializeBrowserTime` and `Navigation` sit inside an
-  `AuthorizeView` in `MainLayout`, so a visitor loads no interactive component at all and no circuit
-  is opened for a public page — verified by there being no `_blazor/negotiate` on one.
-- The public pages — `Home` and `ProjectReadPage` — declare **no render mode**. Nothing on them is
-  operated, so they render statically and the first response carries every block. `MarkdownService`
-  also flattens a text into the meta description (`ToSummary`), so the description is the page's own
-  opening rather than a line kept by hand beside it.
-- `ProjectReadPage` (`/projects/{id}`) is the public page for both types and the one the cards link
-  to. It declares **no render mode**: a page that is read, not operated, ships whole in the first
-  response. It sets the canonical link from `Application:Host` (falling back to the request), the
-  OpenGraph and `article:*` meta, a schema.org block as `application/ld+json`, and a real **404**
-  status for an id the table does not carry — a friendly message under a 200 is a soft 404. Ids in
-  `Globals.Project.IdReserved` are refused, because they are literal segments of the admin routes.
-- **Posters are addresses, never uploads.** Nothing is written to disk by an editor; `UrlPolicy`
-  decides what a browser may load or follow, and both `MarkdownService` and the post features ask it.
-- `business.project.published_at` is the editor's date and the one the cards order and show;
-  `created_at` belongs to the version trigger and says when the row appeared.
-- Reusable editor parts live in `Frontend/Components/Common`: `LanguageTabs` (one tab per locale,
-  marking an empty one with 〇), `MarkdownEditor` (source next to preview), `MarkdownView`.
-- Magic strings (content ids, cookie names, claim types, config keys, page metadata) belong in
-  `tld15Server/Composition/Globals`.
+## The site
+
+### Pages
+
+- A page inherits `BasePage`, which gives it the mediator, the localizer, a cancellation token `_cts`,
+  `IncidentCode`, `IsLoading`, `HasFeatureAsync` and the browser time. A page lives in
+  `Frontend/Pages/<Area>/` and splits into `X.razor`, `X.razor.cs` and `X.razor.css`.
+- A page declares `public const string Url` in its code-behind, and routes with
+  `@attribute [Route(X.Url)]`. Navigation, a redirect and the 404 re-execution all read those constants.
+  Never hard-code a path.
+- **A public page declares no render mode.** `Home` and `ProjectReadPage` are read, not operated, so the
+  first response carries every block. A visitor opens no circuit, because `InitializeBrowserTime` and
+  `Navigation` sit inside an `AuthorizeView` in `MainLayout`. Check for `_blazor/negotiate` in the
+  network log to prove it.
+- Every page that manages the site lives under `Globals.Route.Admin`. That prefix is the one line that
+  `robots.txt` has to carry. `MainLayout.IsAdmin` hides `GlobalNavigation` there, because those pages
+  carry their own navigation at the side.
+- `ProjectReadPage` (`/projects/{id}`) is the public page for a project and for an article. It sets the
+  canonical link from `Application:Host`, the OpenGraph and `article:*` meta, and a `schema.org` block as
+  `application/ld+json`. An id that the table does not carry answers a real 404. An id in
+  `Globals.Project.IdReserved` is refused, because those words are segments of the admin routes.
+
+### Content
+
+- **Stored prose is markdown, never HTML.** `content_translation.markdown` holds the source.
+  `Services/MarkdownService` renders it with Markdig, with HTML disabled and links limited to `http`,
+  `https` and `mailto`. It caches the rendered HTML by source. `Components/Common/MarkdownView` is the
+  only component that hands the result to a `MarkupString`. Styling lives in `app.css` under
+  `.markdown-body`, because scoped CSS cannot reach markup that a component did not write itself.
+- **A poster is an address, never an upload.** No editor writes to disk. `UrlPolicy` decides what a
+  browser may load or follow, and both `MarkdownService` and the post features ask it.
+- A content carries a poster of its own in `business.content.poster_url`, with the description in
+  `content_translation.poster_alt`. Only the lore block on `Home` draws it. The picture stands left of
+  the prose, narrows with the window, crops to the height of the block, and disappears below the narrow
+  breakpoint.
+- A stored set of links is one JSON dictionary of an address to the language that it speaks
+  (`Features/_Shared/Business/SharedLink`). It lives in `business.project.links_json` and
+  `business.content.links_json`, always on the root row and never on a translation. A profile is one
+  address in every language, and the language is a badge that the row carries. The address is the key,
+  because it is unique and because the icon follows from it. Two rows on one address are a validation
+  error. A blank language is allowed.
+- A content editor splits by what the content carries. `ContentLinkEditPage` edits the table of links
+  (`Globals.Content.LinkEditable`). `ContentTextEditPage` edits the markdown body and the poster
+  (`Globals.Content.TextEditable`).
+- Projects and articles share one table and split by `project_type_id`. `ProjectEditPage`
+  (`/projects/edit/{id?}`) creates and edits one. The id, the type, the division, the publication date
+  and the poster address sit above the locale tabs. The titles, the poster text and the markdown body
+  sit inside them. `ProjectPostFeature` drops a locale that arrives blank.
+- The press is its own table (`business.press` and `press_translation`), and not a content. A mention
+  carries an outward address, a poster and a date, and no body. `PressPage` (`/press`) draws it with the
+  same `SharedCard`. The editor lives under `Globals.Route.Admin`.
+- A work of `Globals.Divisions.ACD` stays off the front page, and `ArchivePage` (`/archive`) shows it.
+  `SharedProjectQuery` holds the columns, the order and the mapping that both walls share. A page only
+  chooses which works to ask for.
+
+### Components
+
+- `SharedCardPreview` fills every card. An entry with an `ExternalUrl` leads off the site, and the card
+  then opens a new tab and hands it nothing. An entry without one leads to `ProjectReadPage`. An entry
+  with no `DivisionId` draws no badge. An entry with no `ProjectTypeId` draws no link buttons.
+- `ExternalLinkIcon` is the one outward link button, and it owns its CSS. It takes an address and an
+  optional language. `IconHelper.GetIconByUrl` reads the icon off the host, and it also knows `mailto:`
+  and a `/rss` path. An address that it does not know draws the placeholder. A missing, blank or invalid
+  language draws no badge. The button carries no spacing, and the row around it sets the gap. Every
+  outward link goes through it. Nothing else writes an anchor around an icon.
+- `GlobalNavigation` is the row under the brand in `MainLayout`: Home, Press and Archive, with the
+  current page marked `active`.
+- `LocalNavigation` is the row of anchors at the top of `Home`, one per block that the page draws. The
+  ids come from `Globals.Content.*` for a block that stands for a content, and from `Globals.Anchor.*`
+  for the rest. Do not put `scroll-behavior: smooth` on the document. A browser drops a smooth jump of a
+  few thousand pixels, and the anchors then stop working.
+- Reusable editor parts live in `Frontend/Components/Common`: `LanguageTabs` marks an empty locale with
+  〇, `MarkdownEditor` puts the source next to the preview, and `MarkdownView` renders.
+
+### Feeds and files
+
+- `/sitemap.xml` is built once, at start. `Program.BuildTheSitemap` writes it into the `SitemapService`
+  singleton out of `Application:Host`, the front page, and one address per work that carries a
+  translation. A work published later appears on the next start. Without `Application:Host` the route
+  answers 404, and it never serves a relative address.
+- `/robots.txt` is composed, and it is not a file. `RobotsService` maps beside the sitemap. The
+  `Sitemap:` directive needs an absolute address, and only `Application:Host` knows one. A file in
+  `wwwroot` would hold a second copy of the host and go stale. Without the setting the directive stays
+  out. `Globals.Route` holds `Admin`, `Identity`, `Sitemap` and `Robots`, so the routes and the file
+  cannot drift apart.
+- `/rss` is RSS 2.0, and it reads per request. `RssGetFeature` reads the works, `RssService` writes the
+  XML, and `Program.WriteTheFeed` composes it. A reader polls a feed once, so an announcement must not
+  wait for the next deploy. The document uses `XDocument`, because the format is a handful of elements,
+  and a syndication library would buy a dependency and a reflection surface for forty lines of XML. The
+  feed carries the newest `RssGetFeature.MaxItems` works, skips a work with no translation, and picks a
+  title the way `ProjectReadPage` does. `App.razor` links it for autodiscovery. The renderer writes the
+  plus of the media type as `&#x2B;`, which every parser decodes.
+
+### Localization and styling
+
+Localization is `en` plus `ja`, through `Frontend/Localization/Resources.resx` and `Resources.ja.resx`.
+Keep both files in sync. `LocalizationMiddleware` sets the culture from the `tld15-language` cookie.
+`InvariantGlobalization` is off, and the satellite languages are pinned to `en;ja`. The Docker runtime
+uses the `-extra` tag, so ICU and tzdata are present.
+
+Styling is the global `wwwroot/app.css`, which holds the CSS custom properties, the dark palette and the
+`Park Lane NF` display font, plus per-component scoped CSS. `Frontend/Components/Icons/*.razor` are
+inline SVG files.
 
 ## Conventions
 
 - Every `.cs` file starts with `// SPDX-License-Identifier: AGPL-3.0-only` and the copyright line.
-- `ImplicitUsings` is off — write explicit `using` directives, `System` first, outside the namespace.
-  File-scoped namespaces. CRLF, 4 spaces (`.sh` files stay LF via `.gitattributes`).
-- `EnforceCodeStyleInBuild` is on for every project and `.editorconfig` is the source of truth.
-- Avoid reflection-based configuration binding and startup scans: the skeleton is written to stay
-  trim-friendly (see the remarks on `StainlessCore.Composition.ServiceInjection.ReadEntries`).
+- `ImplicitUsings` is off. Write explicit `using` directives, `System` first, outside the namespace.
+- File-scoped namespaces. CRLF and 4 spaces. A `.sh` file stays LF through `.gitattributes`.
+- `EnforceCodeStyleInBuild` is on for every project, and `.editorconfig` is the source of truth.
+- A magic string belongs in `tld15Server/Composition/Globals`. This covers a content id, a cookie name, a
+  claim type, a config key, a route and page metadata.
+- Avoid reflection-based configuration binding and startup scans. The skeleton stays trim-friendly on
+  purpose. Read the remarks on `StainlessCore.Composition.ServiceInjection.ReadEntries`.
 
 ## Deployment
 
-`.github/workflows/rollout.yml` fires on push to `main`: it builds the image **from the repository
-root** as `tld15-server:latest` — the name `.deploy/docker-compose.yml` starts, and lowercase
-because Docker refuses a capital letter in a repository name — rsyncs the gzipped tarball to the
-server over SSH, loads it, reloads Docker Compose, then waits for the container's own `HEALTHCHECK`
-to report healthy before pruning the image it replaced. Nothing in the roll-out stops the host, and
-a failed verification leaves the replaced image in place to fall back to. `.deploy/` holds the four
-server-side files
-(`docker-compose.yml`, `Caddyfile.example`, `address-lists.sh`, `appsettings.example.json`) and
-`.deploy/README.md` walks a bare VM to a running HTTPS site. Secrets (`Security:Pepper`, connection
-string) live only in the server's `appsettings.json` — `.dockerignore` keeps every `appsettings.json`
-out of the image. Adding a project to the solution means adding it to **both** Dockerfile stages
-(restore copies the `.csproj`, publish copies the sources).
+`.github/workflows/rollout.yml` fires on a push to `main`. It builds the image from the repository root
+as `tld15-server:latest`. That name is what `.deploy/docker-compose.yml` starts, and it stays lowercase
+because Docker refuses a capital letter in a repository name. The workflow then copies the gzipped
+tarball to the server over SSH, loads it, reloads Docker Compose, and waits for the `HEALTHCHECK` of the
+container to report healthy before it prunes the image that it replaced. Nothing in the roll-out stops
+the host. A failed verification leaves the replaced image in place.
+
+`.deploy/` holds the four server-side files: `docker-compose.yml`, `Caddyfile.example`,
+`address-lists.sh` and `appsettings.example.json`. `.deploy/README.md` walks a bare virtual machine to a
+running HTTPS site.
+
+Secrets live only in the `appsettings.json` of the server. This covers `Security:Pepper` and the
+connection string. `.dockerignore` keeps every `appsettings.json` out of the image.
+
+Adding a project to the solution means adding it to both Dockerfile stages. The restore stage copies the
+`.csproj`, and the publish stage copies the sources.
