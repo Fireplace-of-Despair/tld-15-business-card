@@ -304,6 +304,9 @@
   <data name="Navigation.Sections" xml:space="preserve">
     <value>Sections</value>
   </data>
+  <data name="Navigation.Site" xml:space="preserve">
+    <value>Site</value>
+  </data>
   <data name="Navigation.Home" xml:space="preserve">
     <value>Home</value>
   </data>

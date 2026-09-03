@@ -3,6 +3,8 @@
     background-color: var(--color-container);
     flex-direction: column;
     align-items: safe center;
+    box-sizing: border-box;
+    padding: 0 10px;
 
     .brand-header-name {
         font-family: "Park Lane NF";

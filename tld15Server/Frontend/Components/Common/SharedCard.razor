@@ -3,12 +3,11 @@
 @using tld15Server.Composition
 <div id="@SharedCardContent.Id" class="article-card">
     <div class="article-image-container">
-
-        @* A card that leads off the site opens where it leads and hands that page nothing. *@
         <a href="@_url" target="@(_external ? "_blank" : null)" rel="@(_external ? "noopener noreferrer" : null)">
             @if (string.IsNullOrEmpty(SharedCardContent.PosterUrl))
             {
                 <img class="article-image" loading="lazy"
+                     width="350" height="150"
                      src="@Assets["images/placeholder/project.png"]"
                      alt="@SharedCardContent.PosterAlt">
             }

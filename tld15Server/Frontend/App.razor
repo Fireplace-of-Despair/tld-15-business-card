@@ -22,7 +22,6 @@
     <meta name="coverage" content="Worldwide">
     <meta name="distribution" content="Global">
     <meta name="rating" content="General">
-    <meta name="robots">
 
     <!-- Mobile meta tags -->
     <meta name="format-detection" content="telephone=yes" />
@@ -47,14 +46,7 @@
 <body>
     <Routes />
 
-    @* Nothing a visitor reads is operated. Every interactive component of this site sits behind the
-       sign-in: the pages that carry a render mode all live under Globals.Route.Admin, and the two
-       components MainLayout renders interactively are both inside an AuthorizeView. The circuit
-       script and the dialog that reconnects a circuit are therefore written for a signed-in reader
-       and for nobody else, and a public page ships as html alone.
-
-       The forms a visitor can reach - the sign-in and the choice of language - are static forms that
-       post. They needed no script before this and they need none now. *@
+    @* Nothing a visitor reads is operated*@
     @if (Interactive)
     {
         <ReconnectModal />
