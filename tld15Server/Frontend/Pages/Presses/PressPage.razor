@@ -1,5 +1,6 @@
 ﻿@attribute [Route(PressPage.Url)]
 @inherits BasePage
+@using tld15Server.Composition
 @using tld15Server.Frontend.Components.Common
 
 @* No render mode. The page is a wall of links and nothing on it is operated. *@
@@ -7,18 +8,22 @@
 <PageTitle>@Localizer["Brand"] | @Localizer["Press"]</PageTitle>
 
 <HeadContent>
-    <meta name="description" content="@_description" />
+    <meta name="@Globals.Page.Description" content="@_description" />
     <link rel="canonical" href="@_canonical" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="@Localizer["Brand"]" />
-    <meta property="og:title" content="@Localizer["Brand"] | @Localizer["Press"]" />
-    <meta property="og:description" content="@_description" />
-    <meta property="og:url" content="@_canonical" />
-    <meta property="og:locale" content="@Language" />
-    @* A wall of cards carries no work of its own to show, so the card of this page is the mark of
-       the site. Without one a shared link renders as a grey box with a line of text in it. *@
-    <meta property="og:image" content="@_shareCard" />
+    <meta property="@Globals.Page.OpenGraph.Type" content="@Globals.Page.OpenGraph.Kind.Website" />
+    <meta property="@Globals.Page.OpenGraph.SiteName" content="@Localizer["Brand"]" />
+    <meta property="@Globals.Page.OpenGraph.Title" content="@Localizer["Brand"] | @Localizer["Press"]" />
+    <meta property="@Globals.Page.OpenGraph.Description" content="@_description" />
+    <meta property="@Globals.Page.OpenGraph.Url" content="@_canonical" />
+    <meta property="@Globals.Page.OpenGraph.Locale" content="@Globals.ToOpenGraphLocale(Language)" />
+
+    <meta property="@Globals.Page.OpenGraph.Image" content="@_shareCard" />
+    <meta property="@Globals.Page.OpenGraph.ImageWidth" content="@Globals.Image.ShareCardWidth" />
+    <meta property="@Globals.Page.OpenGraph.ImageHeight" content="@Globals.Image.ShareCardHeight" />
+    <meta property="@Globals.Page.OpenGraph.ImageType" content="@Globals.Image.ShareCardType" />
+
+    <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
 </HeadContent>
 
 @if (IncidentCode != null)
@@ -48,7 +53,7 @@
     <div class="cards-container">
         @foreach (var item in Items)
         {
-            <SharedCard SharedCardContent="item" />
+            <SharedCard SharedCardContent="item" HeadingLevel="2" />
         }
     </div>
 </div>

@@ -34,15 +34,7 @@ public abstract class BasePage : ComponentBase, IDisposable
 
     [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
-    internal static string Language
-    {
-        get
-        {
-            var culture = CultureInfo.CurrentUICulture.Name;
-
-            return Globals.Locales.ContainsKey(culture) ? culture : Globals.LanguageFallback;
-        }
-    }
+    internal static string Language => Globals.ToStoredLanguage(CultureInfo.CurrentUICulture.Name);
     internal IncidentCode? IncidentCode { get; set; } = null;
     internal bool IsLoading { get; set; } = true;
     internal CancellationTokenSource _cts = new();

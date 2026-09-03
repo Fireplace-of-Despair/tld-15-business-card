@@ -4,14 +4,20 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
+using Microsoft.Net.Http.Headers;
 using Serilog;
 using StainlessCore.Composition;
 using StainlessInfrastructure;
@@ -108,11 +114,22 @@ public sealed class Program
         app.MapRazorComponents<App>()
            .AddInteractiveServerRenderMode();
 
-        // A crawler looks for the sitemap at the root of the site and will not go hunting under
-        // /api/public, so this one route is mapped here instead of through the endpoint registry.
-        app.MapGet("/sitemap.xml", (SitemapService sitemap) => sitemap.Xml.Length == 0
+        // A crawler looks for both of these at the root of the site and will not go hunting under
+        // /api/public, so these two routes are mapped here instead of through the endpoint registry.
+        app.MapGet(Globals.Route.Sitemap, (SitemapService sitemap) => sitemap.Xml.Length == 0
             ? Results.NotFound()
             : Results.Content(sitemap.Xml, "application/xml", Encoding.UTF8));
+
+        // Composed rather than served from the web root, because the sitemap line it carries has to
+        // be an absolute address and the host is only known to the configuration.
+        app.MapGet(Globals.Route.Robots, (IConfiguration configuration) => Results.Content(
+            RobotsService.Build(configuration[Globals.Settings.ApplicationHost]),
+            "text/plain",
+            Encoding.UTF8));
+
+        // A reader looks for the feed near the root of the site, and IconHelper already draws the
+        // feed icon for a "/rss" path, so this one is mapped here rather than under /api/public.
+        app.MapGet(Globals.Route.Rss, WriteTheFeed);
 
         var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
 
@@ -144,6 +161,53 @@ public sealed class Program
         {
             Log.CloseAndFlush();
         }
+    }
+
+    /// <summary>
+    /// Answers with the feed. Read per request rather than held from start-up: a reader polls a feed
+    /// once and moves on, so an announcement that arrives a deploy late never arrives at all.
+    /// </summary>
+    /// <remarks>
+    /// Without <c>Application:Host</c> there is nothing to answer with. Every address in a feed is
+    /// absolute, and a relative one is not something a reader can follow back to the site.
+    /// </remarks>
+    private static async Task<IResult> WriteTheFeed(
+          IMediator mediator
+        , IConfiguration configuration
+        , IStringLocalizer<Frontend.Localization.Resources> localizer
+        , HttpContext context
+        , CancellationToken ctn)
+    {
+        var origin = configuration[Globals.Settings.ApplicationHost];
+
+        if (string.IsNullOrWhiteSpace(origin)) { return Results.NotFound(); }
+
+        var language = Globals.ToStoredLanguage(CultureInfo.CurrentUICulture.Name);
+
+        var works = await mediator.Send(new Features.Rss.RssGetFeature.Query { Language = language }, ctn);
+
+        var channel = new RssService.Channel(
+            Title: localizer["Brand"].Value,
+            Description: localizer["Brand.Slogan"].Value,
+            Language: language,
+            Copyright: $"{DateTimeOffset.UtcNow.Year} © {localizer["Brand.Company"].Value}",
+            ImagePath: Globals.Image.Logo);
+
+        var entries = works.Entries.ConvertAll(entry => new RssService.Entry(
+            Path: $"{Frontend.Pages.Projects.ProjectReadPage.Url}/{entry.Id}",
+            Title: entry.Title,
+            Description: entry.Subtitle,
+            PublishedAt: entry.PublishedAt));
+
+        // An hour is the poll a reader is asked to keep to. The locale comes from a cookie, so a
+        // shared cache has to be told that this address answers with more than one document.
+        context.Response.Headers.CacheControl = "public, max-age=3600";
+        context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.Cookie);
+
+        return Results.Content(
+            RssService.Build(origin, channel, entries),
+            Globals.Page.Rss.MediaType,
+            Encoding.UTF8);
     }
 
     /// <summary>

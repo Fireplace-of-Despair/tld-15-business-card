@@ -198,6 +198,19 @@ therefore drops all sessions by design. `CacheManager` carries a `TODO` about ne
   singleton) out of `Application:Host`, the front page and one address per work that carries a
   translation. A work published later appears on the next start. Without `Application:Host` the
   route answers 404 rather than serving relative addresses.
+- `/robots.txt` is **composed, not a file** (`RobotsService`, mapped beside the sitemap). The
+  `Sitemap:` directive it carries has to be an absolute address and only `Application:Host` knows
+  one, so a file in `wwwroot` would hold a second copy of the host and go stale. Without the setting
+  the directive is left out rather than written relative. `Globals.Route` holds `Admin`, `Identity`,
+  `Sitemap` and `Robots` so the routes and the text of the file cannot drift apart.
+- `/rss` is RSS 2.0, read **per request** (`RssGetFeature` for the works, `RssService` for the xml,
+  `Program.WriteTheFeed` for the composition). Unlike the sitemap it is not held from start-up: a
+  reader polls a feed once, so an announcement a deploy late never arrives. The document is written
+  with `XDocument` for the same reason the sitemap is — the format is a handful of elements and a
+  syndication library would be a dependency and a reflection surface bought for forty lines of xml.
+  It carries the newest `RssGetFeature.MaxItems` works, skips any that carry no translation, and
+  picks a title the way `ProjectReadPage` does. `App.razor` links it for autodiscovery; the renderer
+  writes the plus of the media type as `&#x2B;`, which is legal html every parser decodes.
 - Every page that manages the site lives under `Globals.Route.Admin` (`/admin/…`), which is the one
   line `robots.txt` has to carry. `InitializeBrowserTime` and `Navigation` sit inside an
   `AuthorizeView` in `MainLayout`, so a visitor loads no interactive component at all and no circuit

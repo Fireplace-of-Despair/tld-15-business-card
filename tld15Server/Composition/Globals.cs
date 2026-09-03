@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2025 Fireplace of Despair
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -62,19 +63,20 @@ public static class Globals
     {
         /// <summary> 1200x630, the picture a share card shows when there is no work to show. </summary>
         public const string ShareCard = "/images/logo_card.png";
-
-        /// <summary> 180x180, the mark itself: the touch icon, and the logo a crawler reads. </summary>
+        public const int ShareCardWidth = 1200;
+        public const int ShareCardHeight = 630;
+        public const string ShareCardType = "image/png";
         public const string Logo = "/images/logo_touch.png";
     }
 
     public static class Route
     {
-        /// <summary>
-        /// Every page that manages the site sits under this segment. One prefix is one line in
-        /// <c>robots.txt</c>, and a page added later is covered by it without anyone remembering to
-        /// go and say so.
-        /// </summary>
         public const string Admin = "/admin";
+
+        public const string Identity = "/identity";
+        public const string Sitemap = "/sitemap.xml";
+        public const string Robots = "/robots.txt";
+        public const string Rss = "/rss";
     }
 
     public static class ProjectType
@@ -169,6 +171,34 @@ public static class Globals
     /// <summary> The locale a page falls back to when the requested one holds no translation </summary>
     public static string LanguageFallback => Locales.First().Key;
 
+    /// <summary> The requested locale, or the fallback when it names one this site does not store. </summary>
+    public static string ToStoredLanguage(string? language)
+    {
+        return Locales.ContainsKey(language ?? string.Empty) ? language! : LanguageFallback;
+    }
+
+    /// <summary> The same locales as OpenGraph writes one: a language and the territory it is read in. </summary>
+    /// <remarks>
+    /// Keep a row here for every row of <see cref="Locales"/>. The specification asks for
+    /// language_TERRITORY, and a consumer handed a bare "en" falls back to its own default - the
+    /// preview then comes back in a language the reader never asked for.
+    /// </remarks>
+    private static Dictionary<string, string> LocalesOpenGraph => new(StringComparer.Ordinal)
+    {
+        {"en", "en_US"},
+        {"ja", "ja_JP"}
+    };
+
+    /// <summary> One locale as OpenGraph writes it, falling back the way the rest of the site does. </summary>
+    public static string ToOpenGraphLocale(string? language)
+    {
+        var locales = LocalesOpenGraph;
+
+        return locales.TryGetValue(language ?? string.Empty, out var value)
+            ? value
+            : locales[LanguageFallback];
+    }
+
     public static class Page
     {
         public static string Title => "title";
@@ -178,12 +208,36 @@ public static class Globals
         {
             public static string Url => "og:url";
             public static string Image => "og:image";
+            public static string ImageAlt => "og:image:alt";
+            public static string ImageWidth => "og:image:width";
+            public static string ImageHeight => "og:image:height";
+            public static string ImageType => "og:image:type";
             public static string Locale => "og:locale";
+            public static string LocaleAlternate => "og:locale:alternate";
             public static string Title => "og:title";
             public static string Description => "og:description";
             public static string SiteName => "og:site_name";
             public static string Type => "og:type";
             public static string ArticleAuthor => "article:author";
+            public static string ArticlePublished => "article:published_time";
+            public static string ArticleModified => "article:modified_time";
+
+            public static class Kind
+            {
+                public static string Website => "website";
+                public static string Article => "article";
+            }
+        }
+
+        public static class Rss
+        {
+            public const string MediaType = "application/rss+xml";
+        }
+
+        public static class Twitter
+        {
+            public static string Card => "twitter:card";
+            public static string CardLarge => "summary_large_image";
         }
 
         public static class Meta

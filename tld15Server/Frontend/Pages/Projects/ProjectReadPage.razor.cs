@@ -49,6 +49,13 @@ public sealed partial class ProjectReadPage
     private string _shareCard = string.Empty;
 
     /// <summary>
+    /// Which of the two it is. It decides what the page may say about the picture: an alt text
+    /// describes a poster, and a declared width and height describe the mark, whose file ships with
+    /// this application and whose size is therefore known.
+    /// </summary>
+    private bool _shareCardIsPoster;
+
+    /// <summary>
     /// The work as schema.org describes it, wrapped in the element that carries it. The element is
     /// built here rather than in the markup because the renderer escapes the plus of the media type
     /// into an entity, and a reader of raw html should not have to decode one to find the block.
@@ -157,9 +164,11 @@ public sealed partial class ProjectReadPage
 
         _canonical = $"{origin}{Url}/{loaded.Item.Id}";
 
-        _shareCard = string.IsNullOrWhiteSpace(loaded.Item.PosterUrl)
-            ? $"{origin}{Globals.Image.ShareCard}"
-            : Absolute(loaded.Item.PosterUrl);
+        _shareCardIsPoster = !string.IsNullOrWhiteSpace(loaded.Item.PosterUrl);
+
+        _shareCard = _shareCardIsPoster
+            ? Absolute(loaded.Item.PosterUrl)
+            : $"{origin}{Globals.Image.ShareCard}";
 
         _otherLocales.Clear();
         _otherLocales.AddRange(loaded.Item.Translations

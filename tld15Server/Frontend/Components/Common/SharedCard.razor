@@ -33,12 +33,19 @@
         </div>
     </div>
 
-    <a href="@_url"
-       class="article-title"
-       target="@(_external ? "_blank" : null)"
-       rel="@(_external ? "noopener noreferrer" : null)">
-        <b>@SharedCardContent.Title</b>
-    </a>
+    @{
+        RenderFragment title = @<a href="@_url"
+                                   target="@(_external ? "_blank" : null)"
+                                   rel="@(_external ? "noopener noreferrer" : null)">@SharedCardContent.Title</a>;
+    }
+    @if (HeadingLevel == 2)
+    {
+        <h2 class="article-title">@title</h2>
+    }
+    else
+    {
+        <h3 class="article-title">@title</h3>
+    }
 
     <div class="article-description">
         @SharedCardContent.Subtitle

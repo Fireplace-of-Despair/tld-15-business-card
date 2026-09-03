@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Localization
+@using tld15Server.Composition
 @using tld15Server.Frontend.Components
 
 <!DOCTYPE html>
@@ -11,27 +12,35 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="keywords" content="@localizer["System.Keywords"]">
     <meta name="language" content="@localizer["System.Language"]" />
     <meta name="author" content="@localizer["System.Author"]" />
     <meta name="designer" content="@localizer["System.Author"]" />
     <meta name="publisher" content="@localizer["Brand.Company"]" />
     <meta name="copyright" content="@localizer["Brand.Company"]">
-    <meta name="revisit-after" content="7 days">
     <meta name="robots" content="index,follow">
-    <meta name="coverage" content="Worldwide">
-    <meta name="distribution" content="Global">
-    <meta name="rating" content="General">
 
     <!-- Mobile meta tags -->
     <meta name="format-detection" content="telephone=yes" />
-    <meta name="HandheldFriendly" content="true" />
 
     <link rel="preload" href="@Assets["fonts/park_lane_nf.woff2"]" as="font" type="font/woff2" crossorigin />
 
     <!-- Styles -->
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["tld15Server.styles.css"]" />
+
+    <!-- The feed, so a browser and a reader both find it from the page instead of guessing at an
+         address. IconHelper draws the feed icon for this path too, so a stored link to it needs no
+         icon of its own.
+
+         The renderer writes the plus of the media type as &#x2B;, and it does so whether the value
+         is interpolated or spelled out - an attribute value goes through the encoder either way.
+         That is legal html and every conformant parser decodes it, which is what finds a feed, so
+         the constant stays. The xml writer of the feed itself has no such habit and writes the
+         plus. -->
+    <link rel="alternate"
+          type="@Globals.Page.Rss.MediaType"
+          title="@localizer["Brand"]"
+          href="@Globals.Route.Rss" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="@Assets["favicon.png"]" />

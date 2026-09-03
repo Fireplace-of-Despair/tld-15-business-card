@@ -11,6 +11,9 @@ public partial class SharedCard
     [Parameter]
     public required SharedCardPreview SharedCardContent { get; set; }
 
+    /// <summary> Which heading level the title of the card takes. </summary>
+    [Parameter] public int HeadingLevel { get; set; } = 3;
+
     internal string _url = string.Empty;
 
     /// <summary> Whether the card leads off this site, which decides how its links behave. </summary>
