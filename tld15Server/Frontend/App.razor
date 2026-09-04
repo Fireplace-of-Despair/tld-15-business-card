@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Localization
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components
+
+<!DOCTYPE html>
+<html lang="@localizer["System.Language"]">
+
+<head>
+    <base href="/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="author" content="@localizer["System.Author"]" />
+    <meta name="robots" content="index,follow">
+
+    <!-- Mobile meta tags -->
+    <meta name="format-detection" content="telephone=yes" />
+
+    <link rel="preload" href="@Assets["fonts/park_lane_nf.woff2"]" as="font" type="font/woff2" crossorigin />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["tld15Server.styles.css"]" />
+
+    <!-- The feed -->
+    <link rel="alternate"
+          type="@Globals.Page.Rss.MediaType"
+          title="@localizer["Brand"]"
+          href="@Globals.Route.Rss" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="@Assets["favicon.png"]" />
+    <link rel="icon" type="image/x-icon" href="@Assets["favicon.ico"]" />
+    <link rel="apple-touch-icon" href="@Assets["images/logo_touch.png"]" />
+
+    @if (Interactive)
+    {
+        <ImportMap />
+    }
+    <HeadOutlet />
+    <ResourcePreloader />
+</head>
+
+<body>
+    <Routes />
+
+    @* Nothing a visitor reads is operated*@
+    @if (Interactive)
+    {
+        <ReconnectModal />
+        <script src="@Assets["_framework/blazor.web.js"]"></script>
+    }
+</body>
+
+</html>
+
+@code {
+    [Inject] private IStringLocalizer<Localization.Resources> localizer { get; set; } = default!;
+    [Inject] private IHttpContextAccessor httpContextAccessor { get; set; } = default!;
+
+    /// <summary> Whether this response carries anything that has to become interactive. </summary>
+    private bool Interactive
+        => httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
+}

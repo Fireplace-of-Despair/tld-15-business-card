@@ -1,0 +1,125 @@
+﻿@attribute [Route($"{ProfileReadPage.Url}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Common.Update"] @Localizer["Account"]
+</PageTitle>
+
+<div class="component-container-column">
+    <h1> @Localizer["Common.Update"] @Localizer["Account"]</h1>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+<AuthorizeView Policy="@Features.Profiles.ProfileGetFeature.Id">
+    <Authorized>
+        <div class="component-container-column">
+            <h2>@Localizer["Common.Main"]</h2>
+            <div class="component-container-row">
+                <div class="input-group">
+                    <label>@Localizer["Account.Login"]</label>
+                    <input type="text" @bind="sharedAccount.Login" readonly/>
+                </div>
+
+                <div class="input-group">
+                    <label>@Localizer["Account.Password.Current"]</label>
+                    <input type="password" @bind="currentPassword" />
+                </div>
+
+                <div class="input-group">
+                    <label>@Localizer["Account.Password.New"]</label>
+                    <input type="password" @bind="sharedAccount.Password" />
+                </div>
+
+            </div>
+        </div>
+
+        <div class="component-container-column">
+            <div class="component-container-column">
+                <div class="container-header">
+                    <button class="icon-button" type="button" @onclick="AddKey">
+                        <Plus />
+                    </button>
+                    <h2>@Localizer["Account.ApiKey"]</h2>
+                </div>
+            </div>
+
+            @if (sharedAccount.ApiKeys.Exists(x => x.Id == null))
+            {
+                <p>@Localizer["Account.ApiKey.CopyNow"]</p>
+            }
+
+            @{
+                // Read once. Inside the loop this asks the resource manager for each key.
+                var dateFormat = Localizer["Common.DateTimeLong"].Value;
+            }
+
+            <div class="component-container-column-full">
+                @foreach (var key in sharedAccount.ApiKeys)
+                {
+                    <div class="input-group api-key-container" @key="key">
+                        @if (key.Id == null)
+                        {
+                            <input class="api-key" type="text" value="@key.Value" readonly />
+                        }
+                        else
+                        {
+                            @* Punctuation sits flush against the value: a line break here renders as a space. *@
+                            <span class="input-like">
+                                @Localizer["Account.ApiKey.Created"]
+                                @LocalTime(key.CreatedAt ?? default, dateFormat)@(",")
+                                @Localizer["Account.ApiKey.LastUsed"]@(": ")
+                                @if (key.LastUsedAt == null)
+                                {
+                                    @Localizer["Account.ApiKey.NeverUsed"]
+                                }
+                                else
+                                {
+                                    @LocalTime(key.LastUsedAt.Value, dateFormat)
+                                }
+                            </span>
+                        }
+                        <button class="icon-button" type="button" @onclick="() => DeleteKey(key)">
+                            <Minus />
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <VersionInfo UpdatableModel="@sharedAccount" VersionLocalModel="@sharedAccount" />
+    </Authorized>
+</AuthorizeView>
+
+<div class="component-container-row">
+    <AuthorizeView Policy="@Features.Profiles.ProfilePutFeature.Id">
+        <Authorized>
+            <button @onclick="() => Save()">@Localizer["Common.Save"]</button>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Policy="@Features.Profiles.ProfileDeleteFeature.Id">
+        <Authorized>
+            <button @onclick="() => ConfirmDelete()">
+                @Localizer["Common.Delete"]
+            </button>
+        </Authorized>
+    </AuthorizeView>
+</div>

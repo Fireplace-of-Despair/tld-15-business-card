@@ -1,0 +1,119 @@
+﻿@attribute [Route($"{ProjectReadPage.Url}/{ProjectReadPage.UrlParamId}")]
+@inherits BasePage
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components
+@using tld15Server.Frontend.Components.Common
+
+@* No render mode on purpose. The page is read, not operated: rendering it statically puts the whole
+   text into the first response, which is what a reader waits for and what a crawler indexes. *@
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+    return;
+}
+
+@if (_project == null || _translation == null)
+{
+    return;
+}
+
+<PageTitle>@Title | @Localizer["Brand"]</PageTitle>
+
+<HeadContent>
+    <meta name="@Globals.Page.Description" content="@Subtitle" />
+    <link rel="canonical" href="@_canonical" />
+
+    <meta property="@Globals.Page.OpenGraph.Type" content="@Globals.Page.OpenGraph.Kind.Article" />
+    <meta property="@Globals.Page.OpenGraph.SiteName" content="@Localizer["Brand"]" />
+    <meta property="@Globals.Page.OpenGraph.Title" content="@Title" />
+    <meta property="@Globals.Page.OpenGraph.Description" content="@Subtitle" />
+    <meta property="@Globals.Page.OpenGraph.Url" content="@_canonical" />
+    <meta property="@Globals.Page.OpenGraph.Locale" content="@Globals.ToOpenGraphLocale(_translation.LanguageId)" />
+    @foreach (var locale in _otherLocales)
+    {
+        <meta property="@Globals.Page.OpenGraph.LocaleAlternate" content="@Globals.ToOpenGraphLocale(locale)" />
+    }
+
+    <meta property="@Globals.Page.OpenGraph.Image" content="@_shareCard" />
+    <meta property="@Globals.Page.OpenGraph.ImageWidth" content="@Globals.Image.ShareCardWidth" />
+    <meta property="@Globals.Page.OpenGraph.ImageHeight" content="@Globals.Image.ShareCardHeight" />
+
+    @if (_shareCardIsPoster)
+    {
+        <meta property="@Globals.Page.OpenGraph.ImageAlt" content="@_translation.PosterAlt" />
+    }
+    else
+    {
+        <meta property="@Globals.Page.OpenGraph.ImageType" content="@Globals.Image.ShareCardType" />
+    }
+
+    <meta property="@Globals.Page.OpenGraph.ArticlePublished" content="@StampIso(_project.PublishedAt)" />
+    <meta property="@Globals.Page.OpenGraph.ArticleModified" content="@StampIso(_updatedAt)" />
+    <meta property="@Globals.Page.OpenGraph.ArticleAuthor" content="@Localizer["System.Author"]" />
+
+    <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
+    @* One account, read into both fields. This is one person publishing one site, so the site and
+       the creator of a card are the same handle, and a second setting would only be a second place
+       for it to go stale in. *@
+    @if (!string.IsNullOrEmpty(_twitterAccount))
+    {
+        <meta name="@Globals.Page.Twitter.Site" content="@_twitterAccount" />
+        <meta name="@Globals.Page.Twitter.Creator" content="@_twitterAccount" />
+    }
+</HeadContent>
+
+<div class="reading-container">
+    <div class="reading">
+        <header class="reading-header">
+            <div class="reading-facts">
+                <span class="reading-division tooltip tooltip-below" data-tooltip="@_divisionName">
+                    @_project.DivisionId.ToUpperInvariant()
+                </span>
+
+                <span class="reading-fact">
+                    <span class="reading-label">@Localizer["Common.PublishedAt"]</span>
+                    <time datetime="@Stamp(_project.PublishedAt)">@Date(_project.PublishedAt)</time>
+                </span>
+
+                <span class="reading-fact">
+                    <span class="reading-label">@Localizer["Common.UpdatedAt"]</span>
+                    <time datetime="@Stamp(_updatedAt)">@Date(_updatedAt)</time>
+                </span>
+
+                <span class="reading-fact">
+                    <span class="reading-label">@Localizer["Common.Version"]</span>
+                    <span>@_versionLocal</span>
+                </span>
+            </div>
+
+            <h1 class="reading-title">@Title</h1>
+        </header>
+
+        @if (!string.IsNullOrWhiteSpace(Subtitle))
+        {
+            <p class="reading-subtitle">@Subtitle</p>
+            <hr />
+        }
+
+        <MarkdownView Markdown="@_translation.Markdown" />
+
+        @if (_project.Links.Count > 0)
+        {
+            <section class="reading-section" aria-labelledby="links">
+                <h2 id="links" class="reading-heading">@Localizer["Content.Links"]</h2>
+                <nav class="external-links-container">
+                    @foreach (var link in _project.Links)
+                    {
+                        <ExternalLinkIcon Url="@link.Url" Language="@link.Language" />
+                    }
+                </nav>
+            </section>
+        }
+    </div>
+</div>
+
+@* Read by a crawler *@
+@_structuredData

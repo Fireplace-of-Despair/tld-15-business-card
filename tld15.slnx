@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/tld15ServerTests/tld15ServerTests.csproj" Id="c04c1d91-18d4-4734-83b6-60b3eecf1183" />
+  </Folder>
+  <Project Path="StainlessCore/StainlessCore.csproj" Id="f836dac4-29b2-4af2-a63e-d6787e6581ce" />
+  <Project Path="StainlessGenerators/StainlessGenerators.csproj" />
+  <Project Path="StainlessInfrastructure/StainlessInfrastructure.csproj" Id="d0155a9f-25ce-4aa8-98a9-4ed6a7be18ca" />
+  <Project Path="tld15Server/tld15Server.csproj" Id="3f2db196-bb94-4350-92e5-047131022b8e" />
+</Solution>

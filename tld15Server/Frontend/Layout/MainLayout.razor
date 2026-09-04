@@ -1,0 +1,77 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using tld15Server.Frontend.Components.Common.LocalTime
+@using tld15Server.Frontend.Components.Icons
+@using tld15Server.Frontend.Components.Navigations
+@using tld15Server.Composition
+@using tld15Server.Frontend.Navigations
+@inject NavigationState NavState
+
+@* Only the pages behind the login show a time in the reader's own zone, and this is the component
+   that opens a circuit to ask the browser for it. A visitor pays for neither. *@
+<AuthorizeView>
+    <Authorized>
+        <InitializeBrowserTime @rendermode="InteractiveServer" />
+    </Authorized>
+</AuthorizeView>
+
+<header>
+    <a class="brand-header-name" href="@Pages.Home.Url">
+        @Localizer["Brand"]
+    </a>
+    <div class="brand-header-slogan">
+        <i>@Localizer["Brand.Slogan"]</i>
+    </div>
+
+    @* The pages a visitor moves between. The section that manages the site keeps its own navigation
+       at the side, and two rows of links pointing at different worlds only confuse the one reading. *@
+    @if (!IsAdmin)
+    {
+        <GlobalNavigation />
+    }
+</header>
+
+<div class="page">
+    <CascadingValue Value="NavState">
+    <AuthorizeView>
+        <Authorized>
+            <Navigation @rendermode="InteractiveServer" />
+        </Authorized>
+    </AuthorizeView>
+
+    <main>
+        <article>
+            @Body
+        </article>
+    </main>
+    </CascadingValue>
+</div>
+
+<footer>
+    <AuthorizeView>
+        <Authorized>
+            <a class="icon-button logo"
+               href="@Pages.Identity.LogoutPage.Url">
+                <Logout />
+            </a>
+        </Authorized>
+        <NotAuthorized>
+            <a class="icon-button logo"
+               href="@Pages.Identity.LoginPage.Url"><Login /></a>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <a class="icon-button logo"
+       href="@Pages.Settings.ChangeLanguagePage.Url">
+        <Translate />
+    </a>
+    <div class="copyright">
+        @DateTimeOffset.UtcNow.Year © @Localizer["Brand.Company"]
+    </div>
+    @* AGPL-3.0-only, section 13. A remote user must reach the source of the running build. *@
+    <div class="source">
+        <a href="@SourceUrl" rel="noopener noreferrer" target="_blank" title="@Globals.License.Spdx">
+            @Localizer["Common.SourceCode"]
+        </a>
+    </div>
+</footer>

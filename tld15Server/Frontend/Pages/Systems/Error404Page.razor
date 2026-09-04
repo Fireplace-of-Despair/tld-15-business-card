@@ -1,0 +1,11 @@
+﻿@attribute [Route(Error404Page.Url)]
+@layout MainLayout
+@inherits BasePage
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Common.NotFound"]
+</PageTitle>
+
+<div class="component-container-column">
+    <p>@Localizer["Incident.NotFoundPage"]</p>
+</div>

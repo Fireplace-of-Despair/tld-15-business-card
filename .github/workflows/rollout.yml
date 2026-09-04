@@ -4,6 +4,12 @@ on:
   push:
     branches: [ main ]
 
+# One roll-out at a time. Two pushes in a row would otherwise load two images onto the same host and
+# race over the same container, and whichever finished last would decide what runs.
+concurrency:
+  group: rollout
+  cancel-in-progress: false
+
 env:
   # Use the same ssh-agent socket value across all jobs
   # Useful when a GH action is using SSH behind-the-scenes
@@ -17,14 +23,24 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      # The context is the repository root, and -f names the file inside it. Every COPY in
+      # tld15Server/Dockerfile reads a path from the root: global.json and the three Stainless
+      # projects sit beside tld15Server rather than inside it, so a build whose context is
+      # tld15Server/ finds none of them.
+      #
+      # The tag is lowercase because Docker refuses anything else -- a repository name may hold no
+      # capital letter -- and it reads tld15-server:latest because that is the image named in
+      # .deploy/docker-compose.yml. A tarball under any other name loads an image Compose never
+      # starts. Both values match the build command in CLAUDE.md and in .deploy/README.md.
+      #
+      # pipefail is off by default in a run block. Without it a failed docker save still leaves a
+      # valid, empty gzip stream behind and this step passes.
       - name: Build Backend
         run: |
-          mkdir rollout
-          cd TLD15
-          docker build -t tld-15 .
-          docker tag tld-15 tld-15:latest
-          docker save -o tld-15.tar tld-15:latest
-          mv tld-15.tar ../rollout/tld-15.tar
+          set -euo pipefail
+          mkdir -p rollout
+          docker build -f tld15Server/Dockerfile -t tld15-server:latest .
+          docker save tld15-server:latest | gzip > rollout/tld15-server.tar.gz
 
       - name: rsync deployments
         uses: burnett01/rsync-deployments@7.0.1
@@ -64,16 +80,57 @@ jobs:
             echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
             echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
 
-      - name: Stop all
-        run: ssh staging 'sudo docker stop $(sudo docker ps -a -q)'
+      # docker load replaces the tag on the host, so nothing has to be stopped or deleted first. The
+      # image that was there keeps its layers and loses its name, and the prune step below drops it
+      # once the new one has proven itself.
+      #
+      # The path is built from the same secret rsync wrote to. A literal path here would agree with
+      # that secret only by luck.
+      - name: Load the image
+        run: ssh staging 'set -eu; sudo docker load --input "${{ secrets.DEPLOY_PATH }}/rollout/tld15-server.tar.gz"'
 
-      - name: Delete tld-15
-        run: ssh staging 'sudo docker rm /tld-15 && sudo docker rmi tld-15'
-
-      - name: Import tld-15
-        run: ssh staging 'cd /uploads/rollout && sudo docker load --input tld-15.tar'
-
+      # Compose compares image ids rather than tags, so the server is recreated on the new image
+      # while Caddy, whose image did not move, keeps serving across the swap. Nothing here stops the
+      # host: "docker stop $(docker ps -a -q)" reached every container on the machine, and it failed
+      # outright whenever that list came back empty.
       - name: Start
-        run: ssh staging 'cd /config && sudo docker compose up -d'
+        run: ssh staging 'set -eu; cd /config && sudo docker compose up -d'
+
+      # Compose accepting the file only proves the file parsed. The image carries a HEALTHCHECK that
+      # reads /api/public/ping, which answers "pong" with a live database and "wrong" without one,
+      # so this waits for the container to call itself healthy and prints the log when it will not.
+      # Two minutes covers the 40s start period and the retries that follow it.
+      - name: Verify
+        run: |
+          ssh staging '
+            set -eu
+            for i in $(seq 1 24); do
+              status=$(sudo docker inspect --format "{{.State.Health.Status}}" tld15-server 2>/dev/null || echo missing)
+              case "$status" in
+                healthy)
+                  echo "tld15-server is healthy"
+                  exit 0
+                  ;;
+                unhealthy)
+                  echo "tld15-server reports unhealthy"
+                  sudo docker logs --tail 80 tld15-server
+                  exit 1
+                  ;;
+              esac
+              echo "waiting, status is $status"
+              sleep 5
+            done
+            echo "tld15-server never reported healthy"
+            sudo docker logs --tail 80 tld15-server
+            exit 1'
+
+      # The tarball goes whatever happened: it is a copy of an image that already lives on the host.
       - name: Cleanup
-        run: ssh staging 'rm -rf /uploads/rollout'
+        if: always()
+        run: ssh staging 'rm -rf "${{ secrets.DEPLOY_PATH }}/rollout"'
+
+      # Only once the new container is proven. The replaced image is dangling by now, and pruning it
+      # after a failed roll-out would throw away the one thing left to fall back to.
+      - name: Prune the replaced image
+        if: success()
+        run: ssh staging 'sudo docker image prune -f'

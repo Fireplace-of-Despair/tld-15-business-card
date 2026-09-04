@@ -1,0 +1,137 @@
+﻿@using tld15Server.Composition
+@using tld15Server.Features.Shared.Business
+@using tld15Server.Frontend.Components
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Navigations
+@attribute [Route(Home.Url)]
+@inherits BasePage
+
+@* No render mode on purpose. Nothing on this page is operated: the cards are links and the icons
+   are inline svg, so rendering it statically puts every block into the first response. *@
+
+<PageTitle> @Localizer["Brand"] | @Localizer["Brand.Slogan"] </PageTitle>
+
+<HeadContent>
+    <meta name="@Globals.Page.Description" content="@_description" />
+    <link rel="canonical" href="@_canonical" />
+
+    @if (!string.IsNullOrEmpty(_preconnect))
+    {
+        <link rel="preconnect" href="@_preconnect" />
+    }
+
+    <meta property="@Globals.Page.OpenGraph.Type" content="@Globals.Page.OpenGraph.Kind.Website" />
+    <meta property="@Globals.Page.OpenGraph.SiteName" content="@Localizer["Brand"]" />
+    <meta property="@Globals.Page.OpenGraph.Title" content="@Localizer["Brand"] | @Localizer["Brand.Slogan"]" />
+    <meta property="@Globals.Page.OpenGraph.Description" content="@_description" />
+    <meta property="@Globals.Page.OpenGraph.Url" content="@_canonical" />
+    <meta property="@Globals.Page.OpenGraph.Locale" content="@Globals.ToOpenGraphLocale(Language)" />
+
+    <meta property="@Globals.Page.OpenGraph.Image" content="@_shareCard" />
+    <meta property="@Globals.Page.OpenGraph.ImageWidth" content="@Globals.Image.ShareCardWidth" />
+    <meta property="@Globals.Page.OpenGraph.ImageHeight" content="@Globals.Image.ShareCardHeight" />
+
+    @if (_shareCardIsPoster)
+    {
+        <meta property="@Globals.Page.OpenGraph.ImageAlt" content="@Lore!.PosterAlt" />
+    }
+    else
+    {
+        <meta property="@Globals.Page.OpenGraph.ImageType" content="@Globals.Image.ShareCardType" />
+    }
+
+    <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
+    @* One account, read into both fields. This is one person publishing one site, so the site and
+       the creator of a card are the same handle, and a second setting would only be a second place
+       for it to go stale in. *@
+    @if (!string.IsNullOrEmpty(_twitterAccount))
+    {
+        <meta name="@Globals.Page.Twitter.Site" content="@_twitterAccount" />
+        <meta name="@Globals.Page.Twitter.Creator" content="@_twitterAccount" />
+    }
+</HeadContent>
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+    return;
+}
+
+<LocalNavigation Sections="@_sections" />
+
+@if (Lore != null && !string.IsNullOrEmpty(Lore.Markdown))
+{
+    <div class="component-container-column-narrow">
+        <h1 id="@Lore.Id" class="component-title">@Lore.Title</h1>
+
+        <div class="lore-body">
+            @if (!string.IsNullOrEmpty(Lore.PosterUrl))
+            {
+                <div class="lore-poster">
+                    <img src="@Lore.PosterUrl" alt="@Lore.PosterAlt" fetchpriority="high" />
+                </div>
+            }
+
+            <MarkdownView Markdown="@Lore.Markdown" />
+        </div>
+    </div>
+}
+
+@if (Articles.Any())
+{
+    <div class="component-container-column-narrow">
+        <h2 id="@Globals.Anchor.Articles" class="component-title">@Localizer["Articles"]</h2>
+
+        <div class="cards-container">
+            @foreach (var article in Articles)
+            {
+                <SharedCard SharedCardContent="article" />
+            }
+        </div>
+    </div>
+}
+
+@if (Projects.Any())
+{
+    <div class="component-container-column-narrow">
+        <h2 id="@Globals.Anchor.Projects" class="component-title">@Localizer["Projects"]</h2>
+        <div class="cards-container">
+            @foreach (var project in Projects)
+            {
+                <SharedCard SharedCardContent="project" />
+            }
+        </div>
+    </div>
+}
+
+@if (Social != null && !string.IsNullOrEmpty(Social.LinksJson))
+{
+    <div class="component-container-column-narrow">
+        <h2 id="@Social.Id" class="component-title">@Social.Title</h2>
+        <div class="external-links-container">
+            @foreach (var link in @Social.LinksToDictionary())
+            {
+                <ExternalLinkIcon Url="@link.Key" Language="@link.Value" />
+            }
+        </div>
+    </div>
+}
+
+@if (Contacts != null && !string.IsNullOrEmpty(Contacts.LinksJson))
+{
+    <div class="component-container-column-narrow">
+        <h2 id="@Contacts.Id" class="component-title">@Contacts.Title</h2>
+        <div class="external-links-container">
+            @foreach (var link in @Contacts.LinksToDictionary())
+            {
+                <ExternalLinkIcon Url="@link.Key" Language="@link.Value" />
+            }
+        </div>
+    </div>
+}
+
+@* Read by a crawler, never executed: it names who the site belongs to and where else the same body
+   is published, which the page itself only shows as a row of icons. *@
+@_structuredData

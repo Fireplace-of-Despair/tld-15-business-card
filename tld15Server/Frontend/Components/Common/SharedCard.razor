@@ -1,0 +1,68 @@
+﻿@using System.Globalization
+@using tld15Server.Common
+@using tld15Server.Composition
+<div id="@SharedCardContent.Id" class="article-card">
+    <div class="article-image-container">
+        <a href="@_url" target="@(_external ? "_blank" : null)" rel="@(_external ? "noopener noreferrer" : null)">
+            @if (string.IsNullOrEmpty(SharedCardContent.PosterUrl))
+            {
+                <img class="article-image" loading="lazy"
+                     width="350" height="150"
+                     src="@Assets["images/placeholder/project.png"]"
+                     alt="@SharedCardContent.PosterAlt">
+            }
+            else
+            {
+                <img class="article-image" loading="lazy"
+                     src="@SharedCardContent.PosterUrl"
+                     alt="@SharedCardContent.PosterAlt">
+            }
+        </a>
+        @if (!string.IsNullOrEmpty(SharedCardContent.DivisionId))
+        {
+            <div class="article-image-overlay-division tooltip"
+                 data-tooltip="@SharedCardContent.DivisionName">
+                @SharedCardContent.DivisionId.ToUpper()
+            </div>
+        }
+
+        <div class="article-image-overlay-date">
+            <time datetime="@SharedCardContent.PublishedAt.UtcDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                @SharedCardContent.PublishedAt.ToString(Globals.Settings.DateFormat, CultureInfo.InvariantCulture)
+            </time>
+        </div>
+    </div>
+
+    @{
+        RenderFragment title = @<a href="@_url"
+                                   target="@(_external ? "_blank" : null)"
+                                   rel="@(_external ? "noopener noreferrer" : null)">@SharedCardContent.Title</a>;
+    }
+    @if (HeadingLevel == 2)
+    {
+        <h2 class="article-title">@title</h2>
+    }
+    else
+    {
+        <h3 class="article-title">@title</h3>
+    }
+
+    <div class="article-description">
+        @SharedCardContent.Subtitle
+    </div>
+
+    <div class="project-buttons-container">
+        @if (SharedCardContent.ProjectTypeId == Globals.ProjectType.Project)
+        {
+            var links = SharedCardContent.LinksToDictionary();
+
+            @foreach (var link in links)
+            {
+                @* A link is stored as the address it opens against the language it speaks: the icon
+                   follows from the address, so nothing here has to name the site. *@
+                <ExternalLinkIcon Url="@link.Key" Language="@link.Value" />
+            }
+    }
+    </div>
+
+</div>

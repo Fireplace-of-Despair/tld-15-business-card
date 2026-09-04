@@ -1,0 +1,28 @@
+﻿[
+    {
+        "Id": "project",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Project"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "プロジェクト"
+            }
+        ]
+    },
+    {
+        "Id": "article",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Article"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "記事"
+            }
+        ]
+    }
+]

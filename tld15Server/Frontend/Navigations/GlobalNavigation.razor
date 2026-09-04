@@ -1,0 +1,10 @@
+﻿<nav class="global-navigation" aria-label="@Localizer["Navigation.Site"]">
+    @foreach (var entry in Entries)
+    {
+        <a class="global-navigation-link @(entry.Url == _path ? "active" : "inactive")"
+           href="@entry.Url"
+           aria-current="@(entry.Url == _path ? "page" : null)">
+            @entry.Title
+        </a>
+    }
+</nav>

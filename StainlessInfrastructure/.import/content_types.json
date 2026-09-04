@@ -1,0 +1,54 @@
+﻿[
+    {
+        "Id": "lore",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Lore"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "伝承"
+            }
+        ]
+    },
+    {
+        "Id": "social",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Social"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "SNS"
+            }
+        ]
+    },
+    {
+        "Id": "contacts",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Contacts"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "相談申込"
+            }
+        ]
+    },
+    {
+        "Id": "press",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "Press"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "メディア掲載"
+            }
+        ]
+    }
+]

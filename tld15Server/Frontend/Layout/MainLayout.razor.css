@@ -1,0 +1,55 @@
+﻿header {
+    display: flex;
+    background-color: var(--color-container);
+    flex-direction: column;
+    align-items: safe center;
+    box-sizing: border-box;
+    padding: 0 10px;
+
+    .brand-header-name {
+        font-family: "Park Lane NF";
+        padding-bottom: 5px;
+        display: flex;
+        margin-left: 10px;
+        font-size: 50px;
+        text-decoration: none;
+        padding-bottom: 0px;
+        text-align: center;
+    }
+
+    .brand-header-slogan {
+        font-size: 25px;
+        margin-bottom: 0;
+        color: var(--color-highlight-soft);
+    }
+}
+
+footer {
+    margin-top: 5px;
+    height: 35px;
+    background-color: var(--color-container);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .copyright {
+        flex-grow: 1;
+        text-align: center;
+    }
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100dvh - 100px);
+
+    main {
+        flex: 1;
+    }
+}
+
+@media (min-width: 641px) {
+    .page {
+        flex-direction: row;
+    }
+}

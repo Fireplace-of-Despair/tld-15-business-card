@@ -1,0 +1,118 @@
+﻿# tld-15 business card deployment.
+#
+# This file sits at /config/docker-compose.yml on the server. One folder next to it holds each part.
+# /config/caddy holds the reverse proxy. /config/tld15 holds the server. Start the stack from
+# /config:
+#   cd /config && docker compose up -d
+#
+# The database is not part of this file. Run PostgreSQL where you want it, and give its address to
+# ConnectionStrings:PostgreSQL in appsettings.json.
+#
+# Only Caddy publishes a port. The server answers on the internal network alone, so nothing else is
+# reachable from the internet. See README.md for the full steps.
+
+services:
+  tld15-server:
+    image: tld15-server:latest
+    container_name: tld15-server
+    # The image comes from a file that you load with "docker load". Never let Compose look for it in
+    # a registry, because no registry holds it yet.
+    pull_policy: never
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: UTC
+    # A database on the host machine answers at host.docker.internal. Delete this block when the
+    # database sits on another server, and write its address into appsettings.json.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # The settings file stays outside the image. It holds the pepper and the database password.
+      - /config/tld15/appsettings.json:/app/appsettings.json:ro
+      - /config/tld15/logs:/app/logs
+    networks:
+      - tld15
+
+    # --- Container hardening ---
+    # The image already runs as user 1654. These lines take away what is left after a break-in: the
+    # ability to gain rights, every Linux capability, and a writable image.
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # The application writes to /app/logs, which is a bind mount, and to /tmp. Nothing else needs a
+    # write. Read the log when the container does not start, and add a tmpfs for the path it names.
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    # A limit stops one container from taking the full machine. The database of step 8 often runs on
+    # the same machine, and it must keep its memory.
+    pids_limit: 512
+    mem_limit: 1g
+    # Without these two options the log of the container grows without a limit. A full disk stops
+    # PostgreSQL.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    depends_on:
+      - tld15-server
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - /config/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Caddy runs as root inside its image, and cap_drop below takes CAP_DAC_OVERRIDE away. This
+      # folder must therefore belong to root. A folder that belongs to 1654 stops the start with
+      # "permission denied". See step 10 of README.md.
+      - /config/caddy/logs:/var/log/caddy
+      # The address filters read this folder. address-lists.sh writes region.caddy and cloud.caddy
+      # into it, and the Caddyfile imports both. Caddy does not start when one file is missing, so
+      # run the script one time before the first start. See step 14 of README.md.
+      - /config/caddy/lists:/etc/caddy/lists:ro
+      # The certificates and the ACME account key live here. A lost volume asks Let's Encrypt for a
+      # new certificate, which counts against the rate limit of the domain.
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - tld15
+
+    # --- Container hardening ---
+    # Caddy keeps no read_only line. It writes the certificate and the account key into /data, and its
+    # own state into /config, at each start and at each renewal.
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      # Caddy binds port 80 and port 443. It needs this capability and no other one.
+      - NET_BIND_SERVICE
+    pids_limit: 256
+    # Caddy proxies and terminates TLS. It holds no application state, and it stays near 50 MB.
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  caddy-data:
+  caddy-config:
+
+networks:
+  tld15:
+    driver: bridge
+    ipam:
+      config:
+        # The address of Caddy comes from this range. Security:ForwardedHeaders:KnownNetworks in
+        # appsettings.json names the same range. The server trusts X-Forwarded-For from this range
+        # only. A different subnet here needs the same change there.
+        - subnet: 172.28.0.0/16

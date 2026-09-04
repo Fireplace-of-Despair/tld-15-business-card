@@ -1,0 +1,72 @@
+﻿@attribute [Route(PressPage.Url)]
+@inherits BasePage
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+
+@* No render mode. The page is a wall of links and nothing on it is operated. *@
+
+<PageTitle>@Localizer["Brand"] | @Localizer["Press"]</PageTitle>
+
+<HeadContent>
+    <meta name="@Globals.Page.Description" content="@_description" />
+    <link rel="canonical" href="@_canonical" />
+
+    @if (!string.IsNullOrEmpty(_preconnect))
+    {
+        <link rel="preconnect" href="@_preconnect" />
+    }
+
+    <meta property="@Globals.Page.OpenGraph.Type" content="@Globals.Page.OpenGraph.Kind.Website" />
+    <meta property="@Globals.Page.OpenGraph.SiteName" content="@Localizer["Brand"]" />
+    <meta property="@Globals.Page.OpenGraph.Title" content="@Localizer["Brand"] | @Localizer["Press"]" />
+    <meta property="@Globals.Page.OpenGraph.Description" content="@_description" />
+    <meta property="@Globals.Page.OpenGraph.Url" content="@_canonical" />
+    <meta property="@Globals.Page.OpenGraph.Locale" content="@Globals.ToOpenGraphLocale(Language)" />
+
+    <meta property="@Globals.Page.OpenGraph.Image" content="@_shareCard" />
+    <meta property="@Globals.Page.OpenGraph.ImageWidth" content="@Globals.Image.ShareCardWidth" />
+    <meta property="@Globals.Page.OpenGraph.ImageHeight" content="@Globals.Image.ShareCardHeight" />
+    <meta property="@Globals.Page.OpenGraph.ImageType" content="@Globals.Image.ShareCardType" />
+
+    <meta name="@Globals.Page.Twitter.Card" content="@Globals.Page.Twitter.CardLarge" />
+    @* One account, read into both fields. This is one person publishing one site, so the site and
+       the creator of a card are the same handle, and a second setting would only be a second place
+       for it to go stale in. *@
+    @if (!string.IsNullOrEmpty(_twitterAccount))
+    {
+        <meta name="@Globals.Page.Twitter.Site" content="@_twitterAccount" />
+        <meta name="@Globals.Page.Twitter.Creator" content="@_twitterAccount" />
+    }
+</HeadContent>
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+    return;
+}
+
+@if (Items.Count == 0)
+{
+    <div class="component-container-column-narrow">
+        <h1 id="press" class="component-title">@Localizer["Press"]</h1>
+
+        <div class="cards-container">
+            <div>@Localizer["Common.NothingWasFound"]</div>
+        </div>
+    </div>
+
+    return;
+}
+
+<div class="component-container-column-narrow">
+    <h1 id="press" class="component-title">@Localizer["Press"]</h1>
+
+    <div class="cards-container">
+        @foreach (var item in Items)
+        {
+            <SharedCard SharedCardContent="item" HeadingLevel="2" />
+        }
+    </div>
+</div>

@@ -1,7 +1,0 @@
-User-agent: *
-
-Disallow: /ssd/
-Disallow: /Account/Login
-Disallow: /account/login
-
-Sitemap: https://fireplace-of-despair.org/sitemap.xml

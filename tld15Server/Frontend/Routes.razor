@@ -1,0 +1,10 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(tld15Server.Frontend.Pages.Systems.Error404Page)">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" DefaultLayout="typeof(tld15Server.Frontend.Layout.MainLayout)" />
+        </Found>
+    </Router>
+</CascadingAuthenticationState>

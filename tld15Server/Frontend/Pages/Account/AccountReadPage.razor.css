@@ -1,0 +1,9 @@
+﻿.api-key-container {
+    flex-direction: row;
+    width: 95%;
+
+    .api-key {
+        margin-right: 5px;
+        flex-grow: 1;
+    }
+}

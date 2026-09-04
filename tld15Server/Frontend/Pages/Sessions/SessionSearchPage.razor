@@ -1,0 +1,124 @@
+﻿@attribute [Route($"{SessionSearchPage.Url}/{SessionSearchPage.UrlParamPage}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Sessions"]
+</PageTitle>
+
+<div class="component-container-column">
+    <div class="container-header">
+        <h1>@Localizer["Sessions"]</h1>
+    </div>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (State == null || State.Sessions.Count == 0)
+{
+    <div class="component-container-column">
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    </div>
+}
+
+@{
+    // Read once. Inside the loop this asks the resource manager for each row.
+    var dateFormat = Localizer["Common.DateTimeLong"].Value;
+    var columnCount = _canDeleteSession ? 4 : 3;
+}
+
+<div class="component-container-column">
+    <table>
+        <thead>
+            <tr>
+                <th>@Localizer["Account.Login"]</th>
+                <th>@Localizer["Common.CreatedAt"]</th>
+                <th>@Localizer["Common.ExpireAt"]</th>
+                @if (_canDeleteSession)
+                {
+                    <th>@Localizer["Common.Manage"]</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in State?.Sessions ?? [])
+            {
+                <tr @key="session.Id">
+                    <td>
+                        <button class="icon-button"
+                                title="@Localizer["Common.UserAgent"]"
+                                @* A bool renders as an omitted attribute when it is false, and a
+                                   reader needs the closed state as much as the open one. *@
+                                aria-expanded="@(_expanded.Contains(session.Id) ? "true" : "false")"
+                                @onclick="() => ToggleDetails(session.Id)">
+                            @if (_expanded.Contains(session.Id))
+                            {
+                                <Minus />
+                            }
+                            else
+                            {
+                                <Plus />
+                            }
+                        </button>
+
+                        @if (_canOpenAccount)
+                        {
+                            <NavLink href="@($"{Pages.Account.AccountReadPage.Url}/{session.AccountId}")">
+                                @session.Login
+                            </NavLink>
+                        }
+                        else
+                        {
+                            @session.Login
+                        }
+                    </td>
+                    <td>
+                        @LocalTime(session.CreatedAt, dateFormat)
+                    </td>
+                    <td>
+                        @LocalTime(session.ExpiresAt, dateFormat)
+                    </td>
+                    @if (_canDeleteSession)
+                    {
+                        <td>
+                            <button @onclick="() => ConfirmDelete(session.Id)">
+                                @Localizer["Common.Delete"]
+                            </button>
+                        </td>
+                    }
+                </tr>
+                @if (_expanded.Contains(session.Id))
+                {
+                    <tr id="info-@session.Id" @key='$"info-{session.Id}"'>
+                        <td colspan="@columnCount">
+                            @Localizer["Common.UserAgent"]: @session.UserAgent
+                            <hr />
+                            @Localizer["Common.IP"]: @session.UserIP
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <Pagination CurrentPage="@(State?.Page ?? 0)"
+                MaxPage="@MaxPage"
+                MaxVisible="@Globals.Pagination.MaxVisiblePages"
+                BaseUrl="@SessionSearchPage.Url" />
+</div>

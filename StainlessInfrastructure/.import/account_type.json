@@ -1,0 +1,28 @@
+﻿[
+    {
+        "Id": "user",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "User"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "ユーザー"
+            }
+        ]
+    },
+    {
+        "Id": "system_automation",
+        "Translations": [
+            {
+                "LanguageId": "en",
+                "Name": "System: Automation"
+            },
+            {
+                "LanguageId": "ja",
+                "Name": "システム：自動化"
+            }
+        ]
+    }
+]

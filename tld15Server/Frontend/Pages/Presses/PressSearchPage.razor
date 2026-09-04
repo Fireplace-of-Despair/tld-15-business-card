@@ -1,0 +1,82 @@
+﻿@attribute [Route($"{PressSearchPage.Url}/{PressSearchPage.UrlParamPage}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Press"]
+</PageTitle>
+
+<div class="component-container-column">
+    <div class="container-header">
+        @if (_canEdit)
+        {
+            <a class="icon-button" href="@Pages.Presses.PressEditPage.Url">
+                <Plus />
+            </a>
+        }
+
+        <h1>@Localizer["Press"]</h1>
+    </div>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident Code="@IncidentCode" />
+    </div>
+}
+
+@if (State == null || State.Items.Count == 0)
+{
+    <div class="component-container-column">
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    </div>
+    return;
+}
+
+@{
+    // Read once. Inside the loop this asks the resource manager for each row.
+    var dateFormat = Localizer["Common.DateTimeLong"].Value;
+}
+
+<div class="component-container-column">
+    <table>
+        <thead>
+            <tr>
+                <th>@Localizer["Common.Title"]</th>
+                <th>@Localizer["Press.Url"]</th>
+                <th>@Localizer["Common.PublishedAt"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in State.Items)
+            {
+                <tr @key="item.Id">
+                    <td>
+                        <NavLink href="@($"{Pages.Presses.PressEditPage.Url}/{item.Id}")">
+                            @(string.IsNullOrEmpty(item.Title) ? item.Id.ToString() : item.Title)
+                        </NavLink>
+                    </td>
+                    <td class="press-url">@item.Url</td>
+                    <td>@LocalTime(item.PublishedAt, dateFormat)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <Pagination CurrentPage="@State.Page"
+                MaxPage="@MaxPage"
+                MaxVisible="@Globals.Pagination.MaxVisiblePages"
+                BaseUrl="@PressSearchPage.Url" />
+</div>

@@ -1,0 +1,30 @@
+﻿@attribute [Route(LoginPage.Url)]
+@inherits BasePage
+@using tld15Server.Frontend.Components.Common
+
+<PageTitle>@Localizer["Brand"] | @Localizer["Identity"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@string.Empty" />
+    <meta name="url" content="@string.Empty">
+    <meta name="identifier-URL" content="@string.Empty">
+</HeadContent>
+
+<EditForm Model="formLogin" FormName="form_login" OnSubmit="OnSubmit" class="component-container-column">
+    <div class="component-container">
+        <InputText id="@nameof(formLogin.ReturnUrl)" type="hidden" @bind-Value="formLogin.ReturnUrl" />
+
+        <div class="input-group">
+            <label for="@nameof(formLogin.Login)">@Localizer["Account.Login"]</label>
+            <InputText id="@nameof(formLogin.Login)" type="login" @bind-Value="formLogin.Login" />
+        </div>
+        <div class="input-group">
+            <label for="@nameof(formLogin.Password)">@Localizer["Account.Password"]</label>
+            <InputText id="@nameof(formLogin.Password)" type="password" @bind-Value="formLogin.Password" />
+        </div>
+        <div class="input-group">
+            <FriendlyIncident code="@IncidentCode" />
+        </div>
+    </div>
+
+    <button type="submit">@Localizer["Identity.DoLogin"]</button>
+</EditForm>

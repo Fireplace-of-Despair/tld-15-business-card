@@ -1,0 +1,95 @@
+﻿@attribute [Route($"{AccountSearchPage.Url}/{AccountSearchPage.UrlParamPage}")]
+@inherits BasePage
+@rendermode InteractiveServer
+@using tld15Server.Composition
+@using tld15Server.Frontend.Components.Common
+@using tld15Server.Frontend.Components.Icons
+
+<PageTitle>
+    @Localizer["Brand"] | @Localizer["Accounts"]: @Localizer["Common.Search"]
+</PageTitle>
+
+<div class="component-container-column">
+    <div class="container-header">
+        @if (_canManageAccounts)
+        {
+            <a class="icon-button"
+               href="@Pages.Account.AccountReadPage.Url">
+               <Plus />
+            </a>
+        }
+
+        <h1>@Localizer["Accounts"]</h1>
+    </div>
+</div>
+
+@if (IsLoading)
+{
+    <div class="component-container-column">
+        <Spinner />
+    </div>
+    return;
+}
+
+@if (IncidentCode != null)
+{
+    <div class="component-container-column">
+        <FriendlyIncident code="@IncidentCode" />
+    </div>
+}
+
+@if (State == null || State.Items.Count == 0)
+{
+    <div class="component-container-column">
+        <div>@Localizer["Common.NothingWasFound"]</div>
+    </div>
+    return;
+}
+
+@{
+    // Read once. Inside the loop this asks the resource manager for each row.
+    var dateFormat = Localizer["Common.DateTimeLong"].Value;
+}
+
+<div class="component-container-column">
+    <table>
+        <thead>
+            <tr>
+                <th>@Localizer["Account.Login"]</th>
+                <th>@Localizer["Account.Status"]</th>
+                <th>@Localizer["Common.CreatedAt"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in State.Items)
+            {
+                <tr id="core-@account.Id" @key="account.Id">
+                    <td>
+                        @if (_canManageAccounts)
+                        {
+                            <NavLink href="@($"{Pages.Account.AccountReadPage.Url}/{account.Id}")">
+                                @account.Login
+                            </NavLink>
+                        }
+                        else
+                        {
+                            @account.Login
+                        }
+                    </td>
+                    <td>
+                        @account.Status
+                    </td>
+                    <td>
+                        @LocalTime(account.CreatedAt, dateFormat)
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+    <Pagination CurrentPage="@State.Page"
+                MaxPage="@MaxPage"
+                MaxVisible="@Globals.Pagination.MaxVisiblePages"
+                BaseUrl="@AccountSearchPage.Url" />
+</div>

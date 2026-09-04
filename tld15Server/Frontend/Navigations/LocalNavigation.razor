@@ -1,0 +1,11 @@
+﻿@if (Sections.Count == 0)
+{
+    return;
+}
+
+<nav class="local-navigation-container" aria-label="@Localizer["Navigation.Sections"]">
+    @foreach (var section in Sections)
+    {
+        <a class="local-navigation-link" href="#@section.Id">@section.Title</a>
+    }
+</nav>
