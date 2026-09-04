@@ -21,8 +21,7 @@
 ## What this is
 
 TLD-15 is a business card. One organization runs one copy of it, and that copy is ours. It carries the
-lore, the works, the articles, the press that mentions us, and the addresses that reach us. It sells
-nothing, tracks nobody, and asks a reader for no account.
+lore, the works, the articles, the press that mentions us, and the addresses that reach us. It tracks nobody, and asks a reader for no account.
 
 It is not a product, and it is not a general-purpose CMS. Nothing here is built for a second tenant.
 The code is open all the same, and the AGPL says what you may do with it: run it, change it, publish
