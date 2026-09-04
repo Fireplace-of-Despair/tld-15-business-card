@@ -51,18 +51,21 @@
     <AuthorizeView>
         <Authorized>
             <a class="icon-button logo"
-               href="@Pages.Identity.LogoutPage.Url">
+               href="@Pages.Identity.LogoutPage.Url"
+               aria-label="@Localizer["Identity.DoLogout"]">
                 <Logout />
             </a>
         </Authorized>
         <NotAuthorized>
             <a class="icon-button logo"
-               href="@Pages.Identity.LoginPage.Url"><Login /></a>
+               href="@Pages.Identity.LoginPage.Url"
+               aria-label="@Localizer["Identity.DoLogin"]"><Login /></a>
         </NotAuthorized>
     </AuthorizeView>
 
     <a class="icon-button logo"
-       href="@Pages.Settings.ChangeLanguagePage.Url">
+       href="@Pages.Settings.ChangeLanguagePage.Url"
+       aria-label="@Localizer["Navigation.ChangeLanguage"]">
         <Translate />
     </a>
     <div class="copyright">

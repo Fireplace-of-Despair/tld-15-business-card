@@ -69,6 +69,16 @@ public static class Globals
         public const string Logo = "/images/logo_touch.png";
     }
 
+    /// <summary> The origins this site loads from, beside its own. </summary>
+    public static class Origin
+    {
+        /// <summary> Where every poster of a card and every file a work hands out is served from. </summary>
+        public const string StorageHost = "storage.fireplace-of-despair.org";
+
+        /// <summary> The same host as an absolute origin, for a link element that wants one. </summary>
+        public const string Storage = "https://" + StorageHost;
+    }
+
     public static class Route
     {
         public const string Admin = "/admin";
