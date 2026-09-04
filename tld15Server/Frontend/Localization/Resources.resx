@@ -235,6 +235,9 @@
   <data name="Identity.DoLogin" xml:space="preserve">
     <value>Log In</value>
   </data>
+  <data name="Identity.DoLogout" xml:space="preserve">
+    <value>Log Out</value>
+  </data>
   <data name="Incident" xml:space="preserve">
     <value>Incident</value>
   </data>
@@ -261,6 +264,9 @@
   </data>
   <data name="Incident.TooManyAttempts" xml:space="preserve">
     <value>Too many sign-in attempts. Try again later.</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
   </data>
   <data name="Menu.Content" xml:space="preserve">
     <value>Content</value>
@@ -303,6 +309,9 @@
   </data>
   <data name="Navigation.Site" xml:space="preserve">
     <value>Site</value>
+  </data>
+  <data name="Navigation.ChangeLanguage" xml:space="preserve">
+    <value>Change language</value>
   </data>
   <data name="Navigation.Home" xml:space="preserve">
     <value>Home</value>

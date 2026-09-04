@@ -235,6 +235,9 @@
   <data name="Identity.DoLogin" xml:space="preserve">
     <value>ログイン</value>
   </data>
+  <data name="Identity.DoLogout" xml:space="preserve">
+    <value>ログアウト</value>
+  </data>
   <data name="Incident" xml:space="preserve">
     <value>インシデント</value>
   </data>
@@ -261,6 +264,9 @@
   </data>
   <data name="Incident.TooManyAttempts" xml:space="preserve">
     <value>ログイン試行が多すぎます。しばらくしてからもう一度お試しください。</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>言語</value>
   </data>
   <data name="Menu.Content" xml:space="preserve">
     <value>コンテンツ</value>
@@ -303,6 +309,9 @@
   </data>
   <data name="Navigation.Site" xml:space="preserve">
     <value>サイト</value>
+  </data>
+  <data name="Navigation.ChangeLanguage" xml:space="preserve">
+    <value>言語を変更</value>
   </data>
   <data name="Navigation.Home" xml:space="preserve">
     <value>ホーム</value>
