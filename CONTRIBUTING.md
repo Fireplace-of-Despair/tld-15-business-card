@@ -10,7 +10,7 @@
 ## Read this first
 
 TLD-15 is an internal project. It serves one organization and one site. We publish the source because
-the AGPL asks us to, and because open code is better code. We do not run this repository as a product,
+open code is better code, and because the skeleton under it is worth reading. We do not run this repository as a product,
 and we owe nobody a review.
 
 Outside help is welcome all the same. A bug report, a fix, a translation, a security note: all of these
@@ -59,20 +59,35 @@ Two rules follow from that.
 
 ## License
 
-The AGPL-3.0-only license covers this repository. [LICENSING.md](LICENSING.md) holds the details. You
+The MPL-2.0 license covers this repository. [LICENSING.md](LICENSING.md) holds the details. You
 license your contribution under the same license.
 
-Every new source file carries this header:
+Two more files carry a rule that a contributor needs.
+
+- [TRADEMARKS.md](TRADEMARKS.md) states which name, which logo and which content stay with the
+  copyright holder. Read it before you publish a fork.
+- [NOTICE](NOTICE) lists every third-party component and its license. Add your package to that list
+  when your pull request adds a dependency.
+
+Every new source file carries this header. The first three lines are Exhibit A of the MPL. A generated
+`*.Designer.cs` file carries no header, because the tool rewrites that file.
 
 ```csharp
-// SPDX-License-Identifier: AGPL-3.0-only
-// Copyright (c) 2025 Fireplace of Despair
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2025-2026 Shevtsov Stanislav (Fireplace of Despair)
 ```
 
+The header is not a formality. The MPL works on each file, and section 3.4 asks every copy to keep the
+notice. A file without the header gives a reader no way to find the license.
+
 **A pull request needs a signed Contributor License Agreement.** Read [CLA.md](CLA.md) for the text.
-One reason drives this rule. Fireplace of Despair must hold one copyright over the whole work, because
-the site mixes code under the AGPL with written content and a brand that stay with the owner. The
-agreement gives Fireplace of Despair the right to relicense your contribution. You keep your own
+Two facts drive this rule. Shevtsov Stanislav sells a commercial license for a company that cannot
+publish a change to a file of this project. The site also mixes code under the MPL with written
+content, division names and a brand that stay under normal copyright. Both need one owner for the
+copyright of the whole work. The agreement gives Shevtsov Stanislav that right. You keep your own
 copyright, and you keep the right to use your own code anywhere.
 
 You sign once. That signature covers every later pull request.

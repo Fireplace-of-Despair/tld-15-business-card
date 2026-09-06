@@ -1,0 +1,73 @@
+TLD-15
+Copyright (c) 2025-2026 Shevtsov Stanislav ("Fireplace of Despair")
+
+This program is free software. You can redistribute it and change it under the
+terms of the Mozilla Public License, version 2.0, as the Mozilla Foundation
+publishes it.
+
+This program goes out in the hope that it is useful, but WITHOUT ANY WARRANTY.
+It carries no implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. Read the Mozilla Public License for more details.
+
+The MPL works on each file. When you change a file of this project, publish
+that file. Your own new files stay under your own terms.
+
+The LICENSE file holds the full text of the license. LICENSING.md explains what
+the license permits and what it asks of you.
+
+The copyright holder also grants a commercial license. Read LICENSING.md.
+
+The name "Fireplace of Despair", the name "TLD-15", the division names, and the
+logo are trademarks of Shevtsov Stanislav. Section 2.3 of the MPL grants no
+right to these marks. The written content of the site stays under normal
+copyright. Read TRADEMARKS.md.
+
+
+THIRD-PARTY COMPONENTS
+======================
+
+This product uses the components below. Each one keeps its own license and its
+own copyright. The list names the license that the package declares. Read the
+license file inside each package for the full text.
+
+Apache License 2.0
+------------------
+  FluentMigrator.Runner.Postgres          https://github.com/fluentmigrator/fluentmigrator
+  Serilog                                 https://serilog.net/
+  Serilog.AspNetCore                      https://github.com/serilog/serilog-aspnetcore
+  Serilog.Extensions.Logging              https://github.com/serilog/serilog-extensions-logging
+  Serilog.Settings.Configuration          https://github.com/serilog/serilog-settings-configuration
+  xunit.v3.mtp-v2                         https://github.com/xunit/xunit
+
+BSD 2-Clause License
+--------------------
+  Markdig                                 https://github.com/xoofx/markdig
+
+MIT License
+-----------
+  Mediator.Abstractions                   https://github.com/martinothamar/Mediator
+  Mediator.SourceGenerator                https://github.com/martinothamar/Mediator
+  Microsoft.CodeAnalysis.CSharp           https://github.com/dotnet/roslyn
+  Microsoft.EntityFrameworkCore           https://github.com/dotnet/efcore
+  Microsoft.Extensions.*                  https://github.com/dotnet/runtime
+  Microsoft.Testing.Platform              https://github.com/microsoft/testfx
+
+PostgreSQL License
+------------------
+  Npgsql                                  https://github.com/npgsql/npgsql
+  Npgsql.EntityFrameworkCore.PostgreSQL   https://github.com/npgsql/efcore.pg
+
+Update this list when you add a package or when you remove one. This command
+prints every package that the solution uses:
+
+  dotnet list package --include-transitive
+
+
+FONTS
+=====
+
+  Park Lane NF                            tld15Server/wwwroot/fonts/park_lane_nf.woff2
+
+The font file is not a part of the MPL grant. It keeps the license that its
+author grants. Check that license before you ship a build of a fork, and
+replace the file when the license does not cover your use.

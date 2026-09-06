@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0--only-blue"/>
+  <img alt="License" src="https://img.shields.io/badge/license-MPL--2.0-blue"/>
   <img alt="Platform" src="https://img.shields.io/badge/.NET-11-512BD4"/>
   <img alt="UI" src="https://img.shields.io/badge/UI-Blazor%20Server-512BD4"/>
   <img alt="Database" src="https://img.shields.io/badge/database-PostgreSQL-336791"/>
@@ -24,8 +24,8 @@ TLD-15 is a business card. One organization runs one copy of it, and that copy i
 lore, the works, the articles, the press that mentions us, and the addresses that reach us. It tracks nobody, and asks a reader for no account.
 
 It is not a product, and it is not a general-purpose CMS. Nothing here is built for a second tenant.
-The code is open all the same, and the AGPL says what you may do with it: run it, change it, publish
-your changes. Fork it and the site becomes yours to fill.
+The code is open all the same, and the MPL says what you may do with it: run it, change it, take a
+file into your own product. Fork it and the site becomes yours to fill.
 
 | | |
 |---|---|
@@ -219,8 +219,8 @@ The server reads `tld15Server/appsettings.json`. That file is git-ignored. Copy
 | `Serilog` | Log levels and sinks. |
 
 > **When you run a modified copy for other people:** point `Application:SourceUrl` at your own fork.
-> The AGPL asks you to offer your source to every remote user, and `GET /api/public/source` reads this
-> key.
+> The MPL asks for no source from a hosted build. The site offers the address all the same, and
+> `GET /api/public/source` reads this key.
 
 > **Without `Application:Host`:** `/sitemap.xml` answers 404, and `robots.txt` carries no `Sitemap:`
 > directive. Neither one writes a relative address instead.
@@ -375,18 +375,25 @@ only when an administrator wants it. An issue, a fix or a security note is welco
 
 ## License
 
-TLD-15 is open source under the [AGPL-3.0-only](LICENSE). [LICENSING.md](LICENSING.md) holds the map and
-the details.
+TLD-15 is open source under the [MPL-2.0](LICENSE). One license covers the whole repository.
+[LICENSING.md](LICENSING.md) holds the map and the details.
 
-Run it for yourself, for your family, or for your organization, and pay nothing. When you run a modified
-copy as a network service for other people, the AGPL asks you to publish your changes. The server answers
-`GET /api/public/source` with the address of its source code, and the footer shows the same address.
+The MPL works on each file. Run the site, fork it, or put one file of this code into a closed product,
+and pay nothing. When you change a file of this project, publish that file. Your own new files stay
+under your own terms.
 
-The license covers the code. The name **Fireplace of Despair**, the division names, the brand, the logo
-and the written content of the site stay with the copyright holder. Rename your fork and replace the
-content before you publish it.
+A hosted build triggers no duty. The server still answers `GET /api/public/source` with the address of
+its source code, and the footer shows the same address, because a reader of a hosted build cannot read
+the code of that build.
 
-The AGPL does not fit every company. Fireplace of Despair owns the full copyright, so it can grant other
-terms. Write to **ChiefService@outlook.com** with the words `TLD15: license` in the subject.
+A commercial license removes the one condition above. Write to **chief@fireplace-of-despair.org**
+with the words `TLD15: license` in the subject.
 
-Copyright (c) 2025 Fireplace of Despair.
+The license covers the code. The name **Fireplace of Despair**, the division names, the logo and the
+written content of the site stay with the copyright holder. Section 2.3 of the MPL grants no right to a
+mark. Rename your fork and replace the content before you publish it. Read
+[TRADEMARKS.md](TRADEMARKS.md) for the rules.
+
+[NOTICE](NOTICE) lists every third-party component and its license.
+
+Copyright (c) 2025-2026 Shevtsov Stanislav ("Fireplace of Despair").

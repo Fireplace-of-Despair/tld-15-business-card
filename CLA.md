@@ -6,16 +6,22 @@
 
 ---
 
+## Who holds the rights
+
+**Shevtsov Stanislav** is the copyright holder of TLD-15. "Fireplace of Despair" is a trade name that
+Shevtsov Stanislav publishes under. It is not a separate company. This agreement grants rights to the
+person, not to the trade name.
+
 ## Why this agreement exists
 
-Fireplace of Despair releases TLD-15 under the AGPL-3.0-only license, and keeps two other routes open.
+Shevtsov Stanislav releases TLD-15 under the MPL-2.0 license, and keeps two other routes open.
 
-1. A company that cannot accept the AGPL asks for a separate license.
-2. The repository mixes code under the AGPL with content and a brand that stay under normal copyright.
-   Read [LICENSING.md](LICENSING.md).
+1. A company that cannot publish a change to a file of this project buys a commercial license.
+2. The repository mixes code under the MPL with written content, division names and a brand that stay
+   under normal copyright. Read [LICENSING.md](LICENSING.md) and [TRADEMARKS.md](TRADEMARKS.md).
 
-Both routes need one owner for the copyright of the whole work. This agreement gives Fireplace of
-Despair that right. You keep your own copyright, and you keep every right to your own code.
+Both routes need one owner for the copyright of the whole work. This agreement gives Shevtsov
+Stanislav that right. You keep your own copyright, and you keep every right to your own code.
 
 ## The agreement
 
@@ -25,23 +31,23 @@ person or the company that signs, and "the Project" for TLD-15.
 ### 1. Definitions
 
 A **Contribution** means any work of authorship that You send to the Project. This covers code, a
-documentation change, a test, a configuration file, and a translation. It covers a pull request, a patch
-in an issue, and a commit that another person applies for You.
+documentation change, a test, a configuration file, and a translation. It covers a pull request, a
+patch in an issue, and a commit that another person applies for You.
 
 ### 2. Copyright license
 
 You keep the copyright of Your Contribution.
 
-You grant Fireplace of Despair a perpetual, worldwide, non-exclusive, royalty-free, and irrevocable
-copyright license. This license lets Fireplace of Despair reproduce Your Contribution, prepare a
+You grant Shevtsov Stanislav a perpetual, worldwide, non-exclusive, royalty-free, and irrevocable
+copyright license. This license lets Shevtsov Stanislav reproduce Your Contribution, prepare a
 derivative work, display it, distribute it, and sublicense it.
 
-**Fireplace of Despair may release Your Contribution under any license terms.** This covers the
-AGPL-3.0-only license, a later open-source license, and a commercial license.
+**Shevtsov Stanislav may release Your Contribution under any license terms.** This covers the MPL-2.0
+license, another open-source license, and a commercial license.
 
 ### 3. Patent license
 
-You grant Fireplace of Despair and every user of the Project a perpetual, worldwide, non-exclusive,
+You grant Shevtsov Stanislav and every user of the Project a perpetual, worldwide, non-exclusive,
 royalty-free, and irrevocable patent license. The license covers every patent claim that You own or
 control, and that Your Contribution infringes alone or together with the Project.
 
@@ -68,19 +74,19 @@ Your employer may own the code that you write. Check your employment contract be
 
 ### 6. Notice of a change
 
-Tell Fireplace of Despair when a fact in this agreement stops being true. Write to the address below.
+Tell Shevtsov Stanislav when a fact in this agreement stops being true. Write to the address below.
 
 ### 7. No warranty and no obligation
 
 You provide Your Contribution "as is", with no warranty of any kind.
 
-Fireplace of Despair takes no duty to merge, to keep, or to support Your Contribution. This project
+Shevtsov Stanislav takes no duty to merge, to keep, or to support Your Contribution. This project
 serves one website, and an administrator decides what lands in it.
 
 ### 8. Nothing else changes
 
 This agreement grants a license. It does not transfer ownership. It does not make You an employee, a
-partner, or an agent of Fireplace of Despair.
+partner, or an agent of Shevtsov Stanislav.
 
 ## How to sign
 
@@ -101,4 +107,4 @@ for a new signature.
 
 ## Contact
 
-Write to **ChiefService@outlook.com** with the words `TLD15: CLA` in the subject.
+Write to **chief@fireplace-of-despair.org** with the words `TLD15: CLA` in the subject.

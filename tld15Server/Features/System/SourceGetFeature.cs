@@ -1,5 +1,8 @@
-﻿// SPDX-License-Identifier: AGPL-3.0-only
-// Copyright (c) 2025 Fireplace of Despair
+﻿// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2025-2026 Shevtsov Stanislav (Fireplace of Despair)
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +18,10 @@ namespace tld15Server.Features.System;
 /// Answers with the address of the source code that this build runs.
 /// </summary>
 /// <remarks>
-/// The AGPL-3.0-only license, section 13, asks a network service to offer its source to every remote
-/// user. A modified deployment sets Application:SourceUrl to its own fork. The version string carries
-/// the informational version, so a user can find the matching commit.
+/// The MPL-2.0 license asks for no source from a hosted build. A remote user still cannot read the
+/// code that runs, so this endpoint offers the address of it. A modified deployment sets
+/// Application:SourceUrl to its own fork. The version string carries the informational version, so
+/// a user can find the matching commit.
 /// </remarks>
 public sealed class SourceGetFeature : IFeature
 {

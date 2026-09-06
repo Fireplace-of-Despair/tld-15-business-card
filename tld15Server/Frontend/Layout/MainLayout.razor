@@ -68,7 +68,8 @@
     <div class="copyright">
         @DateTimeOffset.UtcNow.Year © @Localizer["Brand.Company"]
     </div>
-    @* AGPL-3.0-only, section 13. A remote user must reach the source of the running build. *@
+    @* The MPL asks for no source from a hosted build. A remote user still cannot read the code
+       that runs, so the footer offers the address of it. *@
     <div class="source">
         <a href="@SourceUrl" rel="noopener noreferrer" target="_blank" title="@Globals.License.Spdx">
             @Localizer["Common.SourceCode"]

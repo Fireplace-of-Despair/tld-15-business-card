@@ -5,7 +5,7 @@ Guidance for Claude Code (claude.ai/code) in this repository.
 ## What this is
 
 TLD-15 is the website of Fireplace of Despair: the lore, the projects, the articles, the press and the
-contacts. It is Blazor Server on .NET 11 preview, with PostgreSQL, Serilog and the AGPL-3.0-only
+contacts. It is Blazor Server on .NET 11 preview, with PostgreSQL, Serilog and the MPL-2.0
 license. The `Stainless*` projects are a shared skeleton, and a sibling repository uses them.
 `tld15Server` is the site.
 
@@ -242,7 +242,9 @@ inline SVG files.
 
 ## Conventions
 
-- Every `.cs` file starts with `// SPDX-License-Identifier: AGPL-3.0-only` and the copyright line.
+- Every `.cs` file starts with the five-line MPL header: Exhibit A of the MPL-2.0, then
+  `// SPDX-License-Identifier: MPL-2.0` and `// SPDX-FileCopyrightText: ...`. `LICENSING.md` holds the
+  exact block. A generated `*.Designer.cs` file carries none.
 - `ImplicitUsings` is off. Write explicit `using` directives, `System` first, outside the namespace.
 - File-scoped namespaces. CRLF and 4 spaces. A `.sh` file stays LF through `.gitattributes`.
 - `EnforceCodeStyleInBuild` is on for every project, and `.editorconfig` is the source of truth.
