@@ -6,6 +6,7 @@
 
 using System;
 using Microsoft.AspNetCore.Components;
+using tld15Server.Composition;
 using tld15Server.Frontend.Components.Icons;
 
 namespace tld15Server.Common;
@@ -66,7 +67,7 @@ public static class IconHelper
 
         // What this site hands out itself: the files a work offers for download live here and
         // nowhere else, so the host is enough to know what the button is.
-        ("storage.fireplace-of-despair.org", "pirate"),
+        (Globals.Origin.StorageHost, "pirate"),
     ];
 
     private static readonly RenderFragment _unknown = Render<Unknown>();
