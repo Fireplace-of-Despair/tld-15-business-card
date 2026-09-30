@@ -168,6 +168,16 @@ public static class Globals
         public const int MaxSnapshotsPerAccount = 20;
     }
 
+    public static class Circuit
+    {
+        /// <summary>
+        /// The largest message a circuit accepts from a browser. SignalR stops at 32 KB by default, and a
+        /// long markdown body in Japanese weighs three bytes a character, so the default drops the
+        /// circuit as soon as the editor hands the text over.
+        /// </summary>
+        public const long MaxReceiveMessageSize = 1024 * 1024;
+    }
+
     public static class Pagination
     {
         public const int PageSize = 25;

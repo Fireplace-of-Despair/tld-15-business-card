@@ -59,7 +59,8 @@ public sealed class Program
 
         builder.Services
                .AddRazorComponents()
-               .AddInteractiveServerComponents();
+               .AddInteractiveServerComponents()
+               .AddHubOptions(o => o.MaximumReceiveMessageSize = Globals.Circuit.MaxReceiveMessageSize);
 
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddLocalization();
